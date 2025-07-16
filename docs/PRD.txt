@@ -1,0 +1,460 @@
+Taskmaster BDD Fork — PRD
+
+TL;DR
+
+Fork Taskmaster to generate human-readable Gherkin BDD specs (.feature files) instead of task files, adhering to Cucumber conventions. Maintain minimal scope—no other changes—supporting Python and JavaScript engineering teams who want to organize and deliver work using BDD-first development.
+
+
+
+Goals
+
+Business Goals
+
+
+
+
+
+Facilitate BDD-first development workflows for engineering teams accustomed to Taskmaster.
+
+
+
+Ensure generated deliverables (specs) are actionable, organized, and compatible with mainstream Python and JavaScript toolchains.
+
+
+
+Reduce training and adoption friction by offering a familiar experience with only targeted changes.
+
+
+
+Retain repo cleanliness and project maintainability by using standardized Cucumber-compatible folders.
+
+User Goals
+
+
+
+
+
+Empower engineers to work directly from clear, implementation-ready Gherkin specs.
+
+
+
+Keep the file and folder structure familiar to existing Taskmaster and Cucumber users.
+
+
+
+Enable easy integration of generated specs with Python and JavaScript BDD frameworks (e.g., Behave, Cucumber.js).
+
+
+
+Ensure all output remains human-readable and simple to review or hand off.
+
+Non-Goals
+
+
+
+
+
+Do not introduce any functionality beyond replacing task output with BDD specs.
+
+
+
+Do not modify or extend Taskmaster’s workflow, logic, or integrations beyond the change in output.
+
+
+
+Do not generate any supporting boilerplate or step definitions.
+
+
+
+User Stories
+
+Persona: Software Engineer (Python/JavaScript)
+
+
+
+
+
+As an engineer, I want Taskmaster to generate .feature files from the PRD, so that I can quickly start BDD development using familiar tooling.
+
+
+
+As an engineer, I want the BDD specs to follow Cucumber/Gherkin conventions, so that importing and running them is seamless in my workflow.
+
+
+
+As an engineer, I want the generated .feature files to live in a clear and organized directory structure, so my team can easily find and update specs.
+
+
+
+As an engineer, I want only .feature files (no extra code), so my repo stays clean and minimal.
+
+
+
+As an engineer, I want human-readable outcomes, so reviewing specs with non-developers or product stakeholders is straightforward.
+
+
+
+Functional Requirements
+
+
+
+
+
+Feature File Generation (Priority: Highest)
+
+
+
+
+
+Generate a Gherkin .feature file corresponding to each required spec, mapped from PRD content.
+
+
+
+Use folder structure compliant with standard Cucumber practices:
+
+
+
+
+
+Place .feature files in /features (or configurable, but default to Cucumber style).
+
+
+
+Ensure all .feature files are valid Gherkin, readable by both Python (Behave) and JavaScript (Cucumber.js) BDD toolchains.
+
+
+
+File names should be derived from the feature title, sanitized for file system compatibility (e.g., user_login.feature).
+
+
+
+Do not output any additional files (no step definitions, readmes, templates, or config).
+
+
+
+Ignore advanced BDD/Cucumber features (tags, hooks, etc.) unless explicitly present in the PRD input.
+
+
+
+Preserve human readability in all outputs.
+
+
+
+User Experience
+
+Entry Point & First-Time User Experience
+
+
+
+
+
+Engineers fork or update Taskmaster BDD Fork in their repo/workflow, following a nearly identical invocation or integration as the original.
+
+
+
+No onboarding or tutorials are required if they have used Taskmaster; otherwise, basic instructions highlight the change: tasks to BDD specs.
+
+Core Experience
+
+
+
+
+
+Step 1: Engineer invokes the tool (CLI, API, VS Code command, etc.) with a PRD or requirements file.
+
+
+
+
+
+The tool validates input and confirms location of output folder (/features/).
+
+
+
+Step 2: Tool parses the PRD, extracting key requirements and scenarios.
+
+
+
+
+
+For each requirement, it writes a corresponding Gherkin .feature file.
+
+
+
+UI and logs present clear status: success, failure, or parse errors.
+
+
+
+Step 3: Repo structure updates to include a features/ directory with one .feature file per PRD requirement.
+
+
+
+Step 4: Engineer and team members open, read, and (if needed) edit generated .feature files in a text editor.
+
+
+
+Step 5: Engineers implement BDD test scaffolding and/or step definitions as normal using Python or JavaScript frameworks.
+
+
+
+Step 6: Clean up or re-generate specs in-line with changes to requirements/PRDs.
+
+Advanced Features & Edge Cases
+
+
+
+
+
+If an input cannot be mapped to a valid Gherkin scenario, the tool gracefully notifies the engineer and skips output rather than generating invalid specs.
+
+
+
+Output directory existence or write conflicts are surfaced with clear error messages. Existing .feature files may be overwritten, depending on config/flag.
+
+
+
+No UI changes compared to Taskmaster, outside of output contents.
+
+UI/UX Highlights
+
+
+
+
+
+Output files are always human-readable and use plain Gherkin sections: Feature:, Scenario:, Given/When/Then.
+
+
+
+Directory organization follows Cucumber conventions by default.
+
+
+
+Minimal, clear console or log messages: "Generated X feature files in /features/".
+
+
+
+Narrative
+
+The engineering team at a modern product company values clarity and alignment between product requirements and delivered code. Previously, they used Taskmaster to break PRDs into fine-grained development tasks, but as the team grew more experienced with BDD, they recognized that their true source of implementation clarity came from well-written Gherkin specs.
+
+With the Taskmaster BDD Fork, the team can now generate clear, actionable BDD specs (.feature files) directly from their product requirements, eliminating the manual step of converting tasks to scenarios. This not only saves time, but ensures that every engineer—from backend to frontend—speaks the same language as QA and product management.
+
+Now, instead of referencing disparate todo lists, the team gathers around precise, human-readable .feature files that sit right alongside their source code. Implementation, testing, and review are sharply focused, misunderstandings drop, and product delivery speeds up. The shift to BDD becomes natural: developers, testers, and stakeholders all trust the output from Taskmaster BDD—and collaboration around deliverables improves week over week.
+
+
+
+Success Metrics
+
+User-Centric Metrics
+
+
+
+
+
+Percentage of PRD requirements mapped to valid .feature files.
+
+
+
+Adoption rate: Number of projects (Python/JavaScript) using BDD Fork within 30 days.
+
+
+
+Reported ease-of-use or setup time for first use (<1 hour target).
+
+Business Metrics
+
+
+
+
+
+Reduction in manual task-to-BDD translation steps (self-reported by teams).
+
+
+
+Number of successful production releases referencing taskmaster-generated .feature specs.
+
+
+
+Feedback from engineers and product managers indicating improved clarity/handoff.
+
+Technical Metrics
+
+
+
+
+
+Validity of Gherkin in generated .feature files (parsable by Behave and Cucumber.js).
+
+
+
+Zero output errors in >99% of executions across supported platforms.
+
+
+
+Repo hygiene upheld (no extraneous files generated).
+
+Tracking Plan
+
+
+
+
+
+Monitor invocation and generation logs to ensure .feature file output.
+
+
+
+Collect (optional) user feedback post-generation.
+
+
+
+Track invalid/malformed PRD input cases and spec generation failures.
+
+
+
+Technical Considerations
+
+Technical Needs
+
+
+
+
+
+Parser logic to map PRD requirements into structured Gherkin syntax and write to .feature files.
+
+
+
+Output path management to ensure Cucumber-compatible structure (/features by default).
+
+
+
+File naming and sanitization for cross-platform compatibility.
+
+
+
+Human-readable formatting, conforming to Gherkin conventions.
+
+Integration Points
+
+
+
+
+
+No built-in integrations; output files must remain agnostic of specific BDD runners.
+
+
+
+Must generate .feature files compatible with Python (Behave, pytest-bdd) and JavaScript (Cucumber.js) ecosystems.
+
+Data Storage & Privacy
+
+
+
+
+
+All files are local to the user's repo; no external storage, network calls, or privacy implications.
+
+Scalability & Performance
+
+
+
+
+
+Expected usage is ad hoc, per PRD (tens to hundreds of specs per run). No large-scale, cloud performance required.
+
+Potential Challenges
+
+
+
+
+
+Ensuring consistent, valid Gherkin output for heterogeneous PRD formats.
+
+
+
+Handling ambiguities or unsupported PRD scenarios without generating invalid specs.
+
+
+
+Cross-OS compatibility for file and folder names.
+
+
+
+Milestones & Sequencing
+
+Project Estimate
+
+
+
+
+
+Small: 1–2 weeks
+
+Team Size & Composition
+
+
+
+
+
+Small Team: 1–2 engineers (can be completed by a single full-stack dev)
+
+Suggested Phases
+
+1. Repo Fork & Baseline Setup (1 day)
+
+
+
+
+
+Key Deliverables: Engineer forks Taskmaster, sets up dev environment and test harness.
+
+
+
+Dependencies: Access to original Taskmaster codebase.
+
+2. Replace Task Output with Gherkin BDD (.feature) Generation (3 days)
+
+
+
+
+
+Key Deliverables: Engineer updates task parsing/output logic to map PRD requirements to valid .feature files; code review.
+
+
+
+Dependencies: Knowledge of Gherkin, BDD, and Cucumber conventions.
+
+3. Python & JavaScript Compatibility Testing (2 days)
+
+
+
+
+
+Key Deliverables: Validate output against Behave and Cucumber.js runners using example PRDs.
+
+
+
+Dependencies: Sample PRD files, test environments for Python and JS.
+
+4. Documentation Update and Repo Hygiene (1 day)
+
+
+
+
+
+Key Deliverables: Revise readme, update usage instructions, and confirm no extraneous files generated.
+
+
+
+Dependencies: N/A.
+
+5. Release & Feedback Collection (Optional, 1–2 days)
+
+
+
+
+
+Key Deliverables: Beta release or internal deployment; collect feedback from initial users, address any bugs.
+
+
+
+Dependencies: User access.
+

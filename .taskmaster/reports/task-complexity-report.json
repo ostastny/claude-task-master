@@ -1,10 +1,10 @@
 {
 	"meta": {
-		"generatedAt": "2025-05-27T16:34:53.088Z",
-		"tasksAnalyzed": 1,
-		"totalTasks": 84,
-		"analysisCount": 45,
-		"thresholdScore": 5,
+		"generatedAt": "2025-07-16T12:31:18.643Z",
+		"tasksAnalyzed": 10,
+		"totalTasks": 10,
+		"analysisCount": 55,
+		"thresholdScore": 6,
 		"projectName": "Taskmaster",
 		"usedResearch": true
 	},
@@ -368,6 +368,86 @@
 			"recommendedSubtasks": 10,
 			"expansionPrompt": "Break down the implementation of the GitHub Issue Export Feature into detailed subtasks covering: command structure and CLI integration, GitHub API client development, authentication and error handling, task-to-issue mapping logic, content formatting and markdown conversion, bidirectional linking and metadata management, extensible architecture and adapter interfaces, configuration and settings management, documentation, and comprehensive testing (unit, integration, edge cases, performance).",
 			"reasoning": "This task involves designing and implementing a robust, extensible export system with deep integration into GitHub, including bidirectional workflows, complex data mapping, error handling, and support for future platforms. The requirements span CLI design, API integration, content transformation, metadata management, extensibility, configuration, and extensive testing. The breadth and depth of these requirements, along with the need for maintainability and future extensibility, place this task at a high complexity level. Breaking it into at least 10 subtasks will ensure each major component and concern is addressed systematically, reducing risk and improving quality."
+		},
+		{
+			"taskId": 105,
+			"taskTitle": "Fork Taskmaster Repository and Setup Development Environment",
+			"complexityScore": 4,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down the repository forking and environment setup into specific steps including GitHub fork creation, local clone setup, dependency installation, build system validation, and test execution verification.",
+			"reasoning": "Moderate complexity involving standard Git operations, environment configuration, and build validation. Well-defined steps but requires careful dependency management and regression testing."
+		},
+		{
+			"taskId": 106,
+			"taskTitle": "Implement PRD to Gherkin Parser Logic",
+			"complexityScore": 8,
+			"recommendedSubtasks": 7,
+			"expansionPrompt": "Create detailed subtasks for PRD content analysis, requirement extraction algorithms, Gherkin syntax mapping, scenario generation logic, edge case handling, validation rules, and parser testing framework.",
+			"reasoning": "High complexity requiring natural language processing, domain-specific syntax knowledge, and robust error handling. Core logic with multiple parsing stages and validation requirements."
+		},
+		{
+			"taskId": 107,
+			"taskTitle": "Create Feature File Generation Engine",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Break down into file template creation, Gherkin syntax formatting, file naming and sanitization, error handling implementation, output validation, and integration with parser components.",
+			"reasoning": "High complexity involving file system operations, template processing, and strict syntax adherence. Requires robust error handling and cross-platform compatibility."
+		},
+		{
+			"taskId": 108,
+			"taskTitle": "Implement Cucumber-Compatible Directory Structure",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Create subtasks for directory structure research, file system operations implementation, configuration management, and cross-platform compatibility testing.",
+			"reasoning": "Medium complexity with straightforward file system operations but requires adherence to framework conventions and cross-platform considerations."
+		},
+		{
+			"taskId": 109,
+			"taskTitle": "Replace Task Output System with BDD Feature Generation",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down into existing system analysis, output pipeline modification, integration point identification, legacy code removal, and workflow validation.",
+			"reasoning": "Medium-high complexity requiring deep understanding of existing architecture and careful replacement of core functionality without breaking the processing pipeline."
+		},
+		{
+			"taskId": 110,
+			"taskTitle": "Add Python BDD Framework Compatibility (Behave)",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Create subtasks for Behave framework integration, syntax compatibility validation, test scenario creation, pytest-bdd compatibility, and Python-specific requirements handling.",
+			"reasoning": "Medium-high complexity requiring framework-specific knowledge, integration testing, and ensuring compatibility across multiple Python BDD tools."
+		},
+		{
+			"taskId": 111,
+			"taskTitle": "Add JavaScript BDD Framework Compatibility (Cucumber.js)",
+			"complexityScore": 6,
+			"recommendedSubtasks": 5,
+			"expansionPrompt": "Break down into Cucumber.js integration, cross-platform compatibility testing, JavaScript-specific syntax validation, test runner configuration, and multi-language compatibility verification.",
+			"reasoning": "Medium-high complexity similar to Python compatibility but with additional cross-language compatibility requirements and JavaScript ecosystem considerations."
+		},
+		{
+			"taskId": 112,
+			"taskTitle": "Implement Human-Readable Output and Error Handling",
+			"complexityScore": 5,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Create subtasks for output formatting standards, comprehensive error handling implementation, logging system integration, and graceful failure mode development.",
+			"reasoning": "Medium complexity focusing on user experience and robustness. Well-defined requirements but requires careful consideration of various failure scenarios."
+		},
+		{
+			"taskId": 113,
+			"taskTitle": "Update Documentation and Usage Instructions",
+			"complexityScore": 4,
+			"recommendedSubtasks": 4,
+			"expansionPrompt": "Break down into documentation audit, content creation for new functionality, example development, and integration guide creation for supported frameworks.",
+			"reasoning": "Medium complexity with clear deliverables but requires comprehensive coverage of new functionality and clear communication of changes from original system."
+		},
+		{
+			"taskId": 114,
+			"taskTitle": "Comprehensive Testing and Quality Assurance",
+			"complexityScore": 7,
+			"recommendedSubtasks": 6,
+			"expansionPrompt": "Create subtasks for test suite development, end-to-end validation, performance benchmarking, cross-platform testing, error rate analysis, and quality metrics validation.",
+			"reasoning": "High complexity requiring comprehensive testing strategy, performance analysis, and quality validation across multiple dimensions and platforms."
 		}
 	]
 }

@@ -415,3 +415,5 @@ These commands make AI calls and may take up to a minute:
 ---
 
 _This guide ensures Claude Code has immediate access to Task Master's essential functionality for agentic development workflows._
+
+## PRD-Hash: 4f32bfd594f02d67a0417555a24d741e7a52d321fa815a0e3428697f28f20e96 (reset 2025-07-16)

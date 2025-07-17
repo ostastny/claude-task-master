@@ -1,8 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(task-master init:*)"
+      "Bash(task-master init:*)",
+      "mcp__task-master-ai__get_tasks"
     ],
     "deny": []
-  }
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "task-master-ai"
+  ]
 }

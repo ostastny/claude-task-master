@@ -13,6 +13,13 @@
 set -e  # Exit on error
 set -u  # Exit on undefined variable
 
+# Check for debug flag
+DEBUG_MODE=false
+if [[ "${1:-}" == "--debug" ]] || [[ "${1:-}" == "-d" ]]; then
+    DEBUG_MODE=true
+    echo "🐛 Debug mode enabled"
+fi
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -43,6 +50,13 @@ log_warning() {
 # Function to log error
 log_error() {
     echo -e "${RED}❌ $1${NC}"
+}
+
+# Function to log debug messages (only when debug mode is enabled)
+log_debug() {
+    if [[ "$DEBUG_MODE" == "true" ]]; then
+        echo -e "${YELLOW}🐛 Debug: $1${NC}"
+    fi
 }
 
 # Function to run headless Claude with error handling
@@ -80,6 +94,9 @@ command_exists() {
 echo "🚀 Starting Claude Code Headless Autopilot..."
 echo "Working directory: $(pwd)"
 echo "Timestamp: $(date)"
+if [[ "$DEBUG_MODE" == "false" ]]; then
+    echo "💡 Use --debug or -d flag to see detailed debug output"
+fi
 echo
 
 # 0. SELF-CHECKS (fail fast)
@@ -133,7 +150,7 @@ Handle errors gracefully and return appropriate status."
 
 BACKLOG_RESULT=$(run_claude "$BACKLOG_PROMPT" "mcp__taskmaster-ai__initialize_project mcp__taskmaster-ai__parse_prd mcp__taskmaster-ai__generate mcp__taskmaster-ai__get_tasks Bash" "true")
 
-echo "  → Debug: Backlog result: $BACKLOG_RESULT"
+log_debug "Backlog result: $BACKLOG_RESULT"
 
 # Extract task count from Claude Code response
 # Extract result field and unescape quotes, then extract task_count
@@ -146,7 +163,7 @@ if [[ -z "$TASK_COUNT" ]]; then
     TASK_COUNT="0"
 fi
 
-echo "  → Debug: Extracted task count: $TASK_COUNT"
+log_debug "Extracted task count: $TASK_COUNT"
 
 if [[ "$BACKLOG_RESULT" == *"success"* ]]; then
     log_success "Backlog created with $TASK_COUNT tasks"
@@ -254,7 +271,7 @@ while true; do
     fi
     
     # Extract task ID and details from Claude Code response
-    echo "  → Debug: Raw response first 200 chars: ${NEXT_TASK:0:200}..."
+    log_debug "Raw response first 200 chars: ${NEXT_TASK:0:200}..."
     
     # Extract result field, unescape quotes, and look for JSON (including markdown blocks)
     RESULT_FIELD=$(echo "$NEXT_TASK" | sed -n 's/.*"result":"\(.*\)","session_id".*/\1/p')
@@ -272,7 +289,7 @@ while true; do
     TASK_TITLE=$(echo "$JSON_CONTENT" | grep -o '"title": "[^"]*"' | sed 's/"title": "//' | sed 's/"//' | head -1)
     TASK_COMPLEXITY=$(echo "$JSON_CONTENT" | grep -o '"complexity": [0-9]*' | sed 's/"complexity": //' | head -1)
     
-    echo "  → Debug: Extracted - ID: '$TASK_ID', Title: '$TASK_TITLE', Complexity: '$TASK_COMPLEXITY'"
+    log_debug "Extracted - ID: '$TASK_ID', Title: '$TASK_TITLE', Complexity: '$TASK_COMPLEXITY'"
     
     if [[ -z "$TASK_ID" ]]; then
         log_error "Could not extract task ID from: $NEXT_TASK"
@@ -405,8 +422,26 @@ while true; do
         QUALITY_RETRY_COUNT=$((QUALITY_RETRY_COUNT + 1))
         log_warning "Quality check failed (attempt $QUALITY_RETRY_COUNT/$MAX_QUALITY_RETRIES). Attempting to improve code..."
         
-        # Extract the specific failure reason
-        FAILURE_REASON=$(echo "$QUALITY_RESULT" | sed -n 's/.*QUALITY_FAIL.*- \(.*\)/\1/p')
+        # Extract the specific failure reason from Claude Code response
+        log_debug "Quality result: $QUALITY_RESULT"
+        
+        # Extract result field and unescape quotes, then look for failure reason
+        RESULT_FIELD=$(echo "$QUALITY_RESULT" | sed -n 's/.*"result":"\(.*\)","session_id".*/\1/p')
+        UNESCAPED_RESULT=$(echo "$RESULT_FIELD" | sed 's/\\"/"/g')
+        
+        # Extract failure reason after QUALITY_FAIL
+        FAILURE_REASON=$(echo "$UNESCAPED_RESULT" | sed -n 's/.*QUALITY_FAIL.*- \(.*\)/\1/p')
+        
+        # If that didn't work, try to extract the whole message after QUALITY_FAIL
+        if [[ -z "$FAILURE_REASON" ]]; then
+            FAILURE_REASON=$(echo "$UNESCAPED_RESULT" | grep -o "QUALITY_FAIL.*" | sed 's/QUALITY_FAIL[^-]*- //')
+        fi
+        
+        # If still empty, use the full unescaped result
+        if [[ -z "$FAILURE_REASON" ]]; then
+            FAILURE_REASON="$UNESCAPED_RESULT"
+        fi
+        
         echo "  → Quality issue: $FAILURE_REASON"
         
         # Attempt to fix the quality issues

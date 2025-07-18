@@ -2,8 +2,8 @@
  * @fileoverview Claude Code provider factory and exports
  */
 
-import { NoSuchModelError } from '@ai-sdk/provider';
-import { ClaudeCodeLanguageModel } from './language-model.js';
+import { NoSuchModelError } from '@ai-sdk/provider'
+import { ClaudeCodeLanguageModel } from './language-model.js'
 
 /**
  * @typedef {import('./types.js').ClaudeCodeSettings} ClaudeCodeSettings
@@ -17,67 +17,67 @@ import { ClaudeCodeLanguageModel } from './language-model.js';
  * @param {ClaudeCodeProviderSettings} [options={}] - Provider configuration options
  * @returns {ClaudeCodeProvider} Claude Code provider instance
  */
-export function createClaudeCode(options = {}) {
-	/**
+export function createClaudeCode (options = {}) {
+  /**
 	 * Create a language model instance
 	 * @param {ClaudeCodeModelId} modelId - Model ID
 	 * @param {ClaudeCodeSettings} [settings={}] - Model settings
 	 * @returns {ClaudeCodeLanguageModel}
 	 */
-	const createModel = (modelId, settings = {}) => {
-		return new ClaudeCodeLanguageModel({
-			id: modelId,
-			settings: {
-				...options.defaultSettings,
-				...settings
-			}
-		});
-	};
+  const createModel = (modelId, settings = {}) => {
+    return new ClaudeCodeLanguageModel({
+      id: modelId,
+      settings: {
+        ...options.defaultSettings,
+        ...settings
+      }
+    })
+  }
 
-	/**
+  /**
 	 * Provider function
 	 * @param {ClaudeCodeModelId} modelId - Model ID
 	 * @param {ClaudeCodeSettings} [settings] - Model settings
 	 * @returns {ClaudeCodeLanguageModel}
 	 */
-	const provider = function (modelId, settings) {
-		if (new.target) {
-			throw new Error(
-				'The Claude Code model function cannot be called with the new keyword.'
-			);
-		}
+  const provider = function (modelId, settings) {
+    if (new.target) {
+      throw new Error(
+        'The Claude Code model function cannot be called with the new keyword.'
+      )
+    }
 
-		return createModel(modelId, settings);
-	};
+    return createModel(modelId, settings)
+  }
 
-	provider.languageModel = createModel;
-	provider.chat = createModel; // Alias for languageModel
+  provider.languageModel = createModel
+  provider.chat = createModel // Alias for languageModel
 
-	// Add textEmbeddingModel method that throws NoSuchModelError
-	provider.textEmbeddingModel = (modelId) => {
-		throw new NoSuchModelError({
-			modelId,
-			modelType: 'textEmbeddingModel'
-		});
-	};
+  // Add textEmbeddingModel method that throws NoSuchModelError
+  provider.textEmbeddingModel = (modelId) => {
+    throw new NoSuchModelError({
+      modelId,
+      modelType: 'textEmbeddingModel'
+    })
+  }
 
-	return /** @type {ClaudeCodeProvider} */ (provider);
+  return /** @type {ClaudeCodeProvider} */ (provider)
 }
 
 /**
  * Default Claude Code provider instance
  */
-export const claudeCode = createClaudeCode();
+export const claudeCode = createClaudeCode()
 
 // Provider exports
-export { ClaudeCodeLanguageModel } from './language-model.js';
+export { ClaudeCodeLanguageModel } from './language-model.js'
 
 // Error handling exports
 export {
-	isAuthenticationError,
-	isTimeoutError,
-	getErrorMetadata,
-	createAPICallError,
-	createAuthenticationError,
-	createTimeoutError
-} from './errors.js';
+  isAuthenticationError,
+  isTimeoutError,
+  getErrorMetadata,
+  createAPICallError,
+  createAuthenticationError,
+  createTimeoutError
+} from './errors.js'

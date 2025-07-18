@@ -2,12 +2,12 @@
  * Direct function wrapper for moveTask
  */
 
-import { moveTask } from '../../../../scripts/modules/task-manager.js';
-import { findTasksPath } from '../utils/path-utils.js';
+import { moveTask } from '../../../../scripts/modules/task-manager.js'
+import { findTasksPath } from '../utils/path-utils.js'
 import {
-	enableSilentMode,
-	disableSilentMode
-} from '../../../../scripts/modules/utils.js';
+  enableSilentMode,
+  disableSilentMode
+} from '../../../../scripts/modules/utils.js'
 
 /**
  * Move a task or subtask to a new position
@@ -21,85 +21,85 @@ import {
  * @param {Object} log - Logger object
  * @returns {Promise<{success: boolean, data?: Object, error?: Object}>}
  */
-export async function moveTaskDirect(args, log, context = {}) {
-	const { session } = context;
+export async function moveTaskDirect (args, log, context = {}) {
+  const { session } = context
 
-	// Validate required parameters
-	if (!args.sourceId) {
-		return {
-			success: false,
-			error: {
-				message: 'Source ID is required',
-				code: 'MISSING_SOURCE_ID'
-			}
-		};
-	}
+  // Validate required parameters
+  if (!args.sourceId) {
+    return {
+      success: false,
+      error: {
+        message: 'Source ID is required',
+        code: 'MISSING_SOURCE_ID'
+      }
+    }
+  }
 
-	if (!args.destinationId) {
-		return {
-			success: false,
-			error: {
-				message: 'Destination ID is required',
-				code: 'MISSING_DESTINATION_ID'
-			}
-		};
-	}
+  if (!args.destinationId) {
+    return {
+      success: false,
+      error: {
+        message: 'Destination ID is required',
+        code: 'MISSING_DESTINATION_ID'
+      }
+    }
+  }
 
-	try {
-		// Find tasks.json path if not provided
-		let tasksPath = args.tasksJsonPath || args.file;
-		if (!tasksPath) {
-			if (!args.projectRoot) {
-				return {
-					success: false,
-					error: {
-						message:
+  try {
+    // Find tasks.json path if not provided
+    let tasksPath = args.tasksJsonPath || args.file
+    if (!tasksPath) {
+      if (!args.projectRoot) {
+        return {
+          success: false,
+          error: {
+            message:
 							'Project root is required if tasksJsonPath is not provided',
-						code: 'MISSING_PROJECT_ROOT'
-					}
-				};
-			}
-			tasksPath = findTasksPath(args, log);
-		}
+            code: 'MISSING_PROJECT_ROOT'
+          }
+        }
+      }
+      tasksPath = findTasksPath(args, log)
+    }
 
-		// Enable silent mode to prevent console output during MCP operation
-		enableSilentMode();
+    // Enable silent mode to prevent console output during MCP operation
+    enableSilentMode()
 
-		// Call the core moveTask function with file generation control
-		const generateFiles = args.generateFiles !== false; // Default to true
-		const result = await moveTask(
-			tasksPath,
-			args.sourceId,
-			args.destinationId,
-			generateFiles,
-			{
-				projectRoot: args.projectRoot,
-				tag: args.tag
-			}
-		);
+    // Call the core moveTask function with file generation control
+    const generateFiles = args.generateFiles !== false // Default to true
+    const result = await moveTask(
+      tasksPath,
+      args.sourceId,
+      args.destinationId,
+      generateFiles,
+      {
+        projectRoot: args.projectRoot,
+        tag: args.tag
+      }
+    )
 
-		// Restore console output
-		disableSilentMode();
+    // Restore console output
+    disableSilentMode()
 
-		return {
-			success: true,
-			data: {
-				...result,
-				message: `Successfully moved task/subtask ${args.sourceId} to ${args.destinationId}`
-			}
-		};
-	} catch (error) {
-		// Restore console output in case of error
-		disableSilentMode();
+    return {
+      success: true,
+      data: {
+        ...result,
+        message: `Successfully moved task/subtask ${args.sourceId} to ${args.destinationId}`
+      }
+    }
+  } catch (error) {
+    // Restore console output in case of error
+    disableSilentMode()
 
-		log.error(`Failed to move task: ${error.message}`);
+    log.error(`Failed to move task: ${error.message}`)
 
-		return {
-			success: false,
-			error: {
-				message: error.message,
-				code: 'MOVE_TASK_ERROR'
-			}
-		};
-	}
+    return {
+      success: false,
+      error: {
+        message: error.message,
+        code: 'MOVE_TASK_ERROR'
+      }
+    }
+  }
 }

@@ -59,6 +59,36 @@ log_debug() {
     fi
 }
 
+# Function to extract JSON from Claude Code response
+extract_json_from_response() {
+    local response="$1"
+    local result_field=$(echo "$response" | sed -n 's/.*"result":"\(.*\)","session_id".*/\1/p')
+    local unescaped_result=$(echo "$result_field" | sed 's/\\"/"/g')
+    
+    # Handle markdown code blocks
+    if [[ "$unescaped_result" == *'```json'* ]]; then
+        echo "$unescaped_result" | sed -n '/```json/,/```/p' | sed '1d;$d'
+    else
+        echo "$unescaped_result"
+    fi
+}
+
+# Function to debug and fix failing tests
+debug_and_fix_tests() {
+    local task_id="$1"
+    local context="$2"
+    
+    DEBUG_PROMPT="Debug and fix failing tests $context for task $task_id:
+1. Run the tests and analyze the specific failure messages
+2. Identify exactly what's wrong with the current implementation
+3. Make targeted fixes to address the test failures
+4. Run tests again to verify fixes
+5. Return 'TESTS_NOW_PASSING' if fixed, 'STILL_FAILING' if not, with specific error details"
+    
+    DEBUG_RESULT=$(run_claude "$DEBUG_PROMPT" "Edit Write Bash Read" "false")
+    echo "$DEBUG_RESULT"
+}
+
 # Function to run headless Claude with error handling
 run_claude() {
     local prompt="$1"
@@ -145,7 +175,7 @@ BACKLOG_PROMPT="Initialize Task Master project if needed and create backlog:
    - Parse PRD using mcp__taskmaster-ai__parse_prd with projectRoot='$(pwd)'
    - Generate task files using mcp__taskmaster-ai__generate with projectRoot='$(pwd)'
    - Get final task count using mcp__taskmaster-ai__get_tasks with projectRoot='$(pwd)'
-   - Return: {\"status\": \"success\", \"task_count\": N}
+- Return: {\"status\": \"success\", \"task_count\": N}
 Handle errors gracefully and return appropriate status."
 
 BACKLOG_RESULT=$(run_claude "$BACKLOG_PROMPT" "mcp__taskmaster-ai__initialize_project mcp__taskmaster-ai__parse_prd mcp__taskmaster-ai__generate mcp__taskmaster-ai__get_tasks Bash" "true")
@@ -153,15 +183,9 @@ BACKLOG_RESULT=$(run_claude "$BACKLOG_PROMPT" "mcp__taskmaster-ai__initialize_pr
 log_debug "Backlog result: $BACKLOG_RESULT"
 
 # Extract task count from Claude Code response
-# Extract result field and unescape quotes, then extract task_count
-RESULT_FIELD=$(echo "$BACKLOG_RESULT" | sed -n 's/.*"result":"\(.*\)","session_id".*/\1/p')
-UNESCAPED_RESULT=$(echo "$RESULT_FIELD" | sed 's/\\"/"/g')
-TASK_COUNT=$(echo "$UNESCAPED_RESULT" | grep -o '"task_count": [0-9]*' | grep -o '[0-9]*' | head -1)
-
-# Default to 0 if empty
-if [[ -z "$TASK_COUNT" ]]; then
-    TASK_COUNT="0"
-fi
+JSON_CONTENT=$(extract_json_from_response "$BACKLOG_RESULT")
+TASK_COUNT=$(echo "$JSON_CONTENT" | grep -o '"task_count": [0-9]*' | grep -o '[0-9]*' | head -1)
+TASK_COUNT=${TASK_COUNT:-0}
 
 log_debug "Extracted task count: $TASK_COUNT"
 
@@ -273,18 +297,7 @@ while true; do
     # Extract task ID and details from Claude Code response
     log_debug "Raw response first 200 chars: ${NEXT_TASK:0:200}..."
     
-    # Extract result field, unescape quotes, and look for JSON (including markdown blocks)
-    RESULT_FIELD=$(echo "$NEXT_TASK" | sed -n 's/.*"result":"\(.*\)","session_id".*/\1/p')
-    UNESCAPED_RESULT=$(echo "$RESULT_FIELD" | sed 's/\\"/"/g')
-    
-    # Try to extract from JSON block first (if it exists), otherwise from direct JSON
-    if [[ "$UNESCAPED_RESULT" == *'```json'* ]]; then
-        JSON_CONTENT=$(echo "$UNESCAPED_RESULT" | sed -n '/```json/,/```/p' | sed '1d;$d')
-    else
-        JSON_CONTENT="$UNESCAPED_RESULT"
-    fi
-    
-    # Extract task details
+    JSON_CONTENT=$(extract_json_from_response "$NEXT_TASK")
     TASK_ID=$(echo "$JSON_CONTENT" | grep -o '"task_id": "[^"]*"' | sed 's/"task_id": "//' | sed 's/"//' | head -1)
     TASK_TITLE=$(echo "$JSON_CONTENT" | grep -o '"title": "[^"]*"' | sed 's/"title": "//' | sed 's/"//' | head -1)
     TASK_COMPLEXITY=$(echo "$JSON_CONTENT" | grep -o '"complexity": [0-9]*' | sed 's/"complexity": //' | head -1)
@@ -354,14 +367,7 @@ while true; do
         IMPLEMENTATION_RETRY_COUNT=$((IMPLEMENTATION_RETRY_COUNT + 1))
         log_warning "Tests still failing (attempt $IMPLEMENTATION_RETRY_COUNT/$MAX_IMPLEMENTATION_RETRIES). Debugging and fixing..."
         
-        DEBUG_PROMPT="Debug and fix failing tests for task $TASK_ID:
-1. Run the tests and analyze the specific failure messages
-2. Identify exactly what's wrong with the current implementation
-3. Make targeted fixes to address the test failures
-4. Run tests again to verify fixes
-5. Return 'TESTS_NOW_PASSING' if fixed, 'STILL_FAILING' if not, with specific error details"
-        
-        DEBUG_RESULT=$(run_claude "$DEBUG_PROMPT" "Edit Write Bash Read" "false")
+        DEBUG_RESULT=$(debug_and_fix_tests "$TASK_ID" "during implementation")
         
         if [[ "$DEBUG_RESULT" == *"TESTS_NOW_PASSING"* ]]; then
             log_success "Tests are now passing after debugging"
@@ -425,22 +431,9 @@ while true; do
         # Extract the specific failure reason from Claude Code response
         log_debug "Quality result: $QUALITY_RESULT"
         
-        # Extract result field and unescape quotes, then look for failure reason
-        RESULT_FIELD=$(echo "$QUALITY_RESULT" | sed -n 's/.*"result":"\(.*\)","session_id".*/\1/p')
-        UNESCAPED_RESULT=$(echo "$RESULT_FIELD" | sed 's/\\"/"/g')
-        
-        # Extract failure reason after QUALITY_FAIL
-        FAILURE_REASON=$(echo "$UNESCAPED_RESULT" | sed -n 's/.*QUALITY_FAIL.*- \(.*\)/\1/p')
-        
-        # If that didn't work, try to extract the whole message after QUALITY_FAIL
-        if [[ -z "$FAILURE_REASON" ]]; then
-            FAILURE_REASON=$(echo "$UNESCAPED_RESULT" | grep -o "QUALITY_FAIL.*" | sed 's/QUALITY_FAIL[^-]*- //')
-        fi
-        
-        # If still empty, use the full unescaped result
-        if [[ -z "$FAILURE_REASON" ]]; then
-            FAILURE_REASON="$UNESCAPED_RESULT"
-        fi
+        JSON_CONTENT=$(extract_json_from_response "$QUALITY_RESULT")
+        FAILURE_REASON=$(echo "$JSON_CONTENT" | sed -n 's/.*QUALITY_FAIL.*- \(.*\)/\1/p')
+        FAILURE_REASON=${FAILURE_REASON:-$JSON_CONTENT}
         
         echo "  → Quality issue: $FAILURE_REASON"
         
@@ -459,7 +452,29 @@ Steps to fix:
         QUALITY_FIX_RESULT=$(run_claude "$QUALITY_FIX_PROMPT" "Edit Write Bash Read" "false")
         
         if [[ "$QUALITY_FIX_RESULT" == *"QUALITY_IMPROVED"* ]]; then
-            log_success "Code quality improved. Re-running quality checks..."
+            log_success "Code quality improved. Re-running tests to ensure they still pass..."
+            
+            # Step 4.1.4 Redux: Re-run tests after quality improvements
+            TEST_RERUN_PROMPT="Re-run tests after quality improvements for task $TASK_ID:
+1. Run the full test suite to ensure all tests still pass
+2. If tests fail due to quality improvements (e.g., new test coverage), debug and fix
+3. Continue until all tests pass again
+4. Return 'TESTS_PASSING' if all tests pass, 'TESTS_FAILING' if issues remain"
+            
+            TEST_RERUN_RESULT=$(run_claude "$TEST_RERUN_PROMPT" "Edit Write Bash Read" "false")
+            
+            if [[ "$TEST_RERUN_RESULT" == *"TESTS_FAILING"* ]]; then
+                log_warning "Tests are failing after quality improvements. Attempting to fix..."
+                
+                DEBUG_RESULT=$(debug_and_fix_tests "$TASK_ID" "after quality improvements")
+                
+                if [[ "$DEBUG_RESULT" != *"TESTS_NOW_PASSING"* ]]; then
+                    log_error "Tests still failing after quality improvement and debug attempt"
+                    break
+                fi
+            fi
+            
+            log_success "Tests confirmed passing after quality improvements. Re-running quality checks..."
             
             # Re-run quality checks
             QUALITY_RESULT=$(run_claude "$QUALITY_PROMPT" "Bash" "false")

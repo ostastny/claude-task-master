@@ -227,7 +227,7 @@
         "dependencies": [
           107
         ],
-        "status": "in-progress",
+        "status": "done",
         "subtasks": [
           {
             "id": 1,
@@ -235,7 +235,7 @@
             "description": "Create a robust path handling system that works across Windows, macOS, and Linux environments",
             "dependencies": [],
             "details": "Develop path utilities that handle forward/backward slashes, drive letters, and path separators consistently across platforms. Include path validation, normalization, and resolution functions. Handle edge cases like relative paths, symlinks, and network paths. Use appropriate OS-specific path libraries and ensure consistent behavior.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -246,7 +246,7 @@
               1
             ],
             "details": "Create functions to safely create directories with appropriate permissions. Handle nested directory creation recursively. Implement proper error handling for permission issues, disk space limitations, and invalid directory names. Include validation for directory naming conventions and character restrictions.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -257,7 +257,7 @@
               2
             ],
             "details": "Create conflict detection for existing files and directories. Implement options for overwrite, skip, or rename strategies. Provide clear error messages and user prompts for conflict resolution. Include backup mechanisms for overwritten files and rollback capabilities for failed operations.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -266,7 +266,7 @@
             "description": "Create a flexible configuration system for directory structure and output paths",
             "dependencies": [],
             "details": "Implement configuration loading from files, environment variables, and command-line arguments. Support customizable output directory paths while maintaining Cucumber convention defaults. Include validation for configuration values and provide sensible fallbacks. Support both global and project-specific configuration files.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -280,7 +280,7 @@
               4
             ],
             "details": "Develop test suites that validate directory operations on Windows, macOS, and Linux. Include tests for path handling, permission scenarios, and filesystem edge cases. Create automated testing pipelines for different OS environments. Test file naming restrictions, case sensitivity, and character encoding issues across platforms.",
-            "status": "pending",
+            "status": "done",
             "testStrategy": ""
           }
         ]
@@ -295,7 +295,7 @@
         "dependencies": [
           108
         ],
-        "status": "pending",
+        "status": "in-progress",
         "subtasks": [
           {
             "id": 1,
@@ -303,7 +303,7 @@
             "description": "Modify the core task generation pipeline to route to BDD feature generation instead of task file generation",
             "dependencies": [],
             "details": "Update the main task generation entry points to bypass task file generation entirely and route directly to the BDD feature generation engine. This includes updating the parse-prd command, task expansion logic, and any other core workflows that currently generate task files. Ensure the pipeline maintains the same input processing logic but completely changes the output destination.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": ""
           },
           {
@@ -630,7 +630,7 @@
     ],
     "metadata": {
       "created": "2025-06-13T23:52:56.848Z",
-      "updated": "2025-07-17T17:07:19.793Z",
+      "updated": "2025-07-18T05:49:12.963Z",
       "description": "Tasks for master context"
     }
   },

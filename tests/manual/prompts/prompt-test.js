@@ -13,282 +13,282 @@
  *   node prompt-test.js --help       # Show help
  */
 
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import readline from 'readline';
-
-// Get project root and import prompt manager
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const projectRoot = path.resolve(__dirname, '../../..');
+import fs from 'fs'
+import path from 'path'
+import { fileURLToPath } from 'url'
+import readline from 'readline'
 
 // Import prompt manager
-import { getPromptManager } from '../../../scripts/modules/prompt-manager.js';
-const promptManager = getPromptManager();
+import { getPromptManager } from '../../../scripts/modules/prompt-manager.js'
+
+// Get project root and import prompt manager
+const __filename = fileURLToPath(import.meta.url)
+const __dirname = path.dirname(__filename)
+const projectRoot = path.resolve(__dirname, '../../..')
+const promptManager = getPromptManager()
 
 // ANSI color codes for better output formatting
 const colors = {
-	reset: '\x1b[0m',
-	bright: '\x1b[1m',
-	red: '\x1b[31m',
-	green: '\x1b[32m',
-	yellow: '\x1b[33m',
-	blue: '\x1b[34m',
-	magenta: '\x1b[35m',
-	cyan: '\x1b[36m'
-};
+  reset: '\x1b[0m',
+  bright: '\x1b[1m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  magenta: '\x1b[35m',
+  cyan: '\x1b[36m'
+}
 
 // Test data for all prompt templates
 const sampleData = {
-	'add-task': {
-		scenarios: [
-			{
-				name: 'Basic Task Creation',
-				params: {
-					prompt: 'Implement user authentication with JWT tokens',
-					newTaskId: 15,
-					existingTasks: [
-						{ id: 1, title: 'Setup Express Server', status: 'done' },
-						{ id: 2, title: 'Setup Database Connection', status: 'done' },
-						{ id: 14, title: 'Create User Model', status: 'pending' }
-					],
-					gatheredContext:
+  'add-task': {
+    scenarios: [
+      {
+        name: 'Basic Task Creation',
+        params: {
+          prompt: 'Implement user authentication with JWT tokens',
+          newTaskId: 15,
+          existingTasks: [
+            { id: 1, title: 'Setup Express Server', status: 'done' },
+            { id: 2, title: 'Setup Database Connection', status: 'done' },
+            { id: 14, title: 'Create User Model', status: 'pending' }
+          ],
+          gatheredContext:
 						'Project uses Express.js, MongoDB, and has existing user registration functionality.',
-					contextFromArgs:
+          contextFromArgs:
 						'Use bcrypt for password hashing and jsonwebtoken library.',
-					priority: 'high',
-					dependencies: [1, 2],
-					useResearch: false
-				},
-				variants: ['default']
-			},
-			{
-				name: 'Research-Enhanced Task Creation',
-				params: {
-					prompt: 'Implement real-time chat feature with WebSockets',
-					newTaskId: 20,
-					existingTasks: [
-						{ id: 1, title: 'Setup Express Server', status: 'done' },
-						{ id: 18, title: 'User Authentication', status: 'done' }
-					],
-					gatheredContext: 'Node.js project with Socket.io already installed.',
-					priority: 'medium',
-					dependencies: [18],
-					useResearch: true
-				},
-				variants: ['research']
-			}
-		]
-	},
-	'expand-task': {
-		scenarios: [
-			{
-				name: 'Basic Task Expansion',
-				params: {
-					task: {
-						id: 8,
-						title: 'Implement User Dashboard',
-						description: 'Create a comprehensive user dashboard with analytics',
-						details:
+          priority: 'high',
+          dependencies: [1, 2],
+          useResearch: false
+        },
+        variants: ['default']
+      },
+      {
+        name: 'Research-Enhanced Task Creation',
+        params: {
+          prompt: 'Implement real-time chat feature with WebSockets',
+          newTaskId: 20,
+          existingTasks: [
+            { id: 1, title: 'Setup Express Server', status: 'done' },
+            { id: 18, title: 'User Authentication', status: 'done' }
+          ],
+          gatheredContext: 'Node.js project with Socket.io already installed.',
+          priority: 'medium',
+          dependencies: [18],
+          useResearch: true
+        },
+        variants: ['research']
+      }
+    ]
+  },
+  'expand-task': {
+    scenarios: [
+      {
+        name: 'Basic Task Expansion',
+        params: {
+          task: {
+            id: 8,
+            title: 'Implement User Dashboard',
+            description: 'Create a comprehensive user dashboard with analytics',
+            details:
 							'Dashboard should include user profile, activity history, and statistics.'
-					},
-					subtaskCount: 4,
-					nextSubtaskId: 1,
-					additionalContext:
+          },
+          subtaskCount: 4,
+          nextSubtaskId: 1,
+          additionalContext:
 						'Use React components and Chart.js for visualizations.',
-					complexityReasoningContext: '',
-					gatheredContext:
+          complexityReasoningContext: '',
+          gatheredContext:
 						'React application with existing user authentication and data models for user activities and preferences.',
-					useResearch: false
-				},
-				variants: ['default']
-			},
-			{
-				name: 'Research-Enhanced Expansion',
-				params: {
-					task: {
-						id: 12,
-						title: 'Implement Microservices Architecture',
-						description: 'Refactor monolith to microservices',
-						details:
+          useResearch: false
+        },
+        variants: ['default']
+      },
+      {
+        name: 'Research-Enhanced Expansion',
+        params: {
+          task: {
+            id: 12,
+            title: 'Implement Microservices Architecture',
+            description: 'Refactor monolith to microservices',
+            details:
 							'Break down existing application into independently deployable services.'
-					},
-					subtaskCount: 6,
-					nextSubtaskId: 1,
-					additionalContext:
+          },
+          subtaskCount: 6,
+          nextSubtaskId: 1,
+          additionalContext:
 						'Current tech stack: Node.js, PostgreSQL, Redis. Consider Docker and Kubernetes.',
-					complexityReasoningContext:
+          complexityReasoningContext:
 						'\nComplexity Analysis Reasoning: This task involves significant architectural changes requiring careful planning, service decomposition, data migration, and deployment orchestration.',
-					gatheredContext:
+          gatheredContext:
 						'Monolithic Express.js application with tightly coupled modules, shared database, and existing API contracts that need to be maintained during migration.',
-					useResearch: true
-				},
-				variants: ['research']
-			},
-			{
-				name: 'Complexity Report Driven',
-				params: {
-					task: {
-						id: 15,
-						title: 'Advanced Search Implementation',
-						description: 'Implement full-text search with filters and sorting',
-						details:
+          useResearch: true
+        },
+        variants: ['research']
+      },
+      {
+        name: 'Complexity Report Driven',
+        params: {
+          task: {
+            id: 15,
+            title: 'Advanced Search Implementation',
+            description: 'Implement full-text search with filters and sorting',
+            details:
 							'Search should include autocomplete, faceted search, and relevance scoring.'
-					},
-					subtaskCount: 5,
-					nextSubtaskId: 1,
-					additionalContext:
+          },
+          subtaskCount: 5,
+          nextSubtaskId: 1,
+          additionalContext:
 						'Existing data is in PostgreSQL. Consider Elasticsearch integration.',
-					complexityReasoningContext:
+          complexityReasoningContext:
 						'\nComplexity Analysis Reasoning: High complexity due to search infrastructure requirements, indexing strategy design, query optimization needs, and performance considerations.',
-					gatheredContext:
+          gatheredContext:
 						'E-commerce application with product catalog, user reviews, and inventory data stored in PostgreSQL. Current simple search using LIKE queries is insufficient for growing data volume.',
-					useResearch: false,
-					expansionPrompt:
+          useResearch: false,
+          expansionPrompt:
 						'Break down this complex search implementation focusing on: 1) Search infrastructure setup, 2) Indexing strategy, 3) Query optimization, 4) User interface components, 5) Performance testing and monitoring.'
-				},
-				variants: ['complexity-report']
-			}
-		]
-	},
-	'analyze-complexity': {
-		scenarios: [
-			{
-				name: 'Standard Complexity Analysis',
-				params: {
-					tasks: [
-						{
-							id: 5,
-							title: 'Implement Payment Processing',
-							description:
+        },
+        variants: ['complexity-report']
+      }
+    ]
+  },
+  'analyze-complexity': {
+    scenarios: [
+      {
+        name: 'Standard Complexity Analysis',
+        params: {
+          tasks: [
+            {
+              id: 5,
+              title: 'Implement Payment Processing',
+              description:
 								'Integrate Stripe payments with error handling and webhooks',
-							details:
+              details:
 								'Need to handle multiple payment methods, subscription billing, and compliance.'
-						},
-						{
-							id: 6,
-							title: 'Add CSS Styling',
-							description: 'Style the login form',
-							details: 'Basic styling with CSS.'
-						},
-						{
-							id: 7,
-							title: 'Setup CI/CD Pipeline',
-							description: 'Configure automated testing and deployment',
-							details: 'Multi-environment deployment with Docker and AWS.'
-						}
-					],
-					gatheredContext:
+            },
+            {
+              id: 6,
+              title: 'Add CSS Styling',
+              description: 'Style the login form',
+              details: 'Basic styling with CSS.'
+            },
+            {
+              id: 7,
+              title: 'Setup CI/CD Pipeline',
+              description: 'Configure automated testing and deployment',
+              details: 'Multi-environment deployment with Docker and AWS.'
+            }
+          ],
+          gatheredContext:
 						'E-commerce project using Node.js, React, and AWS infrastructure.',
-					threshold: 6,
-					useResearch: false
-				},
-				variants: ['default']
-			},
-			{
-				name: 'Research-Enhanced Complexity Analysis',
-				params: {
-					tasks: [
-						{
-							id: 10,
-							title: 'Implement Microservices Architecture',
-							description:
+          threshold: 6,
+          useResearch: false
+        },
+        variants: ['default']
+      },
+      {
+        name: 'Research-Enhanced Complexity Analysis',
+        params: {
+          tasks: [
+            {
+              id: 10,
+              title: 'Implement Microservices Architecture',
+              description:
 								'Refactor monolith to microservices using latest patterns',
-							details:
+              details:
 								'Break down existing application into independently deployable services following current industry standards.'
-						},
-						{
-							id: 11,
-							title: 'AI-Powered Search Integration',
-							description: 'Implement semantic search with AI/ML capabilities',
-							details:
+            },
+            {
+              id: 11,
+              title: 'AI-Powered Search Integration',
+              description: 'Implement semantic search with AI/ML capabilities',
+              details:
 								'Modern search implementation using vector databases and LLM integration.'
-						}
-					],
-					gatheredContext:
+            }
+          ],
+          gatheredContext:
 						'Modern web application requiring scalable architecture and AI integration.',
-					threshold: 7,
-					useResearch: true,
-					testName: 'research'
-				},
-				variants: ['research']
-			}
-		]
-	},
-	research: {
-		scenarios: [
-			{
-				name: 'Default Research Query',
-				params: {
-					query:
+          threshold: 7,
+          useResearch: true,
+          testName: 'research'
+        },
+        variants: ['research']
+      }
+    ]
+  },
+  research: {
+    scenarios: [
+      {
+        name: 'Default Research Query',
+        params: {
+          query:
 						'What are the latest trends in full-stack JavaScript development?',
-					gatheredContext:
+          gatheredContext:
 						'MERN stack application with microservices architecture. Looking to modernize tech stack.',
-					detailLevel: 'medium',
-					projectInfo: {
-						root: '/project',
-						taskCount: 25,
-						fileCount: 80
-					}
-				},
-				variants: ['default']
-			},
-			{
-				name: 'Low Detail Research',
-				params: {
-					query:
+          detailLevel: 'medium',
+          projectInfo: {
+            root: '/project',
+            taskCount: 25,
+            fileCount: 80
+          }
+        },
+        variants: ['default']
+      },
+      {
+        name: 'Low Detail Research',
+        params: {
+          query:
 						'What are the best practices for implementing JWT authentication in Node.js?',
-					gatheredContext:
+          gatheredContext:
 						'Express.js application with existing user registration. Using bcrypt for passwords.',
-					detailLevel: 'low',
-					projectInfo: {
-						root: '/project',
-						taskCount: 15,
-						fileCount: 45
-					}
-				},
-				variants: ['low']
-			},
-			{
-				name: 'Medium Detail Research',
-				params: {
-					query:
+          detailLevel: 'low',
+          projectInfo: {
+            root: '/project',
+            taskCount: 15,
+            fileCount: 45
+          }
+        },
+        variants: ['low']
+      },
+      {
+        name: 'Medium Detail Research',
+        params: {
+          query:
 						'How to implement real-time notifications in a React application?',
-					gatheredContext:
+          gatheredContext:
 						'React frontend with Redux state management. Backend uses Socket.io and Redis.',
-					detailLevel: 'medium',
-					projectInfo: {
-						root: '/project',
-						taskCount: 20,
-						fileCount: 67
-					}
-				},
-				variants: ['medium']
-			},
-			{
-				name: 'High Detail Research',
-				params: {
-					query: 'Best architecture patterns for microservices with Node.js?',
-					gatheredContext:
+          detailLevel: 'medium',
+          projectInfo: {
+            root: '/project',
+            taskCount: 20,
+            fileCount: 67
+          }
+        },
+        variants: ['medium']
+      },
+      {
+        name: 'High Detail Research',
+        params: {
+          query: 'Best architecture patterns for microservices with Node.js?',
+          gatheredContext:
 						'Monolithic Express application being refactored. Uses PostgreSQL, Redis, and AWS infrastructure.',
-					detailLevel: 'high',
-					projectInfo: {
-						root: '/project',
-						taskCount: 35,
-						fileCount: 120
-					}
-				},
-				variants: ['high']
-			}
-		]
-	},
-	'parse-prd': {
-		scenarios: [
-			{
-				name: 'Standard PRD Parsing',
-				params: {
-					prdContent: `# Social Media Dashboard
+          detailLevel: 'high',
+          projectInfo: {
+            root: '/project',
+            taskCount: 35,
+            fileCount: 120
+          }
+        },
+        variants: ['high']
+      }
+    ]
+  },
+  'parse-prd': {
+    scenarios: [
+      {
+        name: 'Standard PRD Parsing',
+        params: {
+          prdContent: `# Social Media Dashboard
 
 ## Overview
 Create a comprehensive social media management dashboard that allows users to manage multiple social platforms from a single interface.
@@ -311,18 +311,18 @@ Create a comprehensive social media management dashboard that allows users to ma
 - Support for 3 social platforms
 - Handle 10,000+ scheduled posts
 - 99.9% uptime requirement`,
-					numTasks: 8,
-					nextId: 1,
-					prdPath: 'social-media-dashboard-prd.txt',
-					defaultTaskPriority: 'medium',
-					research: false
-				},
-				variants: ['default']
-			},
-			{
-				name: 'Research-Enhanced PRD Parsing',
-				params: {
-					prdContent: `# AI-Powered E-commerce Platform
+          numTasks: 8,
+          nextId: 1,
+          prdPath: 'social-media-dashboard-prd.txt',
+          defaultTaskPriority: 'medium',
+          research: false
+        },
+        variants: ['default']
+      },
+      {
+        name: 'Research-Enhanced PRD Parsing',
+        params: {
+          prdContent: `# AI-Powered E-commerce Platform
 
 ## Overview
 Build a next-generation e-commerce platform with AI-driven recommendations, voice search, and predictive analytics.
@@ -346,998 +346,998 @@ Build a next-generation e-commerce platform with AI-driven recommendations, voic
 - Support for 1M+ concurrent users
 - 99.99% uptime SLA
 - Global CDN distribution`,
-					numTasks: 10,
-					nextId: 1,
-					prdPath: 'ai-ecommerce-prd.txt',
-					defaultTaskPriority: 'high',
-					research: true
-				},
-				variants: ['research']
-			}
-		]
-	},
-	'update-subtask': {
-		scenarios: [
-			{
-				name: 'Implementation Progress Update',
-				params: {
-					parentTask: {
-						id: 8,
-						title: 'Implement User Authentication',
-						description: 'Build complete authentication system with JWT',
-						status: 'in-progress'
-					},
-					currentDetails:
+          numTasks: 10,
+          nextId: 1,
+          prdPath: 'ai-ecommerce-prd.txt',
+          defaultTaskPriority: 'high',
+          research: true
+        },
+        variants: ['research']
+      }
+    ]
+  },
+  'update-subtask': {
+    scenarios: [
+      {
+        name: 'Implementation Progress Update',
+        params: {
+          parentTask: {
+            id: 8,
+            title: 'Implement User Authentication',
+            description: 'Build complete authentication system with JWT',
+            status: 'in-progress'
+          },
+          currentDetails:
 						'Implement JWT authentication middleware with token validation and refresh capabilities.',
-					updatePrompt:
+          updatePrompt:
 						'Made significant progress on the authentication middleware. Successfully implemented JWT token validation and user session management. Encountered issue with token refresh mechanism - tokens were expiring too quickly. Modified the refresh logic to use sliding expiration. All tests are now passing.',
-					useResearch: false,
-					gatheredContext:
+          useResearch: false,
+          gatheredContext:
 						'Project uses Express.js and MongoDB for user data storage.'
-				},
-				variants: ['default']
-			},
-			{
-				name: 'Research-Enhanced Update',
-				params: {
-					parentTask: {
-						id: 12,
-						title: 'Implement OAuth Integration',
-						description: 'Add OAuth 2.0 support for third-party login',
-						status: 'in-progress'
-					},
-					currentDetails:
+        },
+        variants: ['default']
+      },
+      {
+        name: 'Research-Enhanced Update',
+        params: {
+          parentTask: {
+            id: 12,
+            title: 'Implement OAuth Integration',
+            description: 'Add OAuth 2.0 support for third-party login',
+            status: 'in-progress'
+          },
+          currentDetails:
 						'Implement OAuth 2.0 authentication flow with proper security measures.',
-					updatePrompt:
+          updatePrompt:
 						'Researched latest OAuth 2.0 security best practices. Found vulnerability in current implementation regarding PKCE. Need to implement state parameter validation and secure code exchange. Updated implementation to follow RFC 7636 recommendations.',
-					useResearch: true,
-					gatheredContext:
+          useResearch: true,
+          gatheredContext:
 						'Security is critical for this project. Need to follow industry standards.'
-				},
-				variants: ['research']
-			}
-		]
-	},
-	'update-task': {
-		scenarios: [
-			{
-				name: 'Task Details Update',
-				params: {
-					task: {
-						id: 10,
-						title: 'Implement Payment Processing',
-						description: 'Integrate Stripe payment processing',
-						details: 'Basic Stripe integration with credit card processing.',
-						status: 'pending'
-					},
-					taskJson:
+        },
+        variants: ['research']
+      }
+    ]
+  },
+  'update-task': {
+    scenarios: [
+      {
+        name: 'Task Details Update',
+        params: {
+          task: {
+            id: 10,
+            title: 'Implement Payment Processing',
+            description: 'Integrate Stripe payment processing',
+            details: 'Basic Stripe integration with credit card processing.',
+            status: 'pending'
+          },
+          taskJson:
 						'{"id": 10, "title": "Implement Payment Processing", "description": "Integrate Stripe payment processing", "details": "Basic Stripe integration with credit card processing.", "status": "pending", "dependencies": [], "priority": "high"}',
-					updatePrompt:
+          updatePrompt:
 						'After reviewing the current codebase, the payment integration needs to support additional payment methods beyond Stripe. Add support for PayPal and Apple Pay. Also need to implement webhook security validation and transaction logging for compliance.',
-					useResearch: false,
-					gatheredContext:
+          useResearch: false,
+          gatheredContext:
 						'E-commerce platform with existing user accounts and shopping cart functionality.'
-				},
-				variants: ['default']
-			},
-			{
-				name: 'Append Mode Update',
-				params: {
-					task: {
-						id: 15,
-						title: 'Database Migration System',
-						description: 'Implement automated database schema migrations',
-						details:
+        },
+        variants: ['default']
+      },
+      {
+        name: 'Append Mode Update',
+        params: {
+          task: {
+            id: 15,
+            title: 'Database Migration System',
+            description: 'Implement automated database schema migrations',
+            details:
 							'Create migration scripts for PostgreSQL schema updates with rollback capabilities.',
-						status: 'in-progress'
-					},
-					taskJson:
+            status: 'in-progress'
+          },
+          taskJson:
 						'{"id": 15, "title": "Database Migration System", "description": "Implement automated database schema migrations", "details": "Create migration scripts for PostgreSQL schema updates with rollback capabilities.", "status": "in-progress", "dependencies": [], "priority": "high"}',
-					currentDetails:
+          currentDetails:
 						'Create migration scripts for PostgreSQL schema updates with rollback capabilities.',
-					updatePrompt:
+          updatePrompt:
 						'Discovered additional requirement for zero-downtime migrations. Research shows we need to implement blue-green deployment strategy with gradual schema changes. Added connection pooling considerations and automated testing for migration validation.',
-					appendMode: true,
-					useResearch: false,
-					gatheredContext:
+          appendMode: true,
+          useResearch: false,
+          gatheredContext:
 						'Production database with strict uptime requirements and high transaction volume.'
-				},
-				variants: ['append']
-			},
-			{
-				name: 'Research-Enhanced Task Update',
-				params: {
-					task: {
-						id: 12,
-						title: 'Payment Security Compliance',
-						description: 'Ensure payment processing meets security standards',
-						details:
+        },
+        variants: ['append']
+      },
+      {
+        name: 'Research-Enhanced Task Update',
+        params: {
+          task: {
+            id: 12,
+            title: 'Payment Security Compliance',
+            description: 'Ensure payment processing meets security standards',
+            details:
 							'Implement basic security measures for payment processing.',
-						status: 'in-progress'
-					},
-					taskJson:
+            status: 'in-progress'
+          },
+          taskJson:
 						'{"id": 12, "title": "Payment Security Compliance", "description": "Ensure payment processing meets security standards", "details": "Implement basic security measures for payment processing.", "status": "in-progress", "dependencies": [10], "priority": "high"}',
-					updatePrompt:
+          updatePrompt:
 						'Need to incorporate latest PCI DSS 4.0 compliance requirements and implement Strong Customer Authentication (SCA) for European markets. Research shows new requirements for biometric authentication and dynamic linking.',
-					useResearch: true,
-					gatheredContext:
+          useResearch: true,
+          gatheredContext:
 						'Security compliance is critical for international payment processing.'
-				},
-				variants: ['research']
-			}
-		]
-	},
-	'update-tasks': {
-		scenarios: [
-			{
-				name: 'Bulk Task Updates',
-				params: {
-					tasks: [
-						{
-							id: 5,
-							title: 'User API Endpoints',
-							description: 'Create REST endpoints for user operations',
-							status: 'pending',
-							dependencies: [],
-							priority: 'high'
-						},
-						{
-							id: 6,
-							title: 'Product API Integration',
-							description: 'Integrate with product REST API',
-							status: 'in-progress',
-							dependencies: [5],
-							priority: 'medium'
-						},
-						{
-							id: 7,
-							title: 'Authentication API',
-							description: 'Implement REST-based auth API',
-							status: 'pending',
-							dependencies: [],
-							priority: 'high'
-						}
-					],
-					updatePrompt:
+        },
+        variants: ['research']
+      }
+    ]
+  },
+  'update-tasks': {
+    scenarios: [
+      {
+        name: 'Bulk Task Updates',
+        params: {
+          tasks: [
+            {
+              id: 5,
+              title: 'User API Endpoints',
+              description: 'Create REST endpoints for user operations',
+              status: 'pending',
+              dependencies: [],
+              priority: 'high'
+            },
+            {
+              id: 6,
+              title: 'Product API Integration',
+              description: 'Integrate with product REST API',
+              status: 'in-progress',
+              dependencies: [5],
+              priority: 'medium'
+            },
+            {
+              id: 7,
+              title: 'Authentication API',
+              description: 'Implement REST-based auth API',
+              status: 'pending',
+              dependencies: [],
+              priority: 'high'
+            }
+          ],
+          updatePrompt:
 						'Migration from REST API to GraphQL. All API-related tasks need to be updated to use GraphQL schemas, resolvers, and Apollo Client instead of traditional REST endpoints.',
-					useResearch: false,
-					projectContext:
+          useResearch: false,
+          projectContext:
 						'Full-stack application migrating from REST to GraphQL for better data fetching.'
-				},
-				variants: ['default']
-			}
-		]
-	}
-};
+        },
+        variants: ['default']
+      }
+    ]
+  }
+}
 
 // Interactive menu system
 class PromptTestMenu {
-	constructor() {
-		this.rl = readline.createInterface({
-			input: process.stdin,
-			output: process.stdout
-		});
-		this.promptManager = getPromptManager();
-		this.showFullPrompts = true;
-	}
+  constructor () {
+    this.rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout
+    })
+    this.promptManager = getPromptManager()
+    this.showFullPrompts = true
+  }
 
-	async start() {
-		console.log(
+  async start () {
+    console.log(
 			`${colors.cyan}${colors.bright}=== Task Master Prompt Template Testing Menu ===${colors.reset}\n`
-		);
-		await this.showMainMenu();
-	}
+    )
+    await this.showMainMenu()
+  }
 
-	async showMainMenu() {
-		console.clear();
-		console.log(
+  async showMainMenu () {
+    console.clear()
+    console.log(
 			`${colors.cyan}=== Task Master Prompt Template Testing Menu ===${colors.reset}\n`
-		);
+    )
 
-		console.log('Main Menu:');
-		console.log('  1. Test specific prompt template');
-		console.log('  2. Run all tests');
-		console.log(
+    console.log('Main Menu:')
+    console.log('  1. Test specific prompt template')
+    console.log('  2. Run all tests')
+    console.log(
 			`  3. Toggle full prompt display (currently: ${this.showFullPrompts ? 'ON' : 'OFF'})`
-		);
-		console.log('  4. Generate HTML report');
-		console.log('  5. Exit');
+    )
+    console.log('  4. Generate HTML report')
+    console.log('  5. Exit')
 
-		const choice = await this.getInput('\nSelect an option (1-5): ');
+    const choice = await this.getInput('\nSelect an option (1-5): ')
 
-		switch (choice) {
-			case '1':
-				await this.showTemplateMenu();
-				break;
-			case '2':
-				await this.runAllTests();
-				break;
-			case '3':
-				this.showFullPrompts = !this.showFullPrompts;
-				console.log(
+    switch (choice) {
+      case '1':
+        await this.showTemplateMenu()
+        break
+      case '2':
+        await this.runAllTests()
+        break
+      case '3':
+        this.showFullPrompts = !this.showFullPrompts
+        console.log(
 					`${colors.green}Full prompt display ${this.showFullPrompts ? 'enabled' : 'disabled'}${colors.reset}`
-				);
-				await this.waitForEnter();
-				await this.showMainMenu();
-				break;
-			case '4':
-				await this.generateHTMLReport();
-				break;
-			case '5':
-				console.log('Goodbye!');
-				this.rl.close();
-				return;
-			default:
-				console.log(
+        )
+        await this.waitForEnter()
+        await this.showMainMenu()
+        break
+      case '4':
+        await this.generateHTMLReport()
+        break
+      case '5':
+        console.log('Goodbye!')
+        this.rl.close()
+        return
+      default:
+        console.log(
 					`${colors.red}Invalid option. Please try again.${colors.reset}`
-				);
-				await this.waitForEnter();
-				await this.showMainMenu();
-		}
-	}
+        )
+        await this.waitForEnter()
+        await this.showMainMenu()
+    }
+  }
 
-	async showTemplateMenu() {
-		const templates = [
-			{ key: 'add-task', name: 'Add Task', variants: ['default', 'research'] },
-			{
-				key: 'expand-task',
-				name: 'Expand Task',
-				variants: ['default', 'research', 'complexity-report']
-			},
-			{
-				key: 'analyze-complexity',
-				name: 'Analyze Complexity',
-				variants: ['default', 'research']
-			},
-			{
-				key: 'research',
-				name: 'Research',
-				variants: ['default', 'low', 'medium', 'high']
-			},
-			{
-				key: 'parse-prd',
-				name: 'Parse PRD',
-				variants: ['default', 'research']
-			},
-			{
-				key: 'update-subtask',
-				name: 'Update Subtask',
-				variants: ['default', 'research']
-			},
-			{
-				key: 'update-task',
-				name: 'Update Task',
-				variants: ['default', 'append', 'research']
-			},
-			{
-				key: 'update-tasks',
-				name: 'Update Tasks',
-				variants: ['default']
-			}
-		];
+  async showTemplateMenu () {
+    const templates = [
+      { key: 'add-task', name: 'Add Task', variants: ['default', 'research'] },
+      {
+        key: 'expand-task',
+        name: 'Expand Task',
+        variants: ['default', 'research', 'complexity-report']
+      },
+      {
+        key: 'analyze-complexity',
+        name: 'Analyze Complexity',
+        variants: ['default', 'research']
+      },
+      {
+        key: 'research',
+        name: 'Research',
+        variants: ['default', 'low', 'medium', 'high']
+      },
+      {
+        key: 'parse-prd',
+        name: 'Parse PRD',
+        variants: ['default', 'research']
+      },
+      {
+        key: 'update-subtask',
+        name: 'Update Subtask',
+        variants: ['default', 'research']
+      },
+      {
+        key: 'update-task',
+        name: 'Update Task',
+        variants: ['default', 'append', 'research']
+      },
+      {
+        key: 'update-tasks',
+        name: 'Update Tasks',
+        variants: ['default']
+      }
+    ]
 
-		console.log(
+    console.log(
 			`${colors.bright}Select a prompt template to test:${colors.reset}`
-		);
-		templates.forEach((template, index) => {
-			console.log(
+    )
+    templates.forEach((template, index) => {
+      console.log(
 				`  ${index + 1}. ${template.name} (${template.variants.join(', ')})`
-			);
-		});
-		console.log(`  ${templates.length + 1}. Back to main menu`);
-		console.log();
+      )
+    })
+    console.log(`  ${templates.length + 1}. Back to main menu`)
+    console.log()
 
-		const choice = await this.prompt(
+    const choice = await this.prompt(
 			`Select template (1-${templates.length + 1}): `
-		);
-		const choiceNum = parseInt(choice.trim());
+    )
+    const choiceNum = parseInt(choice.trim())
 
-		if (choiceNum >= 1 && choiceNum <= templates.length) {
-			const selectedTemplate = templates[choiceNum - 1];
-			await this.showVariantMenu(selectedTemplate);
-		} else if (choiceNum === templates.length + 1) {
-			await this.showMainMenu();
-		} else {
-			console.log(
+    if (choiceNum >= 1 && choiceNum <= templates.length) {
+      const selectedTemplate = templates[choiceNum - 1]
+      await this.showVariantMenu(selectedTemplate)
+    } else if (choiceNum === templates.length + 1) {
+      await this.showMainMenu()
+    } else {
+      console.log(
 				`${colors.red}Invalid option. Please try again.${colors.reset}\n`
-			);
-			await this.showTemplateMenu();
-		}
-	}
+      )
+      await this.showTemplateMenu()
+    }
+  }
 
-	async showVariantMenu(template) {
-		console.log(
+  async showVariantMenu (template) {
+    console.log(
 			`${colors.bright}${template.name} - Select variant:${colors.reset}`
-		);
-		template.variants.forEach((variant, index) => {
-			console.log(`  ${index + 1}. ${variant}`);
-		});
-		console.log(`  ${template.variants.length + 1}. Test all variants`);
-		console.log(`  ${template.variants.length + 2}. Back to template menu`);
-		console.log();
+    )
+    template.variants.forEach((variant, index) => {
+      console.log(`  ${index + 1}. ${variant}`)
+    })
+    console.log(`  ${template.variants.length + 1}. Test all variants`)
+    console.log(`  ${template.variants.length + 2}. Back to template menu`)
+    console.log()
 
-		const choice = await this.prompt(
+    const choice = await this.prompt(
 			`Select variant (1-${template.variants.length + 2}): `
-		);
-		const choiceNum = parseInt(choice.trim());
+    )
+    const choiceNum = parseInt(choice.trim())
 
-		if (choiceNum >= 1 && choiceNum <= template.variants.length) {
-			const selectedVariant = template.variants[choiceNum - 1];
-			await this.runSingleTest(template.key, selectedVariant);
-		} else if (choiceNum === template.variants.length + 1) {
-			console.log(
+    if (choiceNum >= 1 && choiceNum <= template.variants.length) {
+      const selectedVariant = template.variants[choiceNum - 1]
+      await this.runSingleTest(template.key, selectedVariant)
+    } else if (choiceNum === template.variants.length + 1) {
+      console.log(
 				`${colors.cyan}Testing all variants for ${template.name}...${colors.reset}\n`
-			);
-			for (const variant of template.variants) {
-				await this.runSingleTest(template.key, variant);
-				console.log(); // Extra spacing between variants
-			}
-		} else if (choiceNum === template.variants.length + 2) {
-			await this.showTemplateMenu();
-		} else {
-			console.log(
+      )
+      for (const variant of template.variants) {
+        await this.runSingleTest(template.key, variant)
+        console.log() // Extra spacing between variants
+      }
+    } else if (choiceNum === template.variants.length + 2) {
+      await this.showTemplateMenu()
+    } else {
+      console.log(
 				`${colors.red}Invalid option. Please try again.${colors.reset}\n`
-			);
-			await this.showVariantMenu(template);
-		}
+      )
+      await this.showVariantMenu(template)
+    }
 
-		// After running test(s), show options to continue
-		await this.showPostTestMenu(template);
-	}
+    // After running test(s), show options to continue
+    await this.showPostTestMenu(template)
+  }
 
-	async showPostTestMenu(template) {
-		console.log(
+  async showPostTestMenu (template) {
+    console.log(
 			`${colors.bright}What would you like to do next?${colors.reset}`
-		);
-		console.log('  1. Test another variant of this template');
-		console.log('  2. Choose a different template');
-		console.log('  3. Back to main menu');
-		console.log();
+    )
+    console.log('  1. Test another variant of this template')
+    console.log('  2. Choose a different template')
+    console.log('  3. Back to main menu')
+    console.log()
 
-		const choice = await this.prompt('Select option (1-3): ');
+    const choice = await this.prompt('Select option (1-3): ')
 
-		switch (choice.trim()) {
-			case '1':
-				await this.showVariantMenu(template);
-				break;
-			case '2':
-				await this.showTemplateMenu();
-				break;
-			case '3':
-				await this.showMainMenu();
-				break;
-			default:
-				console.log(
+    switch (choice.trim()) {
+      case '1':
+        await this.showVariantMenu(template)
+        break
+      case '2':
+        await this.showTemplateMenu()
+        break
+      case '3':
+        await this.showMainMenu()
+        break
+      default:
+        console.log(
 					`${colors.red}Invalid option. Please try again.${colors.reset}\n`
-				);
-				await this.showPostTestMenu(template);
-		}
-	}
+        )
+        await this.showPostTestMenu(template)
+    }
+  }
 
-	async runSingleTest(templateKey, variant) {
-		console.log(
+  async runSingleTest (templateKey, variant) {
+    console.log(
 			`${colors.magenta}${colors.bright}Testing ${templateKey} - ${variant} variant${colors.reset}`
-		);
-		console.log('='.repeat(60));
+    )
+    console.log('='.repeat(60))
 
-		try {
-			// Handle special research mode variants
-			let actualVariant = variant;
-			let useResearch = false;
-			let research = false;
-			let detailLevel = null;
-			if (
-				(templateKey === 'add-task' ||
+    try {
+      // Handle special research mode variants
+      let actualVariant = variant
+      let useResearch = false
+      let research = false
+      let detailLevel = null
+      if (
+        (templateKey === 'add-task' ||
 					templateKey === 'analyze-complexity' ||
 					templateKey === 'update-subtask' ||
 					templateKey === 'update-task' ||
 					templateKey === 'update-tasks') &&
 				variant === 'research'
-			) {
-				actualVariant = 'default';
-				useResearch = true;
-			}
-			if (templateKey === 'parse-prd' && variant === 'research') {
-				actualVariant = 'default';
-				research = true;
-			}
-			if (
-				templateKey === 'research' &&
+      ) {
+        actualVariant = 'default'
+        useResearch = true
+      }
+      if (templateKey === 'parse-prd' && variant === 'research') {
+        actualVariant = 'default'
+        research = true
+      }
+      if (
+        templateKey === 'research' &&
 				['low', 'medium', 'high'].includes(variant)
-			) {
-				actualVariant = 'default';
-				detailLevel = variant;
-			}
+      ) {
+        actualVariant = 'default'
+        detailLevel = variant
+      }
 
-			const testData = getTestDataForTemplate(templateKey, actualVariant);
+      const testData = getTestDataForTemplate(templateKey, actualVariant)
 
-			// Override useResearch, research, or detailLevel if needed
-			if (useResearch) {
-				testData.params.useResearch = true;
-			}
-			if (research) {
-				testData.params.research = true;
-			}
-			if (detailLevel) {
-				testData.params.detailLevel = detailLevel;
-			}
+      // Override useResearch, research, or detailLevel if needed
+      if (useResearch) {
+        testData.params.useResearch = true
+      }
+      if (research) {
+        testData.params.research = true
+      }
+      if (detailLevel) {
+        testData.params.detailLevel = detailLevel
+      }
 
-			const result = await this.promptManager.loadPrompt(
-				templateKey,
-				testData.params,
-				templateVariant
-			);
+      const result = await this.promptManager.loadPrompt(
+        templateKey,
+        testData.params,
+        templateVariant
+      )
 
-			console.log(
+      console.log(
 				`${colors.green}✓ SUCCESS${colors.reset} - Template loaded and processed successfully`
-			);
-			console.log(`${colors.bright}Parameters used:${colors.reset}`);
-			console.log(JSON.stringify(testData.params, null, 2));
+      )
+      console.log(`${colors.bright}Parameters used:${colors.reset}`)
+      console.log(JSON.stringify(testData.params, null, 2))
 
-			if (this.showFullPrompts) {
-				console.log(`\n${colors.bright}System Prompt:${colors.reset}`);
-				console.log('-'.repeat(40));
-				console.log(result.systemPrompt);
+      if (this.showFullPrompts) {
+        console.log(`\n${colors.bright}System Prompt:${colors.reset}`)
+        console.log('-'.repeat(40))
+        console.log(result.systemPrompt)
 
-				console.log(`\n${colors.bright}User Prompt:${colors.reset}`);
-				console.log('-'.repeat(40));
-				console.log(result.userPrompt);
-			} else {
-				console.log(`\n${colors.bright}System Prompt Preview:${colors.reset}`);
-				console.log(result.systemPrompt.substring(0, 200) + '...');
+        console.log(`\n${colors.bright}User Prompt:${colors.reset}`)
+        console.log('-'.repeat(40))
+        console.log(result.userPrompt)
+      } else {
+        console.log(`\n${colors.bright}System Prompt Preview:${colors.reset}`)
+        console.log(result.systemPrompt.substring(0, 200) + '...')
 
-				console.log(`\n${colors.bright}User Prompt Preview:${colors.reset}`);
-				console.log(result.userPrompt.substring(0, 200) + '...');
+        console.log(`\n${colors.bright}User Prompt Preview:${colors.reset}`)
+        console.log(result.userPrompt.substring(0, 200) + '...')
 
-				console.log(
+        console.log(
 					`\n${colors.yellow}Tip: Use option 3 in main menu to toggle full prompt display${colors.reset}`
-				);
-			}
-		} catch (error) {
-			console.log(`${colors.red}✗ FAILED${colors.reset} - ${error.message}`);
-			if (error.stack) {
-				console.log(`${colors.red}Stack trace:${colors.reset}`);
-				console.log(error.stack);
-			}
-		}
+        )
+      }
+    } catch (error) {
+      console.log(`${colors.red}✗ FAILED${colors.reset} - ${error.message}`)
+      if (error.stack) {
+        console.log(`${colors.red}Stack trace:${colors.reset}`)
+        console.log(error.stack)
+      }
+    }
 
-		console.log('='.repeat(60));
-	}
+    console.log('='.repeat(60))
+  }
 
-	async runAllTests() {
-		console.log(
+  async runAllTests () {
+    console.log(
 			`${colors.cyan}Running all comprehensive tests...${colors.reset}\n`
-		);
+    )
 
-		const results = await runComprehensiveTests(true);
+    const results = await runComprehensiveTests(true)
 
-		console.log(`\n${colors.bright}Test Results Summary:${colors.reset}`);
-		console.log(`Total tests: ${results.total}`);
-		console.log(`Passed: ${colors.green}${results.passed}${colors.reset}`);
-		console.log(`Failed: ${colors.red}${results.failed}${colors.reset}`);
+    console.log(`\n${colors.bright}Test Results Summary:${colors.reset}`)
+    console.log(`Total tests: ${results.total}`)
+    console.log(`Passed: ${colors.green}${results.passed}${colors.reset}`)
+    console.log(`Failed: ${colors.red}${results.failed}${colors.reset}`)
 
-		if (results.failedTests.length > 0) {
-			console.log(`\n${colors.red}Failed tests:${colors.reset}`);
-			results.failedTests.forEach((test) => {
-				console.log(`  - ${test.template} (${test.variant}): ${test.error}`);
-			});
-		}
+    if (results.failedTests.length > 0) {
+      console.log(`\n${colors.red}Failed tests:${colors.reset}`)
+      results.failedTests.forEach((test) => {
+        console.log(`  - ${test.template} (${test.variant}): ${test.error}`)
+      })
+    }
 
-		console.log();
-		await this.prompt('Press Enter to continue...');
-		await this.showMainMenu();
-	}
+    console.log()
+    await this.prompt('Press Enter to continue...')
+    await this.showMainMenu()
+  }
 
-	prompt(question) {
-		return new Promise((resolve) => {
-			this.rl.question(question, resolve);
-		});
-	}
+  prompt (question) {
+    return new Promise((resolve) => {
+      this.rl.question(question, resolve)
+    })
+  }
 
-	async getInput(question) {
-		const answer = await this.prompt(question);
-		return answer.trim();
-	}
+  async getInput (question) {
+    const answer = await this.prompt(question)
+    return answer.trim()
+  }
 
-	async waitForEnter() {
-		await this.prompt('Press Enter to continue...');
-	}
+  async waitForEnter () {
+    await this.prompt('Press Enter to continue...')
+  }
 
-	async generateHTMLReport() {
-		const { filepath, results } = await generateAndSaveHTMLReport();
-		await this.waitForEnter();
-		await this.showMainMenu();
-	}
+  async generateHTMLReport () {
+    const { filepath, results } = await generateAndSaveHTMLReport()
+    await this.waitForEnter()
+    await this.showMainMenu()
+  }
 }
 
 // Helper function to get test data for a specific template and variant
-function getTestDataForTemplate(templateKey, variant) {
-	if (!sampleData[templateKey] || !sampleData[templateKey].scenarios) {
-		return { name: 'Unknown Template', params: {} };
-	}
+function getTestDataForTemplate (templateKey, variant) {
+  if (!sampleData[templateKey] || !sampleData[templateKey].scenarios) {
+    return { name: 'Unknown Template', params: {} }
+  }
 
-	// Find appropriate scenario for this variant
-	const scenario = sampleData[templateKey].scenarios.find((s) =>
-		s.variants.includes(variant)
-	);
+  // Find appropriate scenario for this variant
+  const scenario = sampleData[templateKey].scenarios.find((s) =>
+    s.variants.includes(variant)
+  )
 
-	// If no scenario found for this variant, use the first scenario but mark it as a test case
-	if (!scenario) {
-		const firstScenario = sampleData[templateKey].scenarios[0];
-		if (!firstScenario) {
-			return { name: 'No Scenarios', params: {} };
-		}
-		return {
-			name: `${firstScenario.name} (variant test)`,
-			params: firstScenario.params
-		};
-	}
+  // If no scenario found for this variant, use the first scenario but mark it as a test case
+  if (!scenario) {
+    const firstScenario = sampleData[templateKey].scenarios[0]
+    if (!firstScenario) {
+      return { name: 'No Scenarios', params: {} }
+    }
+    return {
+      name: `${firstScenario.name} (variant test)`,
+      params: firstScenario.params
+    }
+  }
 
-	return {
-		name: scenario.name,
-		params: scenario.params
-	};
+  return {
+    name: scenario.name,
+    params: scenario.params
+  }
 }
 
 // Run all comprehensive tests
-async function runComprehensiveTests(generateDetailed = false) {
-	console.log('Task Master Prompt Template Comprehensive Test');
-	console.log('=============================================\n');
+async function runComprehensiveTests (generateDetailed = false) {
+  console.log('Task Master Prompt Template Comprehensive Test')
+  console.log('=============================================\n')
 
-	let passed = 0;
-	let failed = 0;
-	const failedTests = [];
-	const detailedResults = [];
+  let passed = 0
+  let failed = 0
+  const failedTests = []
+  const detailedResults = []
 
-	// Test all combinations
-	const testCases = [
-		{ template: 'add-task', variant: 'default' },
-		{
-			template: 'add-task',
-			variant: 'default',
-			useResearch: true,
-			testName: 'research'
-		},
-		{ template: 'expand-task', variant: 'default' },
-		{ template: 'expand-task', variant: 'research' },
-		{ template: 'expand-task', variant: 'complexity-report' },
-		{ template: 'analyze-complexity', variant: 'default' },
-		{
-			template: 'analyze-complexity',
-			variant: 'default',
-			useResearch: true,
-			testName: 'research'
-		},
-		{
-			template: 'research',
-			variant: 'default',
-			detailLevel: 'low',
-			testName: 'low'
-		},
-		{
-			template: 'research',
-			variant: 'default',
-			detailLevel: 'medium',
-			testName: 'medium'
-		},
-		{
-			template: 'research',
-			variant: 'default',
-			detailLevel: 'high',
-			testName: 'high'
-		},
-		{ template: 'parse-prd', variant: 'default' },
-		{
-			template: 'parse-prd',
-			variant: 'default',
-			research: true,
-			testName: 'research'
-		},
-		{ template: 'update-subtask', variant: 'default' },
-		{
-			template: 'update-subtask',
-			variant: 'default',
-			useResearch: true,
-			testName: 'research'
-		},
-		{ template: 'update-task', variant: 'default' },
-		{ template: 'update-task', variant: 'append' },
-		{
-			template: 'update-task',
-			variant: 'default',
-			useResearch: true,
-			testName: 'research'
-		},
-		{ template: 'update-tasks', variant: 'default' },
+  // Test all combinations
+  const testCases = [
+    { template: 'add-task', variant: 'default' },
+    {
+      template: 'add-task',
+      variant: 'default',
+      useResearch: true,
+      testName: 'research'
+    },
+    { template: 'expand-task', variant: 'default' },
+    { template: 'expand-task', variant: 'research' },
+    { template: 'expand-task', variant: 'complexity-report' },
+    { template: 'analyze-complexity', variant: 'default' },
+    {
+      template: 'analyze-complexity',
+      variant: 'default',
+      useResearch: true,
+      testName: 'research'
+    },
+    {
+      template: 'research',
+      variant: 'default',
+      detailLevel: 'low',
+      testName: 'low'
+    },
+    {
+      template: 'research',
+      variant: 'default',
+      detailLevel: 'medium',
+      testName: 'medium'
+    },
+    {
+      template: 'research',
+      variant: 'default',
+      detailLevel: 'high',
+      testName: 'high'
+    },
+    { template: 'parse-prd', variant: 'default' },
+    {
+      template: 'parse-prd',
+      variant: 'default',
+      research: true,
+      testName: 'research'
+    },
+    { template: 'update-subtask', variant: 'default' },
+    {
+      template: 'update-subtask',
+      variant: 'default',
+      useResearch: true,
+      testName: 'research'
+    },
+    { template: 'update-task', variant: 'default' },
+    { template: 'update-task', variant: 'append' },
+    {
+      template: 'update-task',
+      variant: 'default',
+      useResearch: true,
+      testName: 'research'
+    },
+    { template: 'update-tasks', variant: 'default' },
 
-		// Conditional logic tests for new helper functions
-		{
-			template: 'parse-prd',
-			variant: 'default',
-			customData: {
-				name: 'Test Zero Tasks Conditional Logic',
-				params: {
-					prdContent: 'Test PRD content for zero tasks validation',
-					numTasks: 0,
-					nextId: 1,
-					prdPath: 'test-zero-tasks.txt',
-					defaultTaskPriority: 'medium',
-					research: false
-				}
-			},
-			testName: 'conditional-zero-tasks',
-			validateOutput: (result) => {
-				return (
-					result.systemPrompt.includes('an appropriate number of') &&
+    // Conditional logic tests for new helper functions
+    {
+      template: 'parse-prd',
+      variant: 'default',
+      customData: {
+        name: 'Test Zero Tasks Conditional Logic',
+        params: {
+          prdContent: 'Test PRD content for zero tasks validation',
+          numTasks: 0,
+          nextId: 1,
+          prdPath: 'test-zero-tasks.txt',
+          defaultTaskPriority: 'medium',
+          research: false
+        }
+      },
+      testName: 'conditional-zero-tasks',
+      validateOutput: (result) => {
+        return (
+          result.systemPrompt.includes('an appropriate number of') &&
 					!result.systemPrompt.includes('approximately 0')
-				);
-			}
-		},
-		{
-			template: 'expand-task',
-			variant: 'default',
-			customData: {
-				name: 'Test Zero Subtasks Conditional Logic',
-				params: {
-					task: {
-						id: 99,
-						title: 'Test Zero Subtasks Conditional',
-						description: 'Test conditional logic with zero subtasks',
-						details: 'Testing gt helper with zero value'
-					},
-					subtaskCount: 0,
-					nextSubtaskId: 1,
-					additionalContext: 'Testing conditional logic',
-					complexityReasoningContext: '',
-					gatheredContext: 'Test context'
-				}
-			},
-			testName: 'conditional-zero-subtasks',
-			validateOutput: (result) => {
-				return (
-					result.systemPrompt.includes('an appropriate number of') &&
+        )
+      }
+    },
+    {
+      template: 'expand-task',
+      variant: 'default',
+      customData: {
+        name: 'Test Zero Subtasks Conditional Logic',
+        params: {
+          task: {
+            id: 99,
+            title: 'Test Zero Subtasks Conditional',
+            description: 'Test conditional logic with zero subtasks',
+            details: 'Testing gt helper with zero value'
+          },
+          subtaskCount: 0,
+          nextSubtaskId: 1,
+          additionalContext: 'Testing conditional logic',
+          complexityReasoningContext: '',
+          gatheredContext: 'Test context'
+        }
+      },
+      testName: 'conditional-zero-subtasks',
+      validateOutput: (result) => {
+        return (
+          result.systemPrompt.includes('an appropriate number of') &&
 					!result.systemPrompt.includes('0 specific subtasks')
-				);
-			}
-		},
-		{
-			template: 'parse-prd',
-			variant: 'default',
-			customData: {
-				name: 'Test Positive Tasks Conditional Logic',
-				params: {
-					prdContent: 'Test PRD content for positive tasks validation',
-					numTasks: 5,
-					nextId: 1,
-					prdPath: 'test-positive-tasks.txt',
-					defaultTaskPriority: 'medium',
-					research: false
-				}
-			},
-			testName: 'conditional-positive-tasks',
-			validateOutput: (result) => {
-				return (
-					result.systemPrompt.includes('approximately 5') &&
+        )
+      }
+    },
+    {
+      template: 'parse-prd',
+      variant: 'default',
+      customData: {
+        name: 'Test Positive Tasks Conditional Logic',
+        params: {
+          prdContent: 'Test PRD content for positive tasks validation',
+          numTasks: 5,
+          nextId: 1,
+          prdPath: 'test-positive-tasks.txt',
+          defaultTaskPriority: 'medium',
+          research: false
+        }
+      },
+      testName: 'conditional-positive-tasks',
+      validateOutput: (result) => {
+        return (
+          result.systemPrompt.includes('approximately 5') &&
 					!result.systemPrompt.includes('an appropriate number of')
-				);
-			}
-		},
-		{
-			template: 'expand-task',
-			variant: 'default',
-			customData: {
-				name: 'Test Positive Subtasks Conditional Logic',
-				params: {
-					task: {
-						id: 98,
-						title: 'Test Positive Subtasks Conditional',
-						description: 'Test conditional logic with positive subtasks',
-						details: 'Testing gt helper with positive value'
-					},
-					subtaskCount: 3,
-					nextSubtaskId: 1,
-					additionalContext: 'Testing conditional logic',
-					complexityReasoningContext: '',
-					gatheredContext: 'Test context'
-				}
-			},
-			testName: 'conditional-positive-subtasks',
-			validateOutput: (result) => {
-				return (
-					result.systemPrompt.includes('3 specific subtasks') &&
+        )
+      }
+    },
+    {
+      template: 'expand-task',
+      variant: 'default',
+      customData: {
+        name: 'Test Positive Subtasks Conditional Logic',
+        params: {
+          task: {
+            id: 98,
+            title: 'Test Positive Subtasks Conditional',
+            description: 'Test conditional logic with positive subtasks',
+            details: 'Testing gt helper with positive value'
+          },
+          subtaskCount: 3,
+          nextSubtaskId: 1,
+          additionalContext: 'Testing conditional logic',
+          complexityReasoningContext: '',
+          gatheredContext: 'Test context'
+        }
+      },
+      testName: 'conditional-positive-subtasks',
+      validateOutput: (result) => {
+        return (
+          result.systemPrompt.includes('3 specific subtasks') &&
 					!result.systemPrompt.includes('an appropriate number of')
-				);
-			}
-		},
+        )
+      }
+    },
 
-		// Error condition tests
-		{ template: 'expand-task', variant: 'nonexistent', expectError: true },
-		{ template: 'nonexistent-template', variant: 'default', expectError: true },
-		{
-			template: 'parse-prd',
-			variant: 'default',
-			params: {},
-			expectError: true
-		},
-		{
-			template: 'add-task',
-			variant: 'default',
-			params: { prompt: '' },
-			expectError: true
-		},
-		{
-			template: 'research',
-			variant: 'default',
-			detailLevel: 'invalid-detail',
-			expectError: true,
-			testName: 'invalid-detail'
-		}
-	];
+    // Error condition tests
+    { template: 'expand-task', variant: 'nonexistent', expectError: true },
+    { template: 'nonexistent-template', variant: 'default', expectError: true },
+    {
+      template: 'parse-prd',
+      variant: 'default',
+      params: {},
+      expectError: true
+    },
+    {
+      template: 'add-task',
+      variant: 'default',
+      params: { prompt: '' },
+      expectError: true
+    },
+    {
+      template: 'research',
+      variant: 'default',
+      detailLevel: 'invalid-detail',
+      expectError: true,
+      testName: 'invalid-detail'
+    }
+  ]
 
-	for (const testCase of testCases) {
-		try {
-			// Handle variant conversion for comprehensive tests
-			let scenarioVariant = testCase.variant;
-			let templateVariant = testCase.variant;
+  for (const testCase of testCases) {
+    try {
+      // Handle variant conversion for comprehensive tests
+      const scenarioVariant = testCase.variant
+      let templateVariant = testCase.variant
 
-			// For templates using detail levels, convert to default with detailLevel param
-			if (
-				testCase.template === 'research' &&
+      // For templates using detail levels, convert to default with detailLevel param
+      if (
+        testCase.template === 'research' &&
 				['low', 'medium', 'high'].includes(testCase.variant)
-			) {
-				templateVariant = 'default';
-			}
+      ) {
+        templateVariant = 'default'
+      }
 
-			// For consolidated templates, convert research variant to default for template loading only
-			if (
-				(testCase.template === 'add-task' ||
+      // For consolidated templates, convert research variant to default for template loading only
+      if (
+        (testCase.template === 'add-task' ||
 					testCase.template === 'analyze-complexity' ||
 					testCase.template === 'update-subtask' ||
 					testCase.template === 'update-task' ||
 					testCase.template === 'parse-prd') &&
 				testCase.variant === 'research'
-			) {
-				templateVariant = 'default';
-			}
+      ) {
+        templateVariant = 'default'
+      }
 
-			// Get test data using scenario variant (research scenarios will be found correctly)
-			const testData =
+      // Get test data using scenario variant (research scenarios will be found correctly)
+      const testData =
 				testCase.customData ||
 				(testCase.params
-					? { name: 'Custom Test Data', params: testCase.params }
-					: null) ||
-				getTestDataForTemplate(testCase.template, scenarioVariant);
+				  ? { name: 'Custom Test Data', params: testCase.params }
+				  : null) ||
+				getTestDataForTemplate(testCase.template, scenarioVariant)
 
-			// Override test data with custom parameters if specified
-			if (testCase.useResearch !== undefined) {
-				testData.params.useResearch = testCase.useResearch;
-			}
-			if (testCase.research !== undefined) {
-				testData.params.research = testCase.research;
-			}
-			if (testCase.detailLevel !== undefined) {
-				testData.params.detailLevel = testCase.detailLevel;
-			}
+      // Override test data with custom parameters if specified
+      if (testCase.useResearch !== undefined) {
+        testData.params.useResearch = testCase.useResearch
+      }
+      if (testCase.research !== undefined) {
+        testData.params.research = testCase.research
+      }
+      if (testCase.detailLevel !== undefined) {
+        testData.params.detailLevel = testCase.detailLevel
+      }
 
-			const result = await promptManager.loadPrompt(
-				testCase.template,
-				testData.params,
-				templateVariant
-			);
+      const result = await promptManager.loadPrompt(
+        testCase.template,
+        testData.params,
+        templateVariant
+      )
 
-			const displayName = testCase.testName || testCase.variant;
+      const displayName = testCase.testName || testCase.variant
 
-			if (testCase.expectError) {
-				console.log(
+      if (testCase.expectError) {
+        console.log(
 					`✗ FAILED - ${testCase.template} (${displayName}): Expected error but test passed`
-				);
-				failedTests.push({
-					template: testCase.template,
-					variant: displayName,
-					error: 'Expected error but test passed'
-				});
-				failed++;
+        )
+        failedTests.push({
+          template: testCase.template,
+          variant: displayName,
+          error: 'Expected error but test passed'
+        })
+        failed++
 
-				if (generateDetailed) {
-					detailedResults.push({
-						template: testCase.template,
-						variant: displayName,
-						success: false,
-						expectedError: true,
-						error: 'Expected error but test passed'
-					});
-				}
-			} else {
-				// Check output validation if provided
-				let validationPassed = true;
-				let validationError = null;
+        if (generateDetailed) {
+          detailedResults.push({
+            template: testCase.template,
+            variant: displayName,
+            success: false,
+            expectedError: true,
+            error: 'Expected error but test passed'
+          })
+        }
+      } else {
+        // Check output validation if provided
+        let validationPassed = true
+        let validationError = null
 
-				if (testCase.validateOutput) {
-					try {
-						validationPassed = testCase.validateOutput(result);
-						if (!validationPassed) {
-							validationError =
-								'Output validation failed - conditional logic did not produce expected content';
-						}
-					} catch (error) {
-						validationPassed = false;
-						validationError = `Output validation error: ${error.message}`;
-					}
-				}
+        if (testCase.validateOutput) {
+          try {
+            validationPassed = testCase.validateOutput(result)
+            if (!validationPassed) {
+              validationError =
+								'Output validation failed - conditional logic did not produce expected content'
+            }
+          } catch (error) {
+            validationPassed = false
+            validationError = `Output validation error: ${error.message}`
+          }
+        }
 
-				if (validationPassed) {
-					console.log(`✓ PASSED - ${testCase.template} (${displayName})`);
-					passed++;
+        if (validationPassed) {
+          console.log(`✓ PASSED - ${testCase.template} (${displayName})`)
+          passed++
 
-					if (generateDetailed) {
-						detailedResults.push({
-							template: testCase.template,
-							variant: displayName,
-							success: true,
-							prompts: {
-								systemPrompt: result.systemPrompt,
-								userPrompt: result.userPrompt
-							}
-						});
-					}
-				} else {
-					console.log(
+          if (generateDetailed) {
+            detailedResults.push({
+              template: testCase.template,
+              variant: displayName,
+              success: true,
+              prompts: {
+                systemPrompt: result.systemPrompt,
+                userPrompt: result.userPrompt
+              }
+            })
+          }
+        } else {
+          console.log(
 						`✗ FAILED - ${testCase.template} (${displayName}): ${validationError}`
-					);
-					failedTests.push({
-						template: testCase.template,
-						variant: displayName,
-						error: validationError
-					});
-					failed++;
+          )
+          failedTests.push({
+            template: testCase.template,
+            variant: displayName,
+            error: validationError
+          })
+          failed++
 
-					if (generateDetailed) {
-						detailedResults.push({
-							template: testCase.template,
-							variant: displayName,
-							success: false,
-							error: validationError,
-							prompts: {
-								systemPrompt: result.systemPrompt,
-								userPrompt: result.userPrompt
-							}
-						});
-					}
-				}
-			}
-		} catch (error) {
-			const displayName = testCase.testName || testCase.variant;
+          if (generateDetailed) {
+            detailedResults.push({
+              template: testCase.template,
+              variant: displayName,
+              success: false,
+              error: validationError,
+              prompts: {
+                systemPrompt: result.systemPrompt,
+                userPrompt: result.userPrompt
+              }
+            })
+          }
+        }
+      }
+    } catch (error) {
+      const displayName = testCase.testName || testCase.variant
 
-			if (testCase.expectError) {
-				console.log(
+      if (testCase.expectError) {
+        console.log(
 					`✓ PASSED - ${testCase.template} (${displayName}): Expected error occurred`
-				);
-				passed++;
+        )
+        passed++
 
-				if (generateDetailed) {
-					detailedResults.push({
-						template: testCase.template,
-						variant: displayName,
-						success: true,
-						expectedError: true,
-						error: error.message
-					});
-				}
-			} else {
-				console.log(
+        if (generateDetailed) {
+          detailedResults.push({
+            template: testCase.template,
+            variant: displayName,
+            success: true,
+            expectedError: true,
+            error: error.message
+          })
+        }
+      } else {
+        console.log(
 					`✗ FAILED - ${testCase.template} (${displayName}): ${error.message}`
-				);
-				failedTests.push({
-					template: testCase.template,
-					variant: displayName,
-					error: error.message
-				});
-				failed++;
+        )
+        failedTests.push({
+          template: testCase.template,
+          variant: displayName,
+          error: error.message
+        })
+        failed++
 
-				if (generateDetailed) {
-					detailedResults.push({
-						template: testCase.template,
-						variant: displayName,
-						success: false,
-						error: error.message
-					});
-				}
-			}
-		}
-	}
+        if (generateDetailed) {
+          detailedResults.push({
+            template: testCase.template,
+            variant: displayName,
+            success: false,
+            error: error.message
+          })
+        }
+      }
+    }
+  }
 
-	const total = passed + failed;
-	const results = { passed, failed, total, failedTests };
+  const total = passed + failed
+  const results = { passed, failed, total, failedTests }
 
-	if (generateDetailed) {
-		results.detailedResults = detailedResults;
-	}
+  if (generateDetailed) {
+    results.detailedResults = detailedResults
+  }
 
-	return results;
+  return results
 }
 
 // Test a specific template and variant
-async function testSpecificTemplate(
-	templateKey,
-	variant,
-	showFullOutput = false
+async function testSpecificTemplate (
+  templateKey,
+  variant,
+  showFullOutput = false
 ) {
-	console.log(
+  console.log(
 		`${colors.cyan}Testing: ${templateKey} (${variant})${colors.reset}\n`
-	);
+  )
 
-	try {
-		// Handle special research mode variants for template loading
-		let actualVariant = variant;
-		let detailLevel = null;
+  try {
+    // Handle special research mode variants for template loading
+    let actualVariant = variant
+    let detailLevel = null
 
-		// For templates with separate research scenarios, keep the research variant
-		// For templates using detail levels, convert to default with detailLevel param
-		if (
-			templateKey === 'research' &&
+    // For templates with separate research scenarios, keep the research variant
+    // For templates using detail levels, convert to default with detailLevel param
+    if (
+      templateKey === 'research' &&
 			['low', 'medium', 'high'].includes(variant)
-		) {
-			actualVariant = 'default';
-			detailLevel = variant;
-		}
+    ) {
+      actualVariant = 'default'
+      detailLevel = variant
+    }
 
-		// Get test data using the actual variant (research scenarios will be found)
-		const testData = getTestDataForTemplate(templateKey, actualVariant);
+    // Get test data using the actual variant (research scenarios will be found)
+    const testData = getTestDataForTemplate(templateKey, actualVariant)
 
-		// For consolidated templates, convert research variant to default for template loading
-		let templateVariant = actualVariant;
-		if (
-			(templateKey === 'add-task' ||
+    // For consolidated templates, convert research variant to default for template loading
+    let templateVariant = actualVariant
+    if (
+      (templateKey === 'add-task' ||
 				templateKey === 'analyze-complexity' ||
 				templateKey === 'update-subtask' ||
 				templateKey === 'update-task' ||
 				templateKey === 'parse-prd') &&
 			variant === 'research'
-		) {
-			templateVariant = 'default';
-		}
+    ) {
+      templateVariant = 'default'
+    }
 
-		// Override detailLevel if needed for research template
-		if (detailLevel) {
-			testData.params.detailLevel = detailLevel;
-		}
+    // Override detailLevel if needed for research template
+    if (detailLevel) {
+      testData.params.detailLevel = detailLevel
+    }
 
-		const result = await promptManager.loadPrompt(
-			templateKey,
-			testData.params,
-			templateVariant
-		);
+    const result = await promptManager.loadPrompt(
+      templateKey,
+      testData.params,
+      templateVariant
+    )
 
-		console.log(`${colors.green}✓ SUCCESS${colors.reset}\n`);
-		console.log(`${colors.bright}Template:${colors.reset} ${templateKey}`);
-		console.log(`${colors.bright}Variant:${colors.reset} ${variant}`);
-		console.log(`${colors.bright}Test Data:${colors.reset} ${testData.name}\n`);
+    console.log(`${colors.green}✓ SUCCESS${colors.reset}\n`)
+    console.log(`${colors.bright}Template:${colors.reset} ${templateKey}`)
+    console.log(`${colors.bright}Variant:${colors.reset} ${variant}`)
+    console.log(`${colors.bright}Test Data:${colors.reset} ${testData.name}\n`)
 
-		if (showFullOutput) {
-			console.log(`${colors.bright}=== SYSTEM PROMPT ===${colors.reset}`);
-			console.log(result.systemPrompt);
-			console.log(`\n${colors.bright}=== USER PROMPT ===${colors.reset}`);
-			console.log(result.userPrompt);
-		} else {
-			console.log(`${colors.bright}System Prompt Preview:${colors.reset}`);
-			console.log(result.systemPrompt.substring(0, 200) + '...');
-			console.log(`\n${colors.bright}User Prompt Preview:${colors.reset}`);
-			console.log(result.userPrompt.substring(0, 200) + '...');
-		}
-	} catch (error) {
-		console.log(`${colors.red}✗ FAILED: ${error.message}${colors.reset}`);
-		return false;
-	}
+    if (showFullOutput) {
+      console.log(`${colors.bright}=== SYSTEM PROMPT ===${colors.reset}`)
+      console.log(result.systemPrompt)
+      console.log(`\n${colors.bright}=== USER PROMPT ===${colors.reset}`)
+      console.log(result.userPrompt)
+    } else {
+      console.log(`${colors.bright}System Prompt Preview:${colors.reset}`)
+      console.log(result.systemPrompt.substring(0, 200) + '...')
+      console.log(`\n${colors.bright}User Prompt Preview:${colors.reset}`)
+      console.log(result.userPrompt.substring(0, 200) + '...')
+    }
+  } catch (error) {
+    console.log(`${colors.red}✗ FAILED: ${error.message}${colors.reset}`)
+    return false
+  }
 
-	return true;
+  return true
 }
 
 // Main execution
-async function main() {
-	const args = process.argv.slice(2);
+async function main () {
+  const args = process.argv.slice(2)
 
-	if (args.includes('--help') || args.includes('-h')) {
-		console.log(`Task Master Prompt Template Testing Tool
+  if (args.includes('--help') || args.includes('-h')) {
+    console.log(`Task Master Prompt Template Testing Tool
 
 Usage:
   node prompt-test.js [options]
@@ -1357,107 +1357,107 @@ Examples:
   node prompt-test.js --batch      # Run all tests
   node prompt-test.js --full       # Run all tests with full prompts
   node prompt-test.js --html       # Generate HTML report
-  node prompt-test.js --test add-task:default  # Test specific template`);
-		process.exit(0);
-	}
+  node prompt-test.js --test add-task:default  # Test specific template`)
+    process.exit(0)
+  }
 
-	const showFullPrompts = args.includes('--full');
-	const batchMode = args.includes('--batch');
-	const htmlMode = args.includes('--html');
-	const testArg = args.find((arg) => arg.startsWith('--test'));
+  const showFullPrompts = args.includes('--full')
+  const batchMode = args.includes('--batch')
+  const htmlMode = args.includes('--html')
+  const testArg = args.find((arg) => arg.startsWith('--test'))
 
-	if (testArg) {
-		let templateVariant;
-		if (testArg.includes('=')) {
-			// Handle --test=template:variant format
-			templateVariant = testArg.split('=')[1];
-		} else {
-			// Handle --test template:variant format
-			const testIndex = args.indexOf('--test');
-			templateVariant = args[testIndex + 1];
-		}
+  if (testArg) {
+    let templateVariant
+    if (testArg.includes('=')) {
+      // Handle --test=template:variant format
+      templateVariant = testArg.split('=')[1]
+    } else {
+      // Handle --test template:variant format
+      const testIndex = args.indexOf('--test')
+      templateVariant = args[testIndex + 1]
+    }
 
-		if (!templateVariant) {
-			console.error(
-				'Usage: --test template:variant (e.g., --test add-task:default)'
-			);
-			process.exit(1);
-		}
-		const [templateKey, variant] = templateVariant.split(':');
-		await testSpecificTemplate(templateKey, variant || 'default', true);
-		process.exit(0);
-	}
+    if (!templateVariant) {
+      console.error(
+        'Usage: --test template:variant (e.g., --test add-task:default)'
+      )
+      process.exit(1)
+    }
+    const [templateKey, variant] = templateVariant.split(':')
+    await testSpecificTemplate(templateKey, variant || 'default', true)
+    process.exit(0)
+  }
 
-	if (htmlMode) {
-		await generateAndSaveHTMLReport();
-		process.exit(0);
-	}
+  if (htmlMode) {
+    await generateAndSaveHTMLReport()
+    process.exit(0)
+  }
 
-	if (batchMode) {
-		const results = await runComprehensiveTests(true);
-		console.log(`\nTest Results: ${results.passed}/${results.total} passed`);
-		process.exit(results.failed > 0 ? 1 : 0);
-	} else if (showFullPrompts) {
-		// Legacy full test mode
-		const results = await runComprehensiveTests(true);
-		console.log(`\nTest Results: ${results.passed}/${results.total} passed`);
+  if (batchMode) {
+    const results = await runComprehensiveTests(true)
+    console.log(`\nTest Results: ${results.passed}/${results.total} passed`)
+    process.exit(results.failed > 0 ? 1 : 0)
+  } else if (showFullPrompts) {
+    // Legacy full test mode
+    const results = await runComprehensiveTests(true)
+    console.log(`\nTest Results: ${results.passed}/${results.total} passed`)
 
-		// Show sample full prompts
-		console.log('\n=== Sample Full Prompts ===\n');
-		try {
-			const promptManager = getPromptManager();
-			const testData = getTestDataForTemplate('add-task', 'default');
-			const result = await promptManager.loadPrompt(
-				'add-task',
-				testData.params,
-				'default'
-			);
+    // Show sample full prompts
+    console.log('\n=== Sample Full Prompts ===\n')
+    try {
+      const promptManager = getPromptManager()
+      const testData = getTestDataForTemplate('add-task', 'default')
+      const result = await promptManager.loadPrompt(
+        'add-task',
+        testData.params,
+        'default'
+      )
 
-			console.log('System Prompt (add-task, default):');
-			console.log('-'.repeat(40));
-			console.log(result.systemPrompt);
+      console.log('System Prompt (add-task, default):')
+      console.log('-'.repeat(40))
+      console.log(result.systemPrompt)
 
-			console.log('\nUser Prompt (add-task, default):');
-			console.log('-'.repeat(40));
-			console.log(result.userPrompt);
-		} catch (error) {
-			console.log('Error showing sample prompts:', error.message);
-		}
-	} else {
-		// Interactive mode
-		const menu = new PromptTestMenu();
-		await menu.start();
-	}
+      console.log('\nUser Prompt (add-task, default):')
+      console.log('-'.repeat(40))
+      console.log(result.userPrompt)
+    } catch (error) {
+      console.log('Error showing sample prompts:', error.message)
+    }
+  } else {
+    // Interactive mode
+    const menu = new PromptTestMenu()
+    await menu.start()
+  }
 }
 
 // Run if called directly
 if (import.meta.url === `file://${process.argv[1]}`) {
-	main().catch(console.error);
+  main().catch(console.error)
 }
 
-export { runComprehensiveTests, getTestDataForTemplate };
+export { runComprehensiveTests, getTestDataForTemplate }
 
 // HTML report generation
-function generateHTMLReport(testResults, templateResults = []) {
-	const timestamp = new Date().toISOString();
-	const passed = testResults.passed;
-	const total = testResults.total;
-	const failed = testResults.failed;
+function generateHTMLReport (testResults, templateResults = []) {
+  const timestamp = new Date().toISOString()
+  const passed = testResults.passed
+  const total = testResults.total
+  const failed = testResults.failed
 
-	// Helper function to generate consistent anchor IDs
-	function generateAnchorId(template, variant) {
-		return `test-${template.replace(/[^a-zA-Z0-9]/g, '_')}-${variant.replace(/[^a-zA-Z0-9]/g, '_')}`;
-	}
+  // Helper function to generate consistent anchor IDs
+  function generateAnchorId (template, variant) {
+    return `test-${template.replace(/[^a-zA-Z0-9]/g, '_')}-${variant.replace(/[^a-zA-Z0-9]/g, '_')}`
+  }
 
-	// Sort template results alphabetically by template name, then by variant
-	const sortedResults = [...templateResults].sort((a, b) => {
-		if (a.template !== b.template) {
-			return a.template.localeCompare(b.template);
-		}
-		return a.variant.localeCompare(b.variant);
-	});
+  // Sort template results alphabetically by template name, then by variant
+  const sortedResults = [...templateResults].sort((a, b) => {
+    if (a.template !== b.template) {
+      return a.template.localeCompare(b.template)
+    }
+    return a.variant.localeCompare(b.variant)
+  })
 
-	let html = `<!DOCTYPE html>
+  let html = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1620,158 +1620,158 @@ function generateHTMLReport(testResults, templateResults = []) {
                 <p class="stat-number">${failed}</p>
                 <p class="stat-label">Failed</p>
             </div>
-        </div>`;
+        </div>`
 
-	if (sortedResults.length > 0) {
-		// Separate real templates from error condition tests
-		const realTemplateResults = sortedResults.filter(
-			(result) =>
-				!result.expectedError &&
+  if (sortedResults.length > 0) {
+    // Separate real templates from error condition tests
+    const realTemplateResults = sortedResults.filter(
+      (result) =>
+        !result.expectedError &&
 				result.template !== 'nonexistent-template' &&
 				!(
-					result.template === 'research' && result.testName === 'invalid-detail'
+				  result.template === 'research' && result.testName === 'invalid-detail'
 				) &&
 				!(result.template === 'expand-task' && result.variant === 'nonexistent')
-		);
+    )
 
-		const errorConditionResults = sortedResults.filter(
-			(result) =>
-				result.expectedError ||
+    const errorConditionResults = sortedResults.filter(
+      (result) =>
+        result.expectedError ||
 				result.template === 'nonexistent-template' ||
 				(result.template === 'research' &&
 					result.testName === 'invalid-detail') ||
 				(result.template === 'expand-task' && result.variant === 'nonexistent')
-		);
+    )
 
-		// Group real template results by template
-		const groupedResults = {};
-		realTemplateResults.forEach((result) => {
-			if (!groupedResults[result.template]) {
-				groupedResults[result.template] = [];
-			}
-			groupedResults[result.template].push(result);
-		});
+    // Group real template results by template
+    const groupedResults = {}
+    realTemplateResults.forEach((result) => {
+      if (!groupedResults[result.template]) {
+        groupedResults[result.template] = []
+      }
+      groupedResults[result.template].push(result)
+    })
 
-		// Test Results Summary Section for Real Templates
-		html += `
+    // Test Results Summary Section for Real Templates
+    html += `
         <div class="summary-section">
-            <h2 class="section-title">Test Results Summary</h2>`;
+            <h2 class="section-title">Test Results Summary</h2>`
 
-		Object.keys(groupedResults)
-			.sort()
-			.forEach((templateName) => {
-				const templateResults = groupedResults[templateName];
-				const passedCount = templateResults.filter((r) => r.success).length;
-				const totalCount = templateResults.length;
-				const allPassed = passedCount === totalCount;
+    Object.keys(groupedResults)
+      .sort()
+      .forEach((templateName) => {
+        const templateResults = groupedResults[templateName]
+        const passedCount = templateResults.filter((r) => r.success).length
+        const totalCount = templateResults.length
+        const allPassed = passedCount === totalCount
 
-				html += `
+        html += `
             <div class="template-group">
-                <span class="template-name">${templateName}:</span>`;
+                <span class="template-name">${templateName}:</span>`
 
-				templateResults.forEach((result) => {
-					const status = result.success ? 'passed' : 'failed';
-					const badge = result.success ? '✓' : '✗';
-					const anchorId = generateAnchorId(result.template, result.variant);
-					html += `
+        templateResults.forEach((result) => {
+          const status = result.success ? 'passed' : 'failed'
+          const badge = result.success ? '✓' : '✗'
+          const anchorId = generateAnchorId(result.template, result.variant)
+          html += `
                     <span class="variant-item ${status}">
                         <span class="variant-name"><a href="#${anchorId}">${result.variant}</a></span>
                         <span class="variant-badge">${badge}</span>
-                    </span>`;
-				});
+                    </span>`
+        })
 
-				html += `
+        html += `
                 <span class="template-status ${allPassed ? 'passed' : 'failed'}">${passedCount}/${totalCount} passed</span>
-            </div>`;
-			});
+            </div>`
+      })
 
-		// Error Condition Tests Section
-		if (errorConditionResults.length > 0) {
-			html += `
+    // Error Condition Tests Section
+    if (errorConditionResults.length > 0) {
+      html += `
         </div>
         
         <div class="error-tests-section">
             <h3 class="error-section-title">Error Condition Tests</h3>
-            <div class="error-group">`;
+            <div class="error-group">`
 
-			errorConditionResults.forEach((result) => {
-				const status = result.success ? 'passed' : 'failed';
-				const badge = result.success ? '✓' : '✗';
-				let testName = '';
+      errorConditionResults.forEach((result) => {
+        const status = result.success ? 'passed' : 'failed'
+        const badge = result.success ? '✓' : '✗'
+        let testName = ''
 
-				if (result.template === 'nonexistent-template') {
-					testName = 'nonexistent-template';
-				} else if (
-					result.template === 'expand-task' &&
+        if (result.template === 'nonexistent-template') {
+          testName = 'nonexistent-template'
+        } else if (
+          result.template === 'expand-task' &&
 					result.variant === 'nonexistent'
-				) {
-					testName = 'nonexistent-variant';
-				} else if (result.template === 'parse-prd' && result.error) {
-					testName = 'missing-parameters';
-				} else if (
-					result.template === 'add-task' &&
+        ) {
+          testName = 'nonexistent-variant'
+        } else if (result.template === 'parse-prd' && result.error) {
+          testName = 'missing-parameters'
+        } else if (
+          result.template === 'add-task' &&
 					result.error &&
 					result.error.includes('prompt')
-				) {
-					testName = 'empty-prompt';
-				} else if (
-					result.template === 'research' &&
+        ) {
+          testName = 'empty-prompt'
+        } else if (
+          result.template === 'research' &&
 					result.variant === 'invalid-detail'
-				) {
-					testName = 'invalid-variant';
-				} else {
-					testName = `${result.template}-${result.variant}`;
-				}
+        ) {
+          testName = 'invalid-variant'
+        } else {
+          testName = `${result.template}-${result.variant}`
+        }
 
-				html += `
+        html += `
                 <span class="variant-item ${status}">
                     <span class="variant-name">${testName}</span>
                     <span class="variant-badge">${badge}</span>
-                </span>`;
-			});
+                </span>`
+      })
 
-			const errorPassedCount = errorConditionResults.filter(
-				(r) => r.success
-			).length;
-			const errorTotalCount = errorConditionResults.length;
-			const allErrorsPassed = errorPassedCount === errorTotalCount;
+      const errorPassedCount = errorConditionResults.filter(
+        (r) => r.success
+      ).length
+      const errorTotalCount = errorConditionResults.length
+      const allErrorsPassed = errorPassedCount === errorTotalCount
 
-			html += `
+      html += `
                 <span class="template-status ${allErrorsPassed ? 'passed' : 'failed'}">${errorPassedCount}/${errorTotalCount} passed</span>
             </div>
-        </div>`;
-		}
+        </div>`
+    }
 
-		html += `
+    html += `
         
-        <div class="divider"></div>`;
+        <div class="divider"></div>`
 
-		// Detailed Prompts Section
-		html += `
+    // Detailed Prompts Section
+    html += `
         <div class="test-section">
             <h2 class="section-title">Detailed Prompt Content</h2>
-            <div class="test-grid">`;
+            <div class="test-grid">`
 
-		realTemplateResults.forEach((result, index) => {
-			const status = result.success ? 'passed' : 'failed';
-			const anchorId = generateAnchorId(result.template, result.variant);
-			html += `
+    realTemplateResults.forEach((result, index) => {
+      const status = result.success ? 'passed' : 'failed'
+      const anchorId = generateAnchorId(result.template, result.variant)
+      html += `
             <div class="test-case ${status}" id="${anchorId}">
                 <div class="test-header">
                     <div class="test-name">${result.template} (${result.variant})</div>
-                    <span class="test-status ${status}">${status}</span>`;
+                    <span class="test-status ${status}">${status}</span>`
 
-			if (result.success && result.prompts) {
-				const safeTemplate = (result.template || 'unknown').replace(
-					/[^a-zA-Z0-9]/g,
-					'_'
-				);
-				const safeVariant = (result.variant || 'default').replace(
-					/[^a-zA-Z0-9]/g,
-					'_'
-				);
-				const toggleId = `toggle-${safeTemplate}-${safeVariant}-${index}`;
-				html += `
+      if (result.success && result.prompts) {
+        const safeTemplate = (result.template || 'unknown').replace(
+          /[^a-zA-Z0-9]/g,
+          '_'
+        )
+        const safeVariant = (result.variant || 'default').replace(
+          /[^a-zA-Z0-9]/g,
+          '_'
+        )
+        const toggleId = `toggle-${safeTemplate}-${safeVariant}-${index}`
+        html += `
                     <button class="toggle-button" id="${toggleId}" onclick="togglePrompts('${toggleId}')">Show Prompts</button>
                 </div>
                 <div class="toggle-content" id="${toggleId}-content">
@@ -1783,92 +1783,92 @@ function generateHTMLReport(testResults, templateResults = []) {
                         <div class="prompt-title">User Prompt</div>
                         <div class="prompt-content">${escapeHtml(result.prompts.userPrompt)}</div>
                     </div>
-                </div>`;
-			} else {
-				html += `
-                </div>`;
-			}
+                </div>`
+      } else {
+        html += `
+                </div>`
+      }
 
-			if (!result.success) {
-				html += `<div class="error-message">Error: ${escapeHtml(result.error)}</div>`;
-			}
+      if (!result.success) {
+        html += `<div class="error-message">Error: ${escapeHtml(result.error)}</div>`
+      }
 
-			html += `</div>`;
-		});
+      html += '</div>'
+    })
 
-		html += `</div></div>`;
-	}
+    html += '</div></div>'
+  }
 
-	html += `
+  html += `
         <div class="footer">
             <p>Task Master Prompt Template Testing Tool</p>
         </div>
     </div>
 </body>
-</html>`;
+</html>`
 
-	return html;
+  return html
 }
 
 // Helper function to escape HTML
-function escapeHtml(text) {
-	if (!text) return '';
-	return text
-		.toString()
-		.replace(/&/g, '&amp;')
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;')
-		.replace(/"/g, '&quot;')
-		.replace(/'/g, '&#39;');
+function escapeHtml (text) {
+  if (!text) return ''
+  return text
+    .toString()
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
 }
 
 // Generate and save HTML report
-async function generateAndSaveHTMLReport() {
-	console.log(`${colors.cyan}Generating HTML Report...${colors.reset}\n`);
+async function generateAndSaveHTMLReport () {
+  console.log(`${colors.cyan}Generating HTML Report...${colors.reset}\n`)
 
-	const results = await runComprehensiveTests(true);
-	const html = generateHTMLReport(results, results.detailedResults);
+  const results = await runComprehensiveTests(true)
+  const html = generateHTMLReport(results, results.detailedResults)
 
-	// Create output directory if it doesn't exist
-	const outputDir = path.join(projectRoot, 'tests/manual/prompts/output');
-	if (!fs.existsSync(outputDir)) {
-		fs.mkdirSync(outputDir, { recursive: true });
-	}
+  // Create output directory if it doesn't exist
+  const outputDir = path.join(projectRoot, 'tests/manual/prompts/output')
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true })
+  }
 
-	// Generate filename with timestamp
-	const timestamp = new Date()
-		.toISOString()
-		.replace(/[:.]/g, '-')
-		.substring(0, 19);
-	const filename = `prompt-test-report-${timestamp}.html`;
-	const filepath = path.join(outputDir, filename);
+  // Generate filename with timestamp
+  const timestamp = new Date()
+    .toISOString()
+    .replace(/[:.]/g, '-')
+    .substring(0, 19)
+  const filename = `prompt-test-report-${timestamp}.html`
+  const filepath = path.join(outputDir, filename)
 
-	// Save HTML file
-	fs.writeFileSync(filepath, html, 'utf8');
+  // Save HTML file
+  fs.writeFileSync(filepath, html, 'utf8')
 
-	console.log(
+  console.log(
 		`${colors.green}✓ HTML report generated: ${filepath}${colors.reset}`
-	);
-	console.log(
+  )
+  console.log(
 		`${colors.cyan}Results: ${results.passed}/${results.total} tests passed${colors.reset}`
-	);
+  )
 
-	// Try to open in browser (cross-platform)
-	try {
-		const { exec } = await import('child_process');
-		const command =
+  // Try to open in browser (cross-platform)
+  try {
+    const { exec } = await import('child_process')
+    const command =
 			process.platform === 'darwin'
-				? 'open'
-				: process.platform === 'win32'
-					? 'start'
-					: 'xdg-open';
-		exec(`${command} "${filepath}"`);
-		console.log(`${colors.blue}Opening report in browser...${colors.reset}`);
-	} catch (error) {
-		console.log(
+			  ? 'open'
+			  : process.platform === 'win32'
+			    ? 'start'
+			    : 'xdg-open'
+    exec(`${command} "${filepath}"`)
+    console.log(`${colors.blue}Opening report in browser...${colors.reset}`)
+  } catch (error) {
+    console.log(
 			`${colors.yellow}Couldn't auto-open browser. Please open: ${filepath}${colors.reset}`
-		);
-	}
+    )
+  }
 
-	return { filepath, results };
+  return { filepath, results }
 }

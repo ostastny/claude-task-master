@@ -26,16 +26,16 @@
  * 3. Export it as {profile}Profile in src/profiles/index.js
  */
 export const RULE_PROFILES = [
-  'claude',
-  'cline',
-  'codex',
-  'cursor',
-  'gemini',
-  'roo',
-  'trae',
-  'vscode',
-  'windsurf'
-]
+	'claude',
+	'cline',
+	'codex',
+	'cursor',
+	'gemini',
+	'roo',
+	'trae',
+	'vscode',
+	'windsurf'
+];
 
 /**
  * Centralized enum for all supported Roo agent modes
@@ -43,19 +43,19 @@ export const RULE_PROFILES = [
  * @description Available Roo Code IDE modes for rule generation
  */
 export const ROO_MODES = [
-  'architect',
-  'ask',
-  'orchestrator',
-  'code',
-  'debug',
-  'test'
-]
+	'architect',
+	'ask',
+	'orchestrator',
+	'code',
+	'debug',
+	'test'
+];
 
 /**
  * Check if a given rule profile is valid
  * @param {string} rulesProfile - The rule profile to check
  * @returns {boolean} True if the rule profile is valid, false otherwise
  */
-export function isValidRulesProfile (rulesProfile) {
-  return RULE_PROFILES.includes(rulesProfile)
+export function isValidRulesProfile(rulesProfile) {
+	return RULE_PROFILES.includes(rulesProfile);
 }

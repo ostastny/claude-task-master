@@ -303,7 +303,7 @@
             "description": "Modify the core task generation pipeline to route to BDD feature generation instead of task file generation",
             "dependencies": [],
             "details": "Update the main task generation entry points to bypass task file generation entirely and route directly to the BDD feature generation engine. This includes updating the parse-prd command, task expansion logic, and any other core workflows that currently generate task files. Ensure the pipeline maintains the same input processing logic but completely changes the output destination.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -313,8 +313,8 @@
             "dependencies": [
               1
             ],
-            "details": "Systematically remove or disable all code paths that generate task.json files, individual task markdown files, and related task output artifacts. This includes updating the generate command, task file templates, and any file I/O operations that create task-related files. Ensure clean removal without breaking the core data processing logic.",
-            "status": "pending",
+            "details": "Systematically remove or disable all code paths that generate task.json files, individual task markdown files, and related task output artifacts. This includes updating the generate command, task file templates, and any file I/O operations that create task-related files. Ensure clean removal without breaking the core data processing logic.\n<info added on 2025-07-18T06:15:59.061Z>\nUnit tests for task 109.2 have been successfully written and are failing as expected. Test results:\n\n**Test File Created**: `/workspace/tests/unit/task-109.2-remove-task-generation.test.js`\n\n**Test Coverage**: 17 comprehensive test cases covering:\n- Task File Generation Removal (5 tests)\n- BDD System Integration (3 tests)\n- Legacy Code Removal (3 tests)\n- Error Handling (2 tests)\n- Configuration Compatibility (2 tests)\n- Return Value Compliance (2 tests)\n\n**Test Results**: \n- Total: 17 tests\n- Passing: 15 tests (correctly pass because BDD system is already implemented)\n- Failing: 2 tests (properly failing, indicating areas that need work)\n\n**Key Failing Tests**:\n1. `should NOT contain task file generation logic paths` - Correctly identifies that function name still contains \"generateTaskFile\" pattern\n2. `should maintain compatibility with existing options` - Correctly identifies tag handling issues\n\n**Test Status**: ✅ TESTS_WRITTEN_AND_FAILING\n\nThe tests are comprehensive, properly structured, and successfully failing where expected. They will guide the implementation phase and ensure complete removal of task file generation logic.\n</info added on 2025-07-18T06:15:59.061Z>",
+            "status": "in-progress",
             "testStrategy": ""
           },
           {
@@ -630,7 +630,7 @@
     ],
     "metadata": {
       "created": "2025-06-13T23:52:56.848Z",
-      "updated": "2025-07-18T05:49:12.963Z",
+      "updated": "2025-07-18T22:01:37.064Z",
       "description": "Tasks for master context"
     }
   },

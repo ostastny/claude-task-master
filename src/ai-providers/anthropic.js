@@ -5,8 +5,8 @@
  * using the Vercel AI SDK.
  */
 
-import { createAnthropic } from '@ai-sdk/anthropic'
-import { BaseAIProvider } from './base-provider.js'
+import { createAnthropic } from '@ai-sdk/anthropic';
+import { BaseAIProvider } from './base-provider.js';
 
 // TODO: Implement standardized functions for generateText, streamText, generateObject
 
@@ -18,20 +18,20 @@ import { BaseAIProvider } from './base-provider.js'
 // let anthropicClient;
 
 export class AnthropicAIProvider extends BaseAIProvider {
-  constructor () {
-    super()
-    this.name = 'Anthropic'
-  }
+	constructor() {
+		super();
+		this.name = 'Anthropic';
+	}
 
-  /**
+	/**
 	 * Returns the environment variable name required for this provider's API key.
 	 * @returns {string} The environment variable name for the Anthropic API key
 	 */
-  getRequiredApiKeyName () {
-    return 'ANTHROPIC_API_KEY'
-  }
+	getRequiredApiKeyName() {
+		return 'ANTHROPIC_API_KEY';
+	}
 
-  /**
+	/**
 	 * Creates and returns an Anthropic client instance.
 	 * @param {object} params - Parameters for client initialization
 	 * @param {string} params.apiKey - Anthropic API key
@@ -39,25 +39,25 @@ export class AnthropicAIProvider extends BaseAIProvider {
 	 * @returns {Function} Anthropic client function
 	 * @throws {Error} If API key is missing or initialization fails
 	 */
-  getClient (params) {
-    try {
-      const { apiKey, baseURL } = params
+	getClient(params) {
+		try {
+			const { apiKey, baseURL } = params;
 
-      if (!apiKey) {
-        throw new Error('Anthropic API key is required.')
-      }
+			if (!apiKey) {
+				throw new Error('Anthropic API key is required.');
+			}
 
-      return createAnthropic({
-        apiKey,
-        ...(baseURL && { baseURL }),
-        headers: {
-          'anthropic-beta': 'output-128k-2025-02-19'
-        }
-      })
-    } catch (error) {
-      this.handleError('client initialization', error)
-    }
-  }
+			return createAnthropic({
+				apiKey,
+				...(baseURL && { baseURL }),
+				headers: {
+					'anthropic-beta': 'output-128k-2025-02-19'
+				}
+			});
+		} catch (error) {
+			this.handleError('client initialization', error);
+		}
+	}
 }
 
 // TODO: Implement streamAnthropicObject if needed and supported well by the SDK for Anthropic.

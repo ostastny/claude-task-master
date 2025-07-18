@@ -4,27 +4,27 @@
  */
 
 import {
-  getModelConfiguration,
-  getAvailableModelsList,
-  setModel
-} from '../../../../scripts/modules/task-manager/models.js'
+	getModelConfiguration,
+	getAvailableModelsList,
+	setModel
+} from '../../../../scripts/modules/task-manager/models.js';
 import {
-  enableSilentMode,
-  disableSilentMode
-} from '../../../../scripts/modules/utils.js'
-import { createLogWrapper } from '../../tools/utils.js'
-import { CUSTOM_PROVIDERS_ARRAY } from '../../../../src/constants/providers.js'
+	enableSilentMode,
+	disableSilentMode
+} from '../../../../scripts/modules/utils.js';
+import { createLogWrapper } from '../../tools/utils.js';
+import { CUSTOM_PROVIDERS_ARRAY } from '../../../../src/constants/providers.js';
 
 // Define supported roles for model setting
-const MODEL_ROLES = ['main', 'research', 'fallback']
+const MODEL_ROLES = ['main', 'research', 'fallback'];
 
 /**
  * Determine provider hint from custom provider flags
  * @param {Object} args - Arguments containing provider flags
  * @returns {string|undefined} Provider hint or undefined if no custom provider flag is set
  */
-function getProviderHint (args) {
-  return CUSTOM_PROVIDERS_ARRAY.find((provider) => args[provider])
+function getProviderHint(args) {
+	return CUSTOM_PROVIDERS_ARRAY.find((provider) => args[provider]);
 }
 
 /**
@@ -33,20 +33,20 @@ function getProviderHint (args) {
  * @param {Object} context - Context object with session, mcpLog, projectRoot
  * @returns {Object|null} Result if a model was set, null if no model setting was requested
  */
-async function handleModelSetting (args, context) {
-  for (const role of MODEL_ROLES) {
-    const roleKey = `set${role.charAt(0).toUpperCase() + role.slice(1)}` // setMain, setResearch, setFallback
+async function handleModelSetting(args, context) {
+	for (const role of MODEL_ROLES) {
+		const roleKey = `set${role.charAt(0).toUpperCase() + role.slice(1)}`; // setMain, setResearch, setFallback
 
-    if (args[roleKey]) {
-      const providerHint = getProviderHint(args)
+		if (args[roleKey]) {
+			const providerHint = getProviderHint(args);
 
-      return await setModel(role, args[roleKey], {
-        ...context,
-        providerHint
-      })
-    }
-  }
-  return null // No model setting was requested
+			return await setModel(role, args[roleKey], {
+				...context,
+				providerHint
+			});
+		}
+	}
+	return null; // No model setting was requested
 }
 
 /**
@@ -56,73 +56,73 @@ async function handleModelSetting (args, context) {
  * @param {Object} context - MCP context (contains session)
  * @returns {Object} Result object with success, data/error fields
  */
-export async function modelsDirect (args, log, context = {}) {
-  const { session } = context
-  const { projectRoot } = args // Extract projectRoot from args
+export async function modelsDirect(args, log, context = {}) {
+	const { session } = context;
+	const { projectRoot } = args; // Extract projectRoot from args
 
-  // Create a logger wrapper that the core functions can use
-  const mcpLog = createLogWrapper(log)
+	// Create a logger wrapper that the core functions can use
+	const mcpLog = createLogWrapper(log);
 
-  log.info(`Executing models_direct with args: ${JSON.stringify(args)}`)
-  log.info(`Using project root: ${projectRoot}`)
+	log.info(`Executing models_direct with args: ${JSON.stringify(args)}`);
+	log.info(`Using project root: ${projectRoot}`);
 
-  // Validate flags: only one custom provider flag can be used simultaneously
-  const customProviderFlags = CUSTOM_PROVIDERS_ARRAY.filter(
-    (provider) => args[provider]
-  )
+	// Validate flags: only one custom provider flag can be used simultaneously
+	const customProviderFlags = CUSTOM_PROVIDERS_ARRAY.filter(
+		(provider) => args[provider]
+	);
 
-  if (customProviderFlags.length > 1) {
-    log.error(
-      'Error: Cannot use multiple custom provider flags simultaneously.'
-    )
-    return {
-      success: false,
-      error: {
-        code: 'INVALID_ARGS',
-        message:
+	if (customProviderFlags.length > 1) {
+		log.error(
+			'Error: Cannot use multiple custom provider flags simultaneously.'
+		);
+		return {
+			success: false,
+			error: {
+				code: 'INVALID_ARGS',
+				message:
 					'Cannot use multiple custom provider flags simultaneously. Choose only one: openrouter, ollama, bedrock, azure, or vertex.'
-      }
-    }
-  }
+			}
+		};
+	}
 
-  try {
-    enableSilentMode()
+	try {
+		enableSilentMode();
 
-    try {
-      // Check for the listAvailableModels flag
-      if (args.listAvailableModels === true) {
-        return await getAvailableModelsList({
-          session,
-          mcpLog,
-          projectRoot
-        })
-      }
+		try {
+			// Check for the listAvailableModels flag
+			if (args.listAvailableModels === true) {
+				return await getAvailableModelsList({
+					session,
+					mcpLog,
+					projectRoot
+				});
+			}
 
-      // Handle setting any model role using unified function
-      const modelContext = { session, mcpLog, projectRoot }
-      const modelSetResult = await handleModelSetting(args, modelContext)
-      if (modelSetResult) {
-        return modelSetResult
-      }
+			// Handle setting any model role using unified function
+			const modelContext = { session, mcpLog, projectRoot };
+			const modelSetResult = await handleModelSetting(args, modelContext);
+			if (modelSetResult) {
+				return modelSetResult;
+			}
 
-      // Default action: get current configuration
-      return await getModelConfiguration({
-        session,
-        mcpLog,
-        projectRoot
-      })
-    } finally {
-      disableSilentMode()
-    }
-  } catch (error) {
-    log.error(`Error in models_direct: ${error.message}`)
-    return {
-      success: false,
-      error: {
-        code: 'DIRECT_FUNCTION_ERROR',
-        message: error.message,
-        details: error.stack
-      }
-    }
-  }
+			// Default action: get current configuration
+			return await getModelConfiguration({
+				session,
+				mcpLog,
+				projectRoot
+			});
+		} finally {
+			disableSilentMode();
+		}
+	} catch (error) {
+		log.error(`Error in models_direct: ${error.message}`);
+		return {
+			success: false,
+			error: {
+				code: 'DIRECT_FUNCTION_ERROR',
+				message: error.message,
+				details: error.stack
+			}
+		};
+	}
 }

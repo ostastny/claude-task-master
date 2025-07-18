@@ -90,10 +90,6 @@ dev-debug.log
 
 # OS specific
 
-# Task files
-tasks.json
-tasks/ 
-
 # complexity report
 complexity-report/
 report/
@@ -101,3 +97,7 @@ report/
 
 #claude commands
 .claude/commands/
+
+# Task files
+# tasks.json
+# tasks/ 

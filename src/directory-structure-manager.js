@@ -373,13 +373,14 @@ class ConflictResolver {
 			case 'skip':
 				return { strategy: 'skip', proceeded: false };
 
-			case 'rename':
+			case 'rename': {
 				const newPath = `${dirPath}-${Date.now()}`;
 				return {
 					strategy: 'rename',
 					proceeded: true,
 					newPath
 				};
+			}
 
 			default:
 				throw new Error('Invalid conflict resolution strategy');

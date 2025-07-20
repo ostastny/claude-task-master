@@ -12,6 +12,21 @@ import { log, readJSON } from '../utils.js';
 const DEFAULT_TAG = 'master';
 const FEATURES_DIR = 'features';
 
+// Error Messages
+const ERROR_MESSAGES = {
+	TASK_FILE_READ_FAILED: 'Could not read or parse tasks file',
+	TAG_NOT_FOUND: 'not found or contains no tasks in the data',
+	BDD_GENERATION_FAILED: 'Error generating BDD features'
+};
+
+// Log Messages
+const LOG_MESSAGES = {
+	GENERATION_START: (count, tag) =>
+		`Preparing to generate ${count} BDD feature files for tag '${tag}'`,
+	GENERATION_SUCCESS: (count, tag, dir) =>
+		`Successfully generated ${count} BDD feature files for tag '${tag}' in '${dir}'.`
+};
+
 /**
  * Generate BDD feature files from tasks.json, replacing legacy task file generation
  *
@@ -29,45 +44,99 @@ const FEATURES_DIR = 'features';
  */
 async function generateBDDFeatureFiles(tasksPath, outputDir, options = {}) {
 	try {
-		const isMcpMode = !!options?.mcpLog;
+		validateRequiredParameters(tasksPath, outputDir);
 
-		// Load and validate task data
-		const taskData = loadTaskData(tasksPath, options.projectRoot);
-		const targetTag = determineTargetTag(options.tag, taskData.tag);
-		const tasksForGeneration = extractTasksForTag(taskData, targetTag);
-
-		// Prepare for BDD generation
-		ensureDirectoryExists(outputDir);
-		logGenerationStart(tasksForGeneration.length, targetTag);
-
-		// Validate dependencies
-		const rawData = taskData._rawTaggedData || taskData;
-		validateAndFixDependencies(
-			rawData,
-			tasksPath,
-			options.projectRoot,
-			targetTag
-		);
-
-		// Generate BDD features
-		const bddResult = await generateBDDFeatures(
-			tasksForGeneration,
-			options.projectRoot
-		);
-
-		// Validate no task files are generated
-		await validateNoBDDTaskFiles(outputDir);
+		const context = await setupGenerationContext(tasksPath, outputDir, options);
+		await validateDependencies(context);
+		const bddResult = await executeBDDGeneration(context);
+		await validateGenerationResults(outputDir);
 
 		logGenerationSuccess(
 			bddResult.files.length,
-			targetTag,
+			context.targetTag,
 			bddResult.directory
 		);
 
-		return isMcpMode ? createMcpResult(bddResult) : undefined;
+		return context.isMcpMode ? createMcpResult(bddResult) : undefined;
 	} catch (error) {
 		handleGenerationError(error, options);
 	}
+}
+
+/**
+ * Validate required parameters for generation
+ * @param {string} tasksPath - Path to tasks file
+ * @param {string} outputDir - Output directory
+ * @throws {Error} When required parameters are missing or invalid
+ */
+function validateRequiredParameters(tasksPath, outputDir) {
+	if (!tasksPath || typeof tasksPath !== 'string') {
+		throw new Error('tasksPath is required and must be a string');
+	}
+	if (!outputDir || typeof outputDir !== 'string') {
+		throw new Error('outputDir is required and must be a string');
+	}
+}
+
+/**
+ * Setup generation context with all necessary data
+ * @param {string} tasksPath - Path to tasks file
+ * @param {string} outputDir - Output directory
+ * @param {Object} options - Generation options
+ * @returns {Object} Generation context object
+ */
+async function setupGenerationContext(tasksPath, outputDir, options) {
+	const isMcpMode = !!options?.mcpLog;
+	const taskData = loadTaskData(tasksPath, options.projectRoot);
+	const targetTag = determineTargetTag(options.tag, taskData.tag);
+	const tasksForGeneration = extractTasksForTag(taskData, targetTag);
+
+	ensureDirectoryExists(outputDir);
+	logGenerationStart(tasksForGeneration.length, targetTag);
+
+	return {
+		isMcpMode,
+		taskData,
+		targetTag,
+		tasksForGeneration,
+		tasksPath,
+		projectRoot: options.projectRoot,
+		outputDir
+	};
+}
+
+/**
+ * Validate task dependencies
+ * @param {Object} context - Generation context
+ */
+async function validateDependencies(context) {
+	const rawData = context.taskData._rawTaggedData || context.taskData;
+	validateAndFixDependencies(
+		rawData,
+		context.tasksPath,
+		context.projectRoot,
+		context.targetTag
+	);
+}
+
+/**
+ * Execute BDD feature generation
+ * @param {Object} context - Generation context
+ * @returns {Object} BDD generation result
+ */
+async function executeBDDGeneration(context) {
+	return await generateBDDFeatures(
+		context.tasksForGeneration,
+		context.projectRoot
+	);
+}
+
+/**
+ * Validate generation results
+ * @param {string} outputDir - Output directory to validate
+ */
+async function validateGenerationResults(outputDir) {
+	await validateNoBDDTaskFiles(outputDir);
 }
 
 /**
@@ -79,7 +148,7 @@ async function generateBDDFeatureFiles(tasksPath, outputDir, options = {}) {
 function loadTaskData(tasksPath, projectRoot) {
 	const resolvedData = readJSON(tasksPath, projectRoot);
 	if (!resolvedData) {
-		throw new Error(`Could not read or parse tasks file: ${tasksPath}`);
+		throw new Error(`${ERROR_MESSAGES.TASK_FILE_READ_FAILED}: ${tasksPath}`);
 	}
 	return resolvedData;
 }
@@ -114,9 +183,7 @@ function extractTasksForTag(taskData, targetTag) {
 		return taskData.tasks;
 	}
 
-	throw new Error(
-		`Tag '${targetTag}' not found or contains no tasks in the data.`
-	);
+	throw new Error(`Tag '${targetTag}' ${ERROR_MESSAGES.TAG_NOT_FOUND}.`);
 }
 
 /**
@@ -135,10 +202,7 @@ function ensureDirectoryExists(outputDir) {
  * @param {string} targetTag - Target tag name
  */
 function logGenerationStart(taskCount, targetTag) {
-	log(
-		'info',
-		`Preparing to generate ${taskCount} BDD feature files for tag '${targetTag}'`
-	);
+	log('info', LOG_MESSAGES.GENERATION_START(taskCount, targetTag));
 }
 
 /**
@@ -150,7 +214,7 @@ function logGenerationStart(taskCount, targetTag) {
 function logGenerationSuccess(fileCount, targetTag, outputDir) {
 	log(
 		'success',
-		`Successfully generated ${fileCount} BDD feature files for tag '${targetTag}' in '${outputDir}'.`
+		LOG_MESSAGES.GENERATION_SUCCESS(fileCount, targetTag, outputDir)
 	);
 }
 
@@ -224,17 +288,26 @@ function createMcpResult(bddResult) {
  * @throws {Error} In MCP mode, re-throws the error; in CLI mode, exits process
  */
 function handleGenerationError(error, options) {
-	const errorMessage = `Error generating BDD features: ${error.message}`;
+	const errorMessage = `${ERROR_MESSAGES.BDD_GENERATION_FAILED}: ${error.message}`;
 	log('error', errorMessage);
 
 	if (isCliMode(options)) {
-		console.error(chalk.red(errorMessage));
-		if (getDebugFlag()) {
-			console.error(error);
-		}
+		logCliError(errorMessage, error);
 		process.exit(1);
 	} else {
 		throw error;
+	}
+}
+
+/**
+ * Log errors in CLI mode with appropriate formatting
+ * @param {string} errorMessage - Formatted error message
+ * @param {Error} error - Original error object for debug output
+ */
+function logCliError(errorMessage, error) {
+	console.error(chalk.red(errorMessage));
+	if (getDebugFlag()) {
+		console.error(error);
 	}
 }
 

@@ -259,11 +259,7 @@ export class FeatureFileGenerationEngine {
 	}
 
 	writeFeatureFile(filename, content) {
-		try {
-			this.fileSystem.writeFileSync(filename, content);
-		} catch (error) {
-			throw error; // Re-throw filesystem errors
-		}
+		this.fileSystem.writeFileSync(filename, content);
 	}
 
 	processTemplate(template) {

@@ -321,8 +321,8 @@ while true; do
     log_step "Setting task status and getting details"
     
     STATUS_PROMPT="Set task status and get details for task $TASK_ID:
-1. Set task status to 'in-progress' using mcp__taskmaster-ai__set_task_status with projectRoot='$(pwd)'
-2. Get full task details using mcp__taskmaster-ai__get_task with projectRoot='$(pwd)'
+1. Set task status to 'in-progress' using mcp__taskmaster-ai__set_task_status with projectRoot='$(pwd)', id='$TASK_ID', status='in-progress'
+2. Get full task details using mcp__taskmaster-ai__get_task with projectRoot='$(pwd)', id='$TASK_ID'
 3. Return the task title and description for implementation"
     
     STATUS_RESULT=$(run_claude "$STATUS_PROMPT" "mcp__taskmaster-ai__set_task_status mcp__taskmaster-ai__get_task" "false")
@@ -433,7 +433,14 @@ while true; do
         
         JSON_CONTENT=$(extract_json_from_response "$QUALITY_RESULT")
         FAILURE_REASON=$(echo "$JSON_CONTENT" | sed -n 's/.*QUALITY_FAIL.*- \(.*\)/\1/p')
-        FAILURE_REASON=${FAILURE_REASON:-$JSON_CONTENT}
+        
+        # If no specific reason found, use the whole response but clean it up
+        if [[ -z "$FAILURE_REASON" ]]; then
+            FAILURE_REASON=$(echo "$QUALITY_RESULT" | grep -o 'QUALITY_FAIL[^"]*' | head -1)
+            if [[ -z "$FAILURE_REASON" ]]; then
+                FAILURE_REASON="Quality check failed - see debug output for details"
+            fi
+        fi
         
         echo "  → Quality issue: $FAILURE_REASON"
         
@@ -522,7 +529,7 @@ Steps to fix:
     
     FINALIZE_PROMPT="Finalize task completion:
 1. Update CLAUDE.md with task completion notes
-2. Set task status to 'done' using mcp__taskmaster-ai__set_task_status
+2. Set task status to 'done' using mcp__taskmaster-ai__set_task_status with projectRoot='$(pwd)', id='$TASK_ID', status='done'
 3. Return 'FINALIZED' on success"
     
     FINALIZE_RESULT=$(run_claude "$FINALIZE_PROMPT" "mcp__taskmaster-ai__set_task_status Edit" "false")

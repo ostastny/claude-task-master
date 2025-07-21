@@ -207,7 +207,7 @@ export function removeTaskMasterMCPConfiguration(projectRoot, mcpConfigPath) {
 		}
 
 		// Remove task-master-ai server
-		mcpConfig.mcpServers['task-master-ai'] = undefined;
+		delete mcpConfig.mcpServers['task-master-ai'];
 
 		// Also remove any servers that have task-master-ai in their args
 		Object.keys(mcpConfig.mcpServers).forEach((serverName) => {
@@ -228,9 +228,7 @@ export function removeTaskMasterMCPConfiguration(projectRoot, mcpConfigPath) {
 		});
 
 		// Check if there are other MCP servers remaining
-		const remainingServers = Object.keys(mcpConfig.mcpServers).filter(
-			(key) => mcpConfig.mcpServers[key] !== undefined
-		);
+		const remainingServers = Object.keys(mcpConfig.mcpServers);
 		result.hasOtherServers = remainingServers.length > 0;
 
 		if (result.hasOtherServers) {

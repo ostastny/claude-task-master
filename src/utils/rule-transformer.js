@@ -341,7 +341,13 @@ export function removeProfileRules(projectRoot, profile) {
 		skipped: false,
 		error: null,
 		filesRemoved: [],
-		mcpResult: null,
+		mcpResult: {
+			success: false,
+			removed: false,
+			deleted: false,
+			error: null,
+			hasOtherServers: false
+		},
 		profileDirRemoved: false,
 		notice: null
 	};

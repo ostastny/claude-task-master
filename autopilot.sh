@@ -550,7 +550,7 @@ Steps to fix:
     
     COMMIT_PROMPT="Commit the changes:
 1. Stage all changes: 'git add -A'
-2. Commit with message: 'feat: $TASK_ID - task completed'
+2. Commit with message: 'feat($TASK_ID): $TASK_TITLE'
 3. Review the diff and ensure quality
 4. Return 'COMMITTED' on success"
     

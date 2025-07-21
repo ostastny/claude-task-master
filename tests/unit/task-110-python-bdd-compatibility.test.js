@@ -11,7 +11,11 @@ const __dirname = path.dirname(__filename);
  * Test utilities for Python BDD compatibility testing
  */
 class TestUtils {
-	static createMockFeatureFile(projectRoot, name = 'user-authentication.feature', content = null) {
+	static createMockFeatureFile(
+		projectRoot,
+		name = 'user-authentication.feature',
+		content = null
+	) {
 		return {
 			path: path.join(projectRoot, '.taskmaster/features', name),
 			content: content || TestUtils.getMockGherkinContent()
@@ -37,21 +41,26 @@ class TestUtils {
 
 	static getMockTaskData() {
 		return {
-			tasks: [{
-				id: 1,
-				title: 'User Authentication',
-				description: 'Implement user authentication system',
-				status: 'pending',
-				priority: 'high',
-				details: 'Users need to be able to login and logout securely',
-				testStrategy: 'Unit tests for auth functions, integration tests for login flow',
-				subtasks: [{
+			tasks: [
+				{
 					id: 1,
-					title: 'Login functionality',
-					description: 'Implement login with email and password',
-					status: 'pending'
-				}]
-			}]
+					title: 'User Authentication',
+					description: 'Implement user authentication system',
+					status: 'pending',
+					priority: 'high',
+					details: 'Users need to be able to login and logout securely',
+					testStrategy:
+						'Unit tests for auth functions, integration tests for login flow',
+					subtasks: [
+						{
+							id: 1,
+							title: 'Login functionality',
+							description: 'Implement login with email and password',
+							status: 'pending'
+						}
+					]
+				}
+			]
 		};
 	}
 
@@ -62,7 +71,7 @@ class TestUtils {
 	static createMockCompatibilityModule() {
 		const methods = [
 			'validateBehaveCompatibility',
-			'validatePytestBddCompatibility', 
+			'validatePytestBddCompatibility',
 			'validateGherkinSyntaxForPython',
 			'ensurePythonBDDCompliance',
 			'generatePythonStepDefinitions',
@@ -74,7 +83,7 @@ class TestUtils {
 		];
 
 		const mockModule = {};
-		methods.forEach(method => {
+		methods.forEach((method) => {
 			mockModule[method] = async () => {
 				throw new Error(`${method} not implemented`);
 			};
@@ -100,7 +109,7 @@ class TestUtils {
 		];
 
 		const mockModule = {};
-		methods.forEach(method => {
+		methods.forEach((method) => {
 			mockModule[method] = async () => {
 				throw new Error(`${method} not implemented`);
 			};
@@ -136,10 +145,14 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 					features: {
 						'user-authentication.feature': mockGherkinContent
 					},
-					'config.json': JSON.stringify({
-						enableBDDGeneration: true,
-						pythonBDDCompatibility: true
-					}, null, 2)
+					'config.json': JSON.stringify(
+						{
+							enableBDDGeneration: true,
+							pythonBDDCompatibility: true
+						},
+						null,
+						2
+					)
 				}
 			}
 		});
@@ -168,11 +181,18 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 
 			it('should handle virtual environment installation', async () => {
 				const virtualEnvPath = '/test/project/venv';
-				await testMethodNotImplemented(BehaveFramework, 'installBehavePackage', virtualEnvPath);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'installBehavePackage',
+					virtualEnvPath
+				);
 			});
 
 			it('should verify behave installation success', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'validateBehaveInstallation');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'validateBehaveInstallation'
+				);
 			});
 
 			it('should handle pip installation failures gracefully', async () => {
@@ -180,7 +200,10 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 			});
 
 			it('should check for python and pip availability before installation', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'validateBehaveDependencies');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'validateBehaveDependencies'
+				);
 			});
 		});
 	});
@@ -188,26 +211,50 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 	describe('Test Directory Structure Creation', () => {
 		describe('createBehaveDirectory', () => {
 			it('should create standard behave directory structure', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createBehaveDirectory', mockProjectRoot);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createBehaveDirectory',
+					mockProjectRoot
+				);
 			});
 
 			it('should create features directory for .feature files', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createFeaturesDirectory', mockProjectRoot);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createFeaturesDirectory',
+					mockProjectRoot
+				);
 			});
 
 			it('should create steps directory for step definitions', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createStepsDirectory', mockProjectRoot);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createStepsDirectory',
+					mockProjectRoot
+				);
 			});
 
 			it('should create environment.py for behave configuration', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createEnvironmentPy', mockProjectRoot);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createEnvironmentPy',
+					mockProjectRoot
+				);
 			});
 
 			it('should handle existing directory structure gracefully', async () => {
 				// First create directories
-				await testMethodNotImplemented(BehaveFramework, 'createBehaveDirectory', mockProjectRoot);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createBehaveDirectory',
+					mockProjectRoot
+				);
 				// Then try to create again
-				await testMethodNotImplemented(BehaveFramework, 'createBehaveDirectory', mockProjectRoot);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createBehaveDirectory',
+					mockProjectRoot
+				);
 			});
 		});
 
@@ -218,14 +265,22 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 				'features/environment'
 			];
 
-			expectedDirectories.forEach(dir => {
+			expectedDirectories.forEach((dir) => {
 				it(`should create ${dir} directory`, async () => {
-					await testMethodNotImplemented(BehaveFramework, 'createBehaveDirectory', mockProjectRoot);
+					await testMethodNotImplemented(
+						BehaveFramework,
+						'createBehaveDirectory',
+						mockProjectRoot
+					);
 				});
 			});
 
 			it('should create all required directories in correct hierarchy', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createBehaveDirectory', mockProjectRoot);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createBehaveDirectory',
+					mockProjectRoot
+				);
 			});
 		});
 	});
@@ -233,12 +288,20 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 	describe('Step Definitions Setup', () => {
 		describe('setupBehaveStepDefinitions', () => {
 			it('should create step definitions for common Gherkin patterns', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'setupBehaveStepDefinitions', mockProjectRoot);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'setupBehaveStepDefinitions',
+					mockProjectRoot
+				);
 			});
 
 			it('should generate step definitions with proper behave decorators', async () => {
 				const stepPatterns = ['given', 'when', 'then'];
-				await testMethodNotImplemented(BehaveFramework, 'createSampleStepDefinitions', stepPatterns);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createSampleStepDefinitions',
+					stepPatterns
+				);
 			});
 
 			it('should create step definitions that handle parameterized steps', async () => {
@@ -247,15 +310,27 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 					'When I set age to {age:d}',
 					'Then the result should be "{result}"'
 				];
-				await testMethodNotImplemented(BehaveFramework, 'createSampleStepDefinitions', parameterizedSteps);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createSampleStepDefinitions',
+					parameterizedSteps
+				);
 			});
 
 			it('should create step definitions for scenario outlines', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createSampleStepDefinitions', 'scenario_outline');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createSampleStepDefinitions',
+					'scenario_outline'
+				);
 			});
 
 			it('should handle background step definitions', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createSampleStepDefinitions', 'background');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createSampleStepDefinitions',
+					'background'
+				);
 			});
 		});
 
@@ -267,14 +342,22 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 				'api_steps.py'
 			];
 
-			stepFileTypes.forEach(fileType => {
+			stepFileTypes.forEach((fileType) => {
 				it(`should create ${fileType} step definition file`, async () => {
-					await testMethodNotImplemented(BehaveFramework, 'createSampleStepDefinitions', fileType);
+					await testMethodNotImplemented(
+						BehaveFramework,
+						'createSampleStepDefinitions',
+						fileType
+					);
 				});
 			});
 
 			it('should organize step definitions by feature domain', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'setupBehaveStepDefinitions', mockProjectRoot);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'setupBehaveStepDefinitions',
+					mockProjectRoot
+				);
 			});
 		});
 	});
@@ -282,47 +365,87 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 	describe('Behave Configuration', () => {
 		describe('configureBehaveEnvironment', () => {
 			it('should create behave.ini configuration file', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'generateBehaveConfig', mockProjectRoot);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'generateBehaveConfig',
+					mockProjectRoot
+				);
 			});
 
 			it('should configure behave with appropriate formatters', async () => {
 				const formatters = ['pretty', 'json', 'junit'];
-				await testMethodNotImplemented(BehaveFramework, 'generateBehaveConfig', formatters);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'generateBehaveConfig',
+					formatters
+				);
 			});
 
 			it('should set up environment.py with necessary hooks', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createEnvironmentPy', mockProjectRoot);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createEnvironmentPy',
+					mockProjectRoot
+				);
 			});
 
 			it('should configure tags for test organization', async () => {
 				const tags = ['@smoke', '@regression', '@unit'];
-				await testMethodNotImplemented(BehaveFramework, 'generateBehaveConfig', tags);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'generateBehaveConfig',
+					tags
+				);
 			});
 
 			it('should set up logging configuration for behave', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'configureBehaveEnvironment', 'logging');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'configureBehaveEnvironment',
+					'logging'
+				);
 			});
 		});
 
 		describe('Environment.py Setup', () => {
 			it('should create environment.py with before_all hook', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createEnvironmentPy', 'before_all');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createEnvironmentPy',
+					'before_all'
+				);
 			});
 
 			it('should create environment.py with after_all hook', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createEnvironmentPy', 'after_all');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createEnvironmentPy',
+					'after_all'
+				);
 			});
 
 			it('should create environment.py with before_scenario hook', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createEnvironmentPy', 'before_scenario');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createEnvironmentPy',
+					'before_scenario'
+				);
 			});
 
 			it('should create environment.py with after_scenario hook', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createEnvironmentPy', 'after_scenario');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createEnvironmentPy',
+					'after_scenario'
+				);
 			});
 
 			it('should configure context setup in environment.py', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createEnvironmentPy', 'context_setup');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createEnvironmentPy',
+					'context_setup'
+				);
 			});
 		});
 	});
@@ -330,23 +453,43 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 	describe('pytest-bdd Secondary Validation Setup', () => {
 		describe('pytest-bdd Configuration', () => {
 			it('should install pytest-bdd as secondary validation tool', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'installBehavePackage', 'pytest-bdd');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'installBehavePackage',
+					'pytest-bdd'
+				);
 			});
 
 			it('should create pytest.ini configuration for pytest-bdd', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'generateBehaveConfig', 'pytest-bdd');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'generateBehaveConfig',
+					'pytest-bdd'
+				);
 			});
 
 			it('should set up conftest.py for pytest-bdd fixtures', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createEnvironmentPy', 'pytest-bdd');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createEnvironmentPy',
+					'pytest-bdd'
+				);
 			});
 
 			it('should configure pytest-bdd step definition discovery', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'setupBehaveStepDefinitions', 'pytest-bdd');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'setupBehaveStepDefinitions',
+					'pytest-bdd'
+				);
 			});
 
 			it('should create pytest-bdd compatible test structure', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createBehaveDirectory', 'pytest-bdd');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createBehaveDirectory',
+					'pytest-bdd'
+				);
 			});
 		});
 	});
@@ -362,9 +505,13 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 				'ui_interaction'
 			];
 
-			commonPatterns.forEach(pattern => {
+			commonPatterns.forEach((pattern) => {
 				it(`should create sample step definitions for ${pattern} pattern`, async () => {
-					await testMethodNotImplemented(BehaveFramework, 'createSampleStepDefinitions', pattern);
+					await testMethodNotImplemented(
+						BehaveFramework,
+						'createSampleStepDefinitions',
+						pattern
+					);
 				});
 			});
 
@@ -375,7 +522,11 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 						# Handle data table
 						pass
 				`;
-				await testMethodNotImplemented(BehaveFramework, 'createSampleStepDefinitions', 'data_table');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createSampleStepDefinitions',
+					'data_table'
+				);
 			});
 
 			it('should create step definitions that handle docstrings', async () => {
@@ -385,34 +536,54 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 						# Handle docstring
 						pass
 				`;
-				await testMethodNotImplemented(BehaveFramework, 'createSampleStepDefinitions', 'docstring');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createSampleStepDefinitions',
+					'docstring'
+				);
 			});
 
 			it('should create step definitions with proper parameter matching', async () => {
 				const parameterizedSteps = [
 					'@given(\'I have a user named "{name}"\')',
-					'@when(\'I set the age to {age:d}\')',
-					'@then(\'the result should be {result:w}\')'
+					"@when('I set the age to {age:d}')",
+					"@then('the result should be {result:w}')"
 				];
-				await testMethodNotImplemented(BehaveFramework, 'createSampleStepDefinitions', parameterizedSteps);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createSampleStepDefinitions',
+					parameterizedSteps
+				);
 			});
 		});
 
 		describe('Step Definition Types', () => {
 			const stepTypes = ['given', 'when', 'then', 'step'];
 
-			stepTypes.forEach(stepType => {
+			stepTypes.forEach((stepType) => {
 				it(`should create sample ${stepType} step definitions`, async () => {
-					await testMethodNotImplemented(BehaveFramework, 'createSampleStepDefinitions', stepType);
+					await testMethodNotImplemented(
+						BehaveFramework,
+						'createSampleStepDefinitions',
+						stepType
+					);
 				});
 			});
 
 			it('should create step definitions with proper imports', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createSampleStepDefinitions', 'imports');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createSampleStepDefinitions',
+					'imports'
+				);
 			});
 
 			it('should create step definitions with context usage examples', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createSampleStepDefinitions', 'context');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createSampleStepDefinitions',
+					'context'
+				);
 			});
 		});
 	});
@@ -420,25 +591,45 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 	describe('Behave Runner Setup', () => {
 		describe('setupBehaveRunner', () => {
 			it('should create script to run behave tests', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'setupBehaveRunner', mockProjectRoot);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'setupBehaveRunner',
+					mockProjectRoot
+				);
 			});
 
 			it('should configure behave runner with proper options', async () => {
 				const options = ['--format=pretty', '--tags=@smoke', '--no-capture'];
-				await testMethodNotImplemented(BehaveFramework, 'setupBehaveRunner', options);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'setupBehaveRunner',
+					options
+				);
 			});
 
 			it('should create runner script for different environments', async () => {
 				const environments = ['development', 'testing', 'production'];
-				await testMethodNotImplemented(BehaveFramework, 'setupBehaveRunner', environments);
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'setupBehaveRunner',
+					environments
+				);
 			});
 
 			it('should set up parallel execution configuration', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'setupBehaveRunner', 'parallel');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'setupBehaveRunner',
+					'parallel'
+				);
 			});
 
 			it('should configure test reporting and output', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'setupBehaveRunner', 'reporting');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'setupBehaveRunner',
+					'reporting'
+				);
 			});
 		});
 	});
@@ -446,41 +637,76 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 	describe('Integration Testing Environment', () => {
 		describe('End-to-End Setup Validation', () => {
 			it('should validate complete behave environment setup', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'validateBehaveInstallation');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'validateBehaveInstallation'
+				);
 			});
 
 			it('should run a sample behave test to verify setup', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'setupBehaveRunner', 'validation_test');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'setupBehaveRunner',
+					'validation_test'
+				);
 			});
 
 			it('should verify step definition discovery works correctly', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'validateBehaveInstallation', 'step_discovery');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'validateBehaveInstallation',
+					'step_discovery'
+				);
 			});
 
 			it('should validate environment.py hooks are working', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'validateBehaveInstallation', 'hooks');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'validateBehaveInstallation',
+					'hooks'
+				);
 			});
 
 			it('should verify behave configuration is properly loaded', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'validateBehaveInstallation', 'config');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'validateBehaveInstallation',
+					'config'
+				);
 			});
 		});
 
 		describe('Compatibility Validation', () => {
 			it('should validate generated feature files work with behave', async () => {
-				await testMethodNotImplemented(PythonBDDCompatibility, 'validateBehaveCompatibility', mockFeatureFile.path);
+				await testMethodNotImplemented(
+					PythonBDDCompatibility,
+					'validateBehaveCompatibility',
+					mockFeatureFile.path
+				);
 			});
 
 			it('should validate step definitions are compatible with generated features', async () => {
-				await testMethodNotImplemented(PythonBDDCompatibility, 'validateBehaveCompatibility', 'step_compatibility');
+				await testMethodNotImplemented(
+					PythonBDDCompatibility,
+					'validateBehaveCompatibility',
+					'step_compatibility'
+				);
 			});
 
 			it('should verify pytest-bdd can also parse the same feature files', async () => {
-				await testMethodNotImplemented(PythonBDDCompatibility, 'validatePytestBddCompatibility', mockFeatureFile.path);
+				await testMethodNotImplemented(
+					PythonBDDCompatibility,
+					'validatePytestBddCompatibility',
+					mockFeatureFile.path
+				);
 			});
 
 			it('should validate cross-framework compatibility', async () => {
-				await testMethodNotImplemented(PythonBDDCompatibility, 'ensurePythonBDDCompliance', [mockFeatureFile]);
+				await testMethodNotImplemented(
+					PythonBDDCompatibility,
+					'ensurePythonBDDCompliance',
+					[mockFeatureFile]
+				);
 			});
 		});
 	});
@@ -488,51 +714,95 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 	describe('Error Handling and Edge Cases', () => {
 		describe('Installation Error Handling', () => {
 			it('should handle missing python installation gracefully', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'validateBehaveDependencies', 'python_missing');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'validateBehaveDependencies',
+					'python_missing'
+				);
 			});
 
 			it('should handle missing pip installation gracefully', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'validateBehaveDependencies', 'pip_missing');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'validateBehaveDependencies',
+					'pip_missing'
+				);
 			});
 
 			it('should handle network errors during package installation', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'installBehavePackage', 'network_error');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'installBehavePackage',
+					'network_error'
+				);
 			});
 
 			it('should handle permission errors during installation', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'installBehavePackage', 'permission_error');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'installBehavePackage',
+					'permission_error'
+				);
 			});
 
 			it('should handle virtual environment setup failures', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'installBehavePackage', 'venv_error');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'installBehavePackage',
+					'venv_error'
+				);
 			});
 		});
 
 		describe('Directory Creation Error Handling', () => {
 			it('should handle permission errors when creating directories', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createBehaveDirectory', 'permission_error');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createBehaveDirectory',
+					'permission_error'
+				);
 			});
 
 			it('should handle existing file conflicts when creating directories', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createBehaveDirectory', 'file_conflict');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createBehaveDirectory',
+					'file_conflict'
+				);
 			});
 
 			it('should handle disk space issues when creating structure', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createBehaveDirectory', 'disk_space');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createBehaveDirectory',
+					'disk_space'
+				);
 			});
 		});
 
 		describe('Configuration Error Handling', () => {
 			it('should handle invalid behave.ini configuration', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'generateBehaveConfig', 'invalid_config');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'generateBehaveConfig',
+					'invalid_config'
+				);
 			});
 
 			it('should handle corrupted environment.py files', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'createEnvironmentPy', 'corrupted_file');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'createEnvironmentPy',
+					'corrupted_file'
+				);
 			});
 
 			it('should handle conflicting configuration options', async () => {
-				await testMethodNotImplemented(BehaveFramework, 'configureBehaveEnvironment', 'config_conflict');
+				await testMethodNotImplemented(
+					BehaveFramework,
+					'configureBehaveEnvironment',
+					'config_conflict'
+				);
 			});
 		});
 	});
@@ -540,15 +810,27 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 	describe('Python BDD Framework Compatibility Integration', () => {
 		it('should integrate with existing Python BDD compatibility tests', async () => {
 			// Test that the framework setup works with the existing compatibility validation
-			await testMethodNotImplemented(PythonBDDCompatibility, 'validateBehaveCompatibility', mockFeatureFile.path);
+			await testMethodNotImplemented(
+				PythonBDDCompatibility,
+				'validateBehaveCompatibility',
+				mockFeatureFile.path
+			);
 		});
 
 		it('should ensure generated step definitions match Gherkin converter output', async () => {
-			await testMethodNotImplemented(BehaveFramework, 'createSampleStepDefinitions', 'gherkin_converter_match');
+			await testMethodNotImplemented(
+				BehaveFramework,
+				'createSampleStepDefinitions',
+				'gherkin_converter_match'
+			);
 		});
 
 		it('should validate that the testing environment supports all generated feature patterns', async () => {
-			await testMethodNotImplemented(PythonBDDCompatibility, 'ensurePythonBDDCompliance', [mockFeatureFile]);
+			await testMethodNotImplemented(
+				PythonBDDCompatibility,
+				'ensurePythonBDDCompliance',
+				[mockFeatureFile]
+			);
 		});
 	});
 });

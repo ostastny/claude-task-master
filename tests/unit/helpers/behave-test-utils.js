@@ -69,15 +69,22 @@ export class BehaveTestUtils {
 	}
 
 	/**
+	 * Helper to create a mock method that rejects with not implemented error
+	 */
+	static _createMockMethod(methodName) {
+		return jest
+			.fn()
+			.mockRejectedValue(new Error(`${methodName} not implemented`));
+	}
+
+	/**
 	 * Creates a mock Behave framework with all methods
 	 */
 	static createMockBehaveFramework() {
 		const mockModule = {};
 
 		Object.values(BEHAVE_METHODS).forEach((method) => {
-			mockModule[method] = jest
-				.fn()
-				.mockRejectedValue(new Error(`${method} not implemented`));
+			mockModule[method] = BehaveTestUtils._createMockMethod(method);
 		});
 
 		return mockModule;
@@ -91,23 +98,34 @@ export class BehaveTestUtils {
 	}
 
 	/**
+	 * Helper to create a single parameterized test
+	 */
+	static _createSingleParameterizedTest(getFramework, methodName, scenario) {
+		const testDescriptor = BehaveTestUtils._createTestDescriptor(scenario);
+
+		return {
+			name: testDescriptor.name,
+			test: async () => {
+				const framework = BehaveTestUtils._getFrameworkInstance(getFramework);
+				await BehaveTestUtils.expectNotImplementedError(
+					framework[methodName](testDescriptor.param),
+					methodName
+				);
+			}
+		};
+	}
+
+	/**
 	 * Creates a parameterized test for a method with multiple scenarios
 	 */
 	static createParameterizedTest(getFramework, methodName, scenarios) {
-		return scenarios.map((scenario) => {
-			const testDescriptor = BehaveTestUtils._createTestDescriptor(scenario);
-
-			return {
-				name: testDescriptor.name,
-				test: async () => {
-					const framework = BehaveTestUtils._getFrameworkInstance(getFramework);
-					await BehaveTestUtils.expectNotImplementedError(
-						framework[methodName](testDescriptor.param),
-						methodName
-					);
-				}
-			};
-		});
+		return scenarios.map((scenario) =>
+			BehaveTestUtils._createSingleParameterizedTest(
+				getFramework,
+				methodName,
+				scenario
+			)
+		);
 	}
 
 	/**
@@ -129,6 +147,22 @@ export class BehaveTestUtils {
 	}
 
 	/**
+	 * Helper to create a single item test
+	 */
+	static _createSingleItemTest(getFramework, methodName, item, description) {
+		return {
+			name: `${description} ${item}`,
+			test: async () => {
+				const framework = BehaveTestUtils._getFrameworkInstance(getFramework);
+				await BehaveTestUtils.expectNotImplementedError(
+					framework[methodName](item),
+					methodName
+				);
+			}
+		};
+	}
+
+	/**
 	 * Creates tests for a list of items with a method
 	 */
 	static createItemTests(
@@ -137,33 +171,41 @@ export class BehaveTestUtils {
 		items,
 		description = 'should create'
 	) {
-		return items.map((item) => {
-			return {
-				name: `${description} ${item}`,
-				test: async () => {
-					const framework = BehaveTestUtils._getFrameworkInstance(getFramework);
-					await BehaveTestUtils.expectNotImplementedError(
-						framework[methodName](item),
-						methodName
-					);
-				}
-			};
-		});
+		return items.map((item) =>
+			BehaveTestUtils._createSingleItemTest(
+				getFramework,
+				methodName,
+				item,
+				description
+			)
+		);
+	}
+
+	/**
+	 * Helper to check if structure is valid object type
+	 */
+	static _isValidObjectType(structure) {
+		return (
+			structure && typeof structure === 'object' && !Array.isArray(structure)
+		);
+	}
+
+	/**
+	 * Helper to check if structure has content
+	 */
+	static _hasContent(structure) {
+		return Object.keys(structure).length > 0;
 	}
 
 	/**
 	 * Validates mock project structure format
 	 */
 	static validateMockStructure(structure) {
-		if (!structure || typeof structure !== 'object') {
+		if (!BehaveTestUtils._isValidObjectType(structure)) {
 			return false;
 		}
 
-		if (Array.isArray(structure)) {
-			return false;
-		}
-
-		return Object.keys(structure).length > 0;
+		return BehaveTestUtils._hasContent(structure);
 	}
 
 	/**

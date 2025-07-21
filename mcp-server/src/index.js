@@ -1,12 +1,12 @@
-import { FastMCP } from 'fastmcp';
-import path from 'path';
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
 import fs from 'fs';
-import logger from './logger.js';
-import { registerTaskMasterTools } from './tools/index.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import { FastMCP } from 'fastmcp';
 import ProviderRegistry from '../../src/provider-registry/index.js';
+import logger from './logger.js';
 import { MCPProvider } from './providers/mcp-provider.js';
+import { registerTaskMasterTools } from './tools/index.js';
 
 // Load environment variables
 dotenv.config();

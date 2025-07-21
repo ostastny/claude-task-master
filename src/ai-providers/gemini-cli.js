@@ -7,8 +7,8 @@
 
 import { generateObject, generateText, streamText } from 'ai';
 import { parse } from 'jsonc-parser';
-import { BaseAIProvider } from './base-provider.js';
 import { log } from '../../scripts/modules/utils.js';
+import { BaseAIProvider } from './base-provider.js';
 
 let createGeminiProvider;
 

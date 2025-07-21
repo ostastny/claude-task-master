@@ -1,7 +1,7 @@
 import {
-	Parser,
 	AstBuilder,
-	GherkinClassicTokenMatcher
+	GherkinClassicTokenMatcher,
+	Parser
 } from '@cucumber/gherkin';
 import { IdGenerator } from '@cucumber/messages';
 

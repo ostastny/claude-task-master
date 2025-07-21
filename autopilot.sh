@@ -13,12 +13,22 @@
 set -e  # Exit on error
 set -u  # Exit on undefined variable
 
-# Check for debug flag
+# Check for flags
 DEBUG_MODE=false
-if [[ "${1:-}" == "--debug" ]] || [[ "${1:-}" == "-d" ]]; then
-    DEBUG_MODE=true
-    echo "🐛 Debug mode enabled"
-fi
+SKIP_SETUP=false
+
+for arg in "$@"; do
+    case $arg in
+        --debug|-d)
+            DEBUG_MODE=true
+            echo "🐛 Debug mode enabled"
+            ;;
+        --skip-setup|-s)
+            SKIP_SETUP=true
+            echo "⏭️  Setup skip mode enabled - jumping to implementation loop"
+            ;;
+    esac
+done
 
 # Colors for output
 RED='\033[0;31m'
@@ -62,10 +72,20 @@ log_debug() {
 # Function to extract JSON from Claude Code response
 extract_json_from_response() {
     local response="$1"
-    local result_field=$(echo "$response" | sed -n 's/.*"result":"\(.*\)","session_id".*/\1/p')
-    local unescaped_result=$(echo "$result_field" | sed 's/\\"/"/g')
     
-    # Handle markdown code blocks
+    # First try to extract from markdown code blocks in the result field
+    local json_from_markdown=$(echo "$response" | sed -n '/```json/,/```/p' | sed '1d;$d' | head -1)
+    
+    if [[ -n "$json_from_markdown" && "$json_from_markdown" == *"{"* ]]; then
+        echo "$json_from_markdown"
+        return
+    fi
+    
+    # Fallback: try to extract the result field and unescape it
+    local result_field=$(echo "$response" | sed -n 's/.*"result":"\(.*\)","session_id".*/\1/p')
+    local unescaped_result=$(echo "$result_field" | sed 's/\\"/"/g' | sed 's/\\n/\n/g')
+    
+    # Handle markdown code blocks in the unescaped result
     if [[ "$unescaped_result" == *'```json'* ]]; then
         echo "$unescaped_result" | sed -n '/```json/,/```/p' | sed '1d;$d'
     else
@@ -127,42 +147,50 @@ echo "Timestamp: $(date)"
 if [[ "$DEBUG_MODE" == "false" ]]; then
     echo "💡 Use --debug or -d flag to see detailed debug output"
 fi
+if [[ "$SKIP_SETUP" == "false" ]]; then
+    echo "💡 Use --skip-setup or -s flag to skip validation and setup steps"
+fi
 echo
 
-# 0. SELF-CHECKS (fail fast)
-log_step "Self-checks and prerequisites"
+if [[ "$SKIP_SETUP" == "true" ]]; then
+    echo "⏭️  Skipping setup steps and jumping to implementation loop..."
+    # Adjust step counter to start at step 4
+    CURRENT_STEP=3
+else
+    # 0. SELF-CHECKS (fail fast)
+    log_step "Self-checks and prerequisites"
 
-# Check if claude command exists
-if ! command_exists claude; then
-    log_error "Claude Code CLI not found. Please install it first."
-    exit 1
-fi
+    # Check if claude command exists
+    if ! command_exists claude; then
+        log_error "Claude Code CLI not found. Please install it first."
+        exit 1
+    fi
 
-# Check if git repo
-if ! git rev-parse --git-dir >/dev/null 2>&1; then
-    log_error "Not a git repository. Please run in a git repository."
-    exit 1
-fi
+    # Check if git repo
+    if ! git rev-parse --git-dir >/dev/null 2>&1; then
+        log_error "Not a git repository. Please run in a git repository."
+        exit 1
+    fi
 
-# Check MCP connectivity with headless Claude
-MCP_CHECK=$(run_claude "Check if Task Master MCP tools are available by running mcp__taskmaster-ai__get_tasks with projectRoot='$(pwd)'. Return 'MCP_OK' if successful, 'MCP_FAIL' if not." "mcp__taskmaster-ai__get_tasks" "false" || echo "MCP_FAIL")
+    # Check MCP connectivity with headless Claude
+    MCP_CHECK=$(run_claude "Check if Task Master MCP tools are available by running mcp__taskmaster-ai__get_tasks with projectRoot='$(pwd)'. Return 'MCP_OK' if successful, 'MCP_FAIL' if not." "mcp__taskmaster-ai__get_tasks" "false" || echo "MCP_FAIL")
 
-if [[ "$MCP_CHECK" == *"MCP_FAIL"* ]]; then
-    log_error "Task Master MCP tools not available. Check your .mcp.json configuration."
-    exit 1
-fi
+    if [[ "$MCP_CHECK" == *"MCP_FAIL"* ]]; then
+        log_error "Task Master MCP tools not available. Check your .mcp.json configuration."
+        exit 1
+    fi
 
-# Check working tree status
-if [[ -n "$(git status --porcelain)" ]]; then
-    log_warning "Working tree is not clean. Continuing anyway..."
-fi
+    # Check working tree status
+    if [[ -n "$(git status --porcelain)" ]]; then
+        log_warning "Working tree is not clean. Continuing anyway..."
+    fi
 
-log_success "Self-checks completed"
+    log_success "Self-checks completed"
 
-# 1. BACKLOG CREATION (idempotent)
-log_step "Backlog creation and initialization"
+    # 1. BACKLOG CREATION (idempotent)
+    log_step "Backlog creation and initialization"
 
-BACKLOG_PROMPT="Initialize Task Master project if needed and create backlog:
+    BACKLOG_PROMPT="Initialize Task Master project if needed and create backlog:
 1. Check if .taskmaster directory exists
 2. If not, run mcp__taskmaster-ai__initialize_project with projectRoot='$(pwd)', rules=['cursor','claude'], yes=true, storeTasksInGit=true
 3. Check if .taskmaster/tasks/tasks.json exists and has tasks data
@@ -178,55 +206,59 @@ BACKLOG_PROMPT="Initialize Task Master project if needed and create backlog:
 - Return: {\"status\": \"success\", \"task_count\": N}
 Handle errors gracefully and return appropriate status."
 
-BACKLOG_RESULT=$(run_claude "$BACKLOG_PROMPT" "mcp__taskmaster-ai__initialize_project mcp__taskmaster-ai__parse_prd mcp__taskmaster-ai__generate mcp__taskmaster-ai__get_tasks Bash" "true")
+    BACKLOG_RESULT=$(run_claude "$BACKLOG_PROMPT" "mcp__taskmaster-ai__initialize_project mcp__taskmaster-ai__parse_prd mcp__taskmaster-ai__generate mcp__taskmaster-ai__get_tasks Bash" "true")
 
-log_debug "Backlog result: $BACKLOG_RESULT"
+    log_debug "Backlog result: $BACKLOG_RESULT"
 
-# Extract task count from Claude Code response
-JSON_CONTENT=$(extract_json_from_response "$BACKLOG_RESULT")
-TASK_COUNT=$(echo "$JSON_CONTENT" | grep -o '"task_count": [0-9]*' | grep -o '[0-9]*' | head -1)
-TASK_COUNT=${TASK_COUNT:-0}
+    # Extract task count from Claude Code response
+    JSON_CONTENT=$(extract_json_from_response "$BACKLOG_RESULT")
+    TASK_COUNT=$(echo "$JSON_CONTENT" | grep -o '"task_count": [0-9]*' | grep -o '[0-9]*' | head -1)
+    TASK_COUNT=${TASK_COUNT:-0}
 
-log_debug "Extracted task count: $TASK_COUNT"
+    log_debug "Extracted task count: $TASK_COUNT"
+    log_debug "JSON content: $JSON_CONTENT"
 
-if [[ "$BACKLOG_RESULT" == *"success"* ]]; then
-    log_success "Backlog created with $TASK_COUNT tasks"
-elif [[ "$BACKLOG_RESULT" == *"skipped"* ]]; then
-    log_warning "Backlog creation skipped - tasks already exist ($TASK_COUNT tasks)"
-else
-    log_error "Failed to create backlog"
-    log_error "Full response: $BACKLOG_RESULT"
-    exit 1
-fi
+    if [[ "$JSON_CONTENT" == *"tasks_exist"* ]] || [[ "$JSON_CONTENT" == *"skipped"* ]]; then
+        log_warning "Backlog creation skipped - tasks already exist ($TASK_COUNT tasks)"
+    elif [[ "$JSON_CONTENT" == *"success"* ]]; then
+        log_success "Backlog created with $TASK_COUNT tasks"
+    else
+        log_error "Failed to create backlog"
+        log_error "Full response: $BACKLOG_RESULT"
+        log_error "JSON content: $JSON_CONTENT"
+        exit 1
+    fi
 
-# 2. PROJECT MEMORY (CLAUDE.md)
-log_step "Project memory management"
+    # 2. PROJECT MEMORY (CLAUDE.md)
+    log_step "Project memory management"
 
-MEMORY_PROMPT="Manage project memory in CLAUDE.md:
+    MEMORY_PROMPT="Manage project memory in CLAUDE.md:
 1. Calculate SHA256 hash of .taskmaster/docs/prd.txt
 2. Read current CLAUDE.md content
 3. If hash is not found in CLAUDE.md, append: '\\n## PRD-Hash: [hash] (reset [date])\\n'
 4. Return the hash for tracking"
 
-HASH_RESULT=$(run_claude "$MEMORY_PROMPT" "Bash Read Edit" "false")
-log_success "Project memory updated"
+    HASH_RESULT=$(run_claude "$MEMORY_PROMPT" "Bash Read Edit" "false")
+    log_success "Project memory updated"
 
-# 3. TASK COMPLEXITY ANALYSIS
-if [[ "$BACKLOG_RESULT" == *"skipped"* ]]; then
-    log_step "Task complexity analysis (skipped - tasks already exist)"
-    log_success "Complexity analysis skipped - using existing tasks"
-else
-    log_step "Task complexity analysis"
-    
-    COMPLEXITY_PROMPT="Analyze task complexity and expand complex tasks:
+    # 3. TASK COMPLEXITY ANALYSIS
+    if [[ "$JSON_CONTENT" == *"tasks_exist"* ]] || [[ "$JSON_CONTENT" == *"skipped"* ]]; then
+        log_step "Task complexity analysis (skipped - tasks already exist)"
+        log_success "Complexity analysis skipped - using existing tasks"
+    else
+        log_step "Task complexity analysis"
+        
+        COMPLEXITY_PROMPT="Analyze task complexity and expand complex tasks:
 1. Run mcp__taskmaster-ai__analyze_project_complexity with projectRoot='$(pwd)', research=true
 2. Get all tasks with mcp__taskmaster-ai__get_tasks
 3. For any task with complexity > 6, expand it using mcp__taskmaster-ai__expand_task with research=true
 4. Return summary of expansions performed"
-    
-    COMPLEXITY_RESULT=$(run_claude "$COMPLEXITY_PROMPT" "mcp__taskmaster-ai__analyze_project_complexity mcp__taskmaster-ai__get_tasks mcp__taskmaster-ai__expand_task" "false")
-    log_success "Complexity analysis completed"
-fi
+        
+        COMPLEXITY_RESULT=$(run_claude "$COMPLEXITY_PROMPT" "mcp__taskmaster-ai__analyze_project_complexity mcp__taskmaster-ai__get_tasks mcp__taskmaster-ai__expand_task" "false")
+        log_success "Complexity analysis completed"
+    fi
+
+fi  # End of SKIP_SETUP conditional
 
 # 4. MAIN IMPLEMENTATION LOOP
 log_step "Starting main implementation loop"
@@ -527,12 +559,15 @@ Steps to fix:
     # 4.5 UPDATE TASK STATUS AND MEMORY
     log_step "Finalizing task $TASK_ID"
     
-    FINALIZE_PROMPT="Finalize task completion:
+    FINALIZE_PROMPT="Finalize task completion for $TASK_ID:
 1. Update CLAUDE.md with task completion notes
 2. Set task status to 'done' using mcp__taskmaster-ai__set_task_status with projectRoot='$(pwd)', id='$TASK_ID', status='done'
-3. Return 'FINALIZED' on success"
+3. If this is a subtask (contains dot like '109.2'), check if all sibling subtasks are now done:
+   - Get parent task details using mcp__taskmaster-ai__get_task to see all subtasks
+   - If all subtasks are done, also mark parent task as done
+4. Return 'FINALIZED' on success"
     
-    FINALIZE_RESULT=$(run_claude "$FINALIZE_PROMPT" "mcp__taskmaster-ai__set_task_status Edit" "false")
+    FINALIZE_RESULT=$(run_claude "$FINALIZE_PROMPT" "mcp__taskmaster-ai__set_task_status mcp__taskmaster-ai__get_task Edit" "false")
     
     log_success "Task $TASK_ID completed successfully"
     

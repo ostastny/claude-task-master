@@ -4,11 +4,11 @@
  */
 
 import { generateTaskFiles } from '../../../../scripts/modules/task-manager.js';
-import { BDDReplacementSystem } from '../../../../src/bdd-replacement-system.js';
 import {
-	enableSilentMode,
-	disableSilentMode
+	disableSilentMode,
+	enableSilentMode
 } from '../../../../scripts/modules/utils.js';
+import { BDDReplacementSystem } from '../../../../src/bdd-replacement-system.js';
 
 /**
  * Direct function wrapper for generateTaskFiles with error handling.

@@ -5,16 +5,16 @@
  * authoritative source for all critical file and directory paths, resolving circular dependencies.
  */
 
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 import {
-	TASKMASTER_DIR,
-	TASKMASTER_TASKS_FILE,
+	LEGACY_CONFIG_FILE,
 	LEGACY_TASKS_FILE,
+	TASKMASTER_CONFIG_FILE,
+	TASKMASTER_DIR,
 	TASKMASTER_DOCS_DIR,
 	TASKMASTER_REPORTS_DIR,
-	TASKMASTER_CONFIG_FILE,
-	LEGACY_CONFIG_FILE
+	TASKMASTER_TASKS_FILE
 } from './constants/paths.js';
 
 /**

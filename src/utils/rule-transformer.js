@@ -12,8 +12,8 @@ import { log } from '../../scripts/modules/utils.js';
 
 // Import the shared MCP configuration helper
 import {
-	setupMCPConfiguration,
-	removeTaskMasterMCPConfiguration
+	removeTaskMasterMCPConfiguration,
+	setupMCPConfiguration
 } from './create-mcp-config.js';
 
 // Import profile constants (single source of truth)

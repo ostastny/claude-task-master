@@ -3,17 +3,17 @@
  * Direct function implementation for expanding a task into subtasks
  */
 
-import expandTask from '../../../../scripts/modules/task-manager/expand-task.js';
-import { BDDReplacementSystem } from '../../../../src/bdd-replacement-system.js';
-import {
-	readJSON,
-	writeJSON,
-	enableSilentMode,
-	disableSilentMode,
-	isSilentMode
-} from '../../../../scripts/modules/utils.js';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
+import expandTask from '../../../../scripts/modules/task-manager/expand-task.js';
+import {
+	disableSilentMode,
+	enableSilentMode,
+	isSilentMode,
+	readJSON,
+	writeJSON
+} from '../../../../scripts/modules/utils.js';
+import { BDDReplacementSystem } from '../../../../src/bdd-replacement-system.js';
 import { createLogWrapper } from '../../tools/utils.js';
 
 /**

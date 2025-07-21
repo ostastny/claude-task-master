@@ -1,10 +1,10 @@
 import { z } from 'zod';
+import { responseLanguageDirect } from '../core/direct-functions/response-language.js';
 import {
 	createErrorResponse,
 	handleApiResult,
 	withNormalizedProjectRoot
 } from './utils.js';
-import { responseLanguageDirect } from '../core/direct-functions/response-language.js';
 
 export function registerResponseLanguageTool(server) {
 	server.addTool({

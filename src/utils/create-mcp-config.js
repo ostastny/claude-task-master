@@ -228,7 +228,9 @@ export function removeTaskMasterMCPConfiguration(projectRoot, mcpConfigPath) {
 		});
 
 		// Check if there are other MCP servers remaining
-		const remainingServers = Object.keys(mcpConfig.mcpServers);
+		const remainingServers = Object.keys(mcpConfig.mcpServers).filter(
+			(key) => mcpConfig.mcpServers[key] !== undefined
+		);
 		result.hasOtherServers = remainingServers.length > 0;
 
 		if (result.hasOtherServers) {

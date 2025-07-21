@@ -1,13 +1,13 @@
-import {
-	jest,
-	beforeEach,
-	afterEach,
-	describe,
-	it,
-	expect
-} from '@jest/globals';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import {
+	afterEach,
+	beforeEach,
+	describe,
+	expect,
+	it,
+	jest
+} from '@jest/globals';
 
 // Create mock functions
 const mockReadFileSync = jest.fn();

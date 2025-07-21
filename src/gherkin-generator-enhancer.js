@@ -62,11 +62,11 @@ export class GherkinGeneratorEnhancer {
 				but: 'But'
 			},
 			pythonMappings: {
-				'Given': '@given',
-				'When': '@when', 
-				'Then': '@then',
-				'And': '@and',
-				'But': '@but'
+				Given: '@given',
+				When: '@when',
+				Then: '@then',
+				And: '@and',
+				But: '@but'
 			},
 			status: 'implemented'
 		};
@@ -136,16 +136,16 @@ export class GherkinGeneratorEnhancer {
 		return {
 			stepTemplates: {
 				behave: {
-					given: '@given(\'{step_text}\')\ndef step_impl(context):\n    pass',
-					when: '@when(\'{step_text}\')\ndef step_impl(context):\n    pass',
+					given: "@given('{step_text}')\ndef step_impl(context):\n    pass",
+					when: "@when('{step_text}')\ndef step_impl(context):\n    pass",
 					// biome-ignore lint/suspicious/noThenProperty: This is a Gherkin keyword, not a Promise method
-					then: '@then(\'{step_text}\')\ndef step_impl(context):\n    pass'
+					then: "@then('{step_text}')\ndef step_impl(context):\n    pass"
 				},
 				'pytest-bdd': {
-					given: '@given(\'{step_text}\')\ndef step_impl():\n    pass',
-					when: '@when(\'{step_text}\')\ndef step_impl():\n    pass',
+					given: "@given('{step_text}')\ndef step_impl():\n    pass",
+					when: "@when('{step_text}')\ndef step_impl():\n    pass",
 					// biome-ignore lint/suspicious/noThenProperty: This is a Gherkin keyword, not a Promise method
-					then: '@then(\'{step_text}\')\ndef step_impl():\n    pass'
+					then: "@then('{step_text}')\ndef step_impl():\n    pass"
 				}
 			},
 			parameterHandling: {
@@ -235,7 +235,7 @@ export class GherkinGeneratorEnhancer {
 
 	_generateContent(data, framework) {
 		let content = `Feature: ${data.title}\n`;
-		
+
 		if (data.description) {
 			content += `  ${data.description}\n\n`;
 		}
@@ -251,9 +251,11 @@ export class GherkinGeneratorEnhancer {
 
 	_generateScenario(scenario, framework) {
 		let content = '';
-		
+
 		if (scenario.tags) {
-			const tags = scenario.tags.map(tag => `@${this._sanitizeTag(tag)}`).join(' ');
+			const tags = scenario.tags
+				.map((tag) => `@${this._sanitizeTag(tag)}`)
+				.join(' ');
 			content += `  ${tags}\n`;
 		}
 

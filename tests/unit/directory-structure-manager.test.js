@@ -1,11 +1,11 @@
+import fs from 'fs';
+import path from 'path';
 /**
  * Tests for Directory Structure Manager (Task 108)
  * Testing Cucumber-compatible directory structure implementation
  * Following TDD approach - these tests should fail initially
  */
 import { jest } from '@jest/globals';
-import path from 'path';
-import fs from 'fs';
 
 // Mock fs module before importing the module under test
 jest.unstable_mockModule('fs', () => ({

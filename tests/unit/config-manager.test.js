@@ -1,12 +1,12 @@
 import fs from 'fs';
 import path from 'path';
-import { jest } from '@jest/globals';
 import { fileURLToPath } from 'url';
+import { jest } from '@jest/globals';
 
-// --- Import the module under test AFTER mocks are defined ---
-import * as configManager from '../../scripts/modules/config-manager.js';
 // Import the mocked 'fs' module to allow spying on its functions
 import fsMocked from 'fs';
+// --- Import the module under test AFTER mocks are defined ---
+import * as configManager from '../../scripts/modules/config-manager.js';
 
 // Mock modules first before any imports
 jest.mock('fs', () => ({

@@ -7,19 +7,19 @@
 
 import { jest } from '@jest/globals';
 import mockFs from 'mock-fs';
-import { BehaveTestUtils } from './helpers/behave-test-utils.js';
 import {
 	BEHAVE_METHODS,
-	DIRECTORY_STRUCTURE,
-	STEP_DEFINITION_FILES,
-	STEP_PATTERNS,
 	CONFIG_TYPES,
+	DIRECTORY_STRUCTURE,
 	ENVIRONMENT_HOOKS,
+	ERROR_SCENARIOS,
 	PYTEST_BDD_FEATURES,
 	RUNNER_FEATURES,
-	VALIDATION_TYPES,
-	ERROR_SCENARIOS
+	STEP_DEFINITION_FILES,
+	STEP_PATTERNS,
+	VALIDATION_TYPES
 } from './helpers/behave-test-constants.js';
+import { BehaveTestUtils } from './helpers/behave-test-utils.js';
 
 describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 	let BehaveFramework;
@@ -737,7 +737,7 @@ describe('Task 110.1: Setup Behave Framework Testing Environment', () => {
 			expect(Object.keys(taskmasterContents)).toContain('config.json');
 
 			// Verify JSON parsing works
-			const tasksJson = JSON.parse(taskmasterContents['tasks']['tasks.json']);
+			const tasksJson = JSON.parse(taskmasterContents.tasks['tasks.json']);
 			expect(tasksJson).toHaveProperty('tasks');
 			expect(Array.isArray(tasksJson.tasks)).toBe(true);
 

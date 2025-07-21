@@ -9,8 +9,8 @@ import fs from 'fs';
 import path from 'path';
 import { setupCLI } from '../../scripts/modules/commands.js';
 import {
-	RULES_SETUP_ACTION,
-	RULES_ACTIONS
+	RULES_ACTIONS,
+	RULES_SETUP_ACTION
 } from '../../src/constants/rules-actions.js';
 
 // Mock modules first

@@ -15,8 +15,8 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import readline from 'readline';
+import { fileURLToPath } from 'url';
 
 // Import prompt manager
 import { getPromptManager } from '../../../scripts/modules/prompt-manager.js';

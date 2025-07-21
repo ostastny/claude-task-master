@@ -1,8 +1,8 @@
-import { jest } from '@jest/globals';
 import fs from 'fs';
 import path from 'path';
-import mockFs from 'mock-fs';
 import { fileURLToPath } from 'url';
+import { jest } from '@jest/globals';
+import mockFs from 'mock-fs';
 
 // Mock dependencies
 const mockFeatureEngine = {

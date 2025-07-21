@@ -6,10 +6,37 @@ export class PythonBddCompatibilityFixer {
 	constructor() {
 		this.supportedFrameworks = ['behave', 'pytest-bdd'];
 		this.pythonReservedKeywords = [
-			'and', 'as', 'assert', 'break', 'class', 'continue', 'def', 'del',
-			'elif', 'else', 'except', 'exec', 'finally', 'for', 'from',
-			'global', 'if', 'import', 'in', 'is', 'lambda', 'not', 'or',
-			'pass', 'print', 'raise', 'return', 'try', 'while', 'with', 'yield'
+			'and',
+			'as',
+			'assert',
+			'break',
+			'class',
+			'continue',
+			'def',
+			'del',
+			'elif',
+			'else',
+			'except',
+			'exec',
+			'finally',
+			'for',
+			'from',
+			'global',
+			'if',
+			'import',
+			'in',
+			'is',
+			'lambda',
+			'not',
+			'or',
+			'pass',
+			'print',
+			'raise',
+			'return',
+			'try',
+			'while',
+			'with',
+			'yield'
 		];
 		// Constants for consistent regex patterns
 		this.patterns = {
@@ -34,13 +61,13 @@ export class PythonBddCompatibilityFixer {
 	 */
 	async detectPythonBddCompatibilityIssues(content, framework, options = {}) {
 		const issues = [];
-		
+
 		// Check if framework is supported
 		issues.push(...this._validateFrameworks(framework));
-		
+
 		// Parse content for issues
 		const lines = content.split('\n');
-		
+
 		// Detect all types of issues
 		issues.push(
 			...this._detectDataTableIssues(lines, options),
@@ -48,7 +75,7 @@ export class PythonBddCompatibilityFixer {
 			...this._detectTagIssues(lines, options),
 			...this._detectStepParameterIssues(lines, options)
 		);
-		
+
 		return this._createDetectionResult(issues, framework);
 	}
 
@@ -58,11 +85,19 @@ export class PythonBddCompatibilityFixer {
 	async fixDataTableSyntaxForBehave(content, options = {}) {
 		const lines = content.split('\n');
 		const { fixedLines, mappingDoc } = this._processLines(lines, {
-			processor: (line) => this._isDataTableHeader(line) ? this._fixDataTableHeaderLine(line) : { fixed: line },
+			processor: (line) =>
+				this._isDataTableHeader(line)
+					? this._fixDataTableHeaderLine(line)
+					: { fixed: line },
 			collectMappings: options.generateMappingDoc
 		});
-		
-		return this._createFixResult(lines, fixedLines, mappingDoc, options.generateMappingDoc);
+
+		return this._createFixResult(
+			lines,
+			fixedLines,
+			mappingDoc,
+			options.generateMappingDoc
+		);
 	}
 
 	/**
@@ -71,17 +106,17 @@ export class PythonBddCompatibilityFixer {
 	async fixScenarioOutlinePythonCompatibility(content, options = {}) {
 		const lines = content.split('\n');
 		const parameterMappings = new Map();
-		
-		const fixedLines = lines.map(line => {
+
+		const fixedLines = lines.map((line) => {
 			let fixedLine = this._fixParametersInLine(line, parameterMappings);
-			
+
 			if (this._isExamplesTableHeader(line)) {
 				fixedLine = this._fixExamplesTableHeader(fixedLine, parameterMappings);
 			}
-			
+
 			return fixedLine;
 		});
-		
+
 		return {
 			content: fixedLines.join('\n'),
 			parameterMappings: Array.from(parameterMappings.entries()),
@@ -95,12 +130,18 @@ export class PythonBddCompatibilityFixer {
 	async fixTagSystemCompatibility(content, options = {}) {
 		const lines = content.split('\n');
 		const { fixedLines, mappingDoc: tagMappings } = this._processLines(lines, {
-			processor: (line) => this._isTagLine(line) ? this._fixTagLine(line) : { fixed: line },
+			processor: (line) =>
+				this._isTagLine(line) ? this._fixTagLine(line) : { fixed: line },
 			collectMappings: options.generateTagMapping,
 			mappingProperty: 'mappings'
 		});
-		
-		return this._createTagFixResult(lines, fixedLines, tagMappings, options.generateTagMapping);
+
+		return this._createTagFixResult(
+			lines,
+			fixedLines,
+			tagMappings,
+			options.generateTagMapping
+		);
 	}
 
 	/**
@@ -109,36 +150,45 @@ export class PythonBddCompatibilityFixer {
 	async validatePythonIdentifierCompliance(content, options = {}) {
 		const violations = [];
 		const lines = content.split('\n');
-		
+
 		for (let i = 0; i < lines.length; i++) {
 			const line = lines[i];
 			const lineNumber = i + 1;
-			
-			if (options.checkParameters || !options.checkDataTables && !options.checkTags) {
+
+			if (
+				options.checkParameters ||
+				(!options.checkDataTables && !options.checkTags)
+			) {
 				violations.push(...this._checkParametersInLine(line, lineNumber));
 			}
-			
-			if (options.checkDataTables || !options.checkParameters && !options.checkTags) {
+
+			if (
+				options.checkDataTables ||
+				(!options.checkParameters && !options.checkTags)
+			) {
 				violations.push(...this._checkDataTableInLine(line, lineNumber));
 			}
-			
-			if (options.checkTags || !options.checkParameters && !options.checkDataTables) {
+
+			if (
+				options.checkTags ||
+				(!options.checkParameters && !options.checkDataTables)
+			) {
 				violations.push(...this._checkTagsInLine(line, lineNumber));
 			}
 		}
-		
+
 		const result = {
 			compliant: violations.length === 0,
 			violations
 		};
-		
+
 		if (options.detailedReport) {
 			result.summary = {
 				totalViolations: violations.length,
-				violationTypes: [...new Set(violations.map(v => v.type))]
+				violationTypes: [...new Set(violations.map((v) => v.type))]
 			};
 		}
-		
+
 		return result;
 	}
 
@@ -152,25 +202,28 @@ export class PythonBddCompatibilityFixer {
 			issues: [],
 			stepDefinitions: []
 		};
-		
+
 		const lines = content.split('\n');
-		
+
 		for (const line of lines) {
 			if (this._isStepLine(line)) {
 				const stepAnalysis = this._analyzeStepCompatibility(line, framework);
 				analysis.stepDefinitions.push(stepAnalysis);
-				
+
 				if (!stepAnalysis.compatible) {
 					analysis.compatible = false;
 					analysis.issues.push(...stepAnalysis.issues);
 				}
 			}
 		}
-		
+
 		if (options.generateTemplates) {
-			analysis.templates = this._generateStepTemplates(analysis.stepDefinitions, framework);
+			analysis.templates = this._generateStepTemplates(
+				analysis.stepDefinitions,
+				framework
+			);
 		}
-		
+
 		return analysis;
 	}
 
@@ -229,9 +282,10 @@ export class PythonBddCompatibilityFixer {
 			dataTables: 'Data table headers must be valid Python identifiers',
 			scenarioOutlines: 'Parameters must follow Python naming conventions',
 			tags: 'Tags should use underscores instead of hyphens',
-			stepDefinitions: 'Step definitions must be compatible with framework syntax'
+			stepDefinitions:
+				'Step definitions must be compatible with framework syntax'
 		};
-		
+
 		if (options.section) {
 			return {
 				section: options.section,
@@ -239,7 +293,7 @@ export class PythonBddCompatibilityFixer {
 				status: 'updated'
 			};
 		}
-		
+
 		return {
 			sections,
 			status: 'updated'
@@ -250,7 +304,7 @@ export class PythonBddCompatibilityFixer {
 	_validateFrameworks(framework) {
 		const issues = [];
 		const frameworks = Array.isArray(framework) ? framework : [framework];
-		
+
 		for (const fw of frameworks) {
 			if (fw !== 'all' && !this.supportedFrameworks.includes(fw)) {
 				issues.push({
@@ -260,10 +314,10 @@ export class PythonBddCompatibilityFixer {
 				});
 			}
 		}
-		
+
 		return issues;
 	}
-	
+
 	_createDetectionResult(issues, framework) {
 		return {
 			issues,
@@ -271,56 +325,65 @@ export class PythonBddCompatibilityFixer {
 			hasIssues: issues.length > 0
 		};
 	}
-	
+
 	// Helper methods - Line Processing
-	_processLines(lines, { processor, collectMappings, mappingProperty = 'mapping' }) {
+	_processLines(
+		lines,
+		{ processor, collectMappings, mappingProperty = 'mapping' }
+	) {
 		const fixedLines = [];
 		const mappingDoc = [];
-		
+
 		for (const line of lines) {
 			const result = processor(line);
 			fixedLines.push(result.fixed);
-			
+
 			if (collectMappings && result[mappingProperty]) {
-				const mappings = Array.isArray(result[mappingProperty]) ? 
-					result[mappingProperty] : [result[mappingProperty]];
+				const mappings = Array.isArray(result[mappingProperty])
+					? result[mappingProperty]
+					: [result[mappingProperty]];
 				mappingDoc.push(...mappings);
 			}
 		}
-		
+
 		return { fixedLines, mappingDoc };
 	}
-	
+
 	_createFixResult(originalLines, fixedLines, mappingDoc, includeMappings) {
 		const result = {
 			content: fixedLines.join('\n'),
 			changed: this._hasChanges(originalLines, fixedLines)
 		};
-		
+
 		if (includeMappings) {
 			result.mappingDoc = mappingDoc;
 		}
-		
+
 		return result;
 	}
-	
-	_createTagFixResult(originalLines, fixedLines, tagMappings, includeTagMapping) {
+
+	_createTagFixResult(
+		originalLines,
+		fixedLines,
+		tagMappings,
+		includeTagMapping
+	) {
 		const result = {
 			content: fixedLines.join('\n'),
 			changed: this._hasChanges(originalLines, fixedLines)
 		};
-		
+
 		if (includeTagMapping) {
 			result.tagMappings = tagMappings;
 		}
-		
+
 		return result;
 	}
-	
+
 	_hasChanges(originalLines, fixedLines) {
 		return fixedLines.some((line, i) => line !== originalLines[i]);
 	}
-	
+
 	_createIssue(type, line, properties, message) {
 		return {
 			type,
@@ -329,119 +392,134 @@ export class PythonBddCompatibilityFixer {
 			message
 		};
 	}
-	
+
 	// Helper methods - Issue Detection
 	_detectDataTableIssues(lines, options) {
 		const issues = [];
-		
+
 		for (let i = 0; i < lines.length; i++) {
 			const line = lines[i];
-			
+
 			if (this._isDataTableHeader(line)) {
 				const headers = this._extractDataTableHeaders(line);
-				
+
 				for (const header of headers) {
 					if (!this._isValidPythonIdentifier(header.trim())) {
-						issues.push(this._createIssue(
-							this.issueTypes.INVALID_DATA_TABLE_HEADER,
-							options.includeLineNumbers ? i + 1 : undefined,
-							{ header: header.trim() },
-							`Invalid Python identifier: ${header.trim()}`
-						));
+						issues.push(
+							this._createIssue(
+								this.issueTypes.INVALID_DATA_TABLE_HEADER,
+								options.includeLineNumbers ? i + 1 : undefined,
+								{ header: header.trim() },
+								`Invalid Python identifier: ${header.trim()}`
+							)
+						);
 					}
 				}
 			}
 		}
-		
+
 		return issues;
 	}
 
 	_detectScenarioOutlineIssues(lines, options) {
 		const issues = [];
-		
+
 		for (let i = 0; i < lines.length; i++) {
 			const line = lines[i];
 			const parameterMatches = line.match(this.patterns.scenarioOutlineParams);
-			
+
 			if (parameterMatches) {
 				for (const match of parameterMatches) {
 					const parameter = match.slice(1, -1); // Remove < >
-					
+
 					if (!this._isValidPythonIdentifier(parameter)) {
-						issues.push(this._createIssue(
-							this.issueTypes.INVALID_SCENARIO_OUTLINE_PARAMETER,
-							options.includeLineNumbers ? i + 1 : undefined,
-							{ parameter },
-							`Invalid parameter name: ${parameter}`
-						));
+						issues.push(
+							this._createIssue(
+								this.issueTypes.INVALID_SCENARIO_OUTLINE_PARAMETER,
+								options.includeLineNumbers ? i + 1 : undefined,
+								{ parameter },
+								`Invalid parameter name: ${parameter}`
+							)
+						);
 					}
 				}
 			}
 		}
-		
+
 		return issues;
 	}
 
 	_detectTagIssues(lines, options) {
 		const issues = [];
-		
+
 		for (let i = 0; i < lines.length; i++) {
 			const line = lines[i];
-			
+
 			if (this._isTagLine(line)) {
 				const tags = this._extractTags(line);
-				
+
 				for (const tag of tags) {
 					if (!this._isValidTagName(tag)) {
-						issues.push(this._createIssue(
-							this.issueTypes.INVALID_TAG_NAME,
-							options.includeLineNumbers ? i + 1 : undefined,
-							{ tag },
-							`Invalid tag name: ${tag}`
-						));
+						issues.push(
+							this._createIssue(
+								this.issueTypes.INVALID_TAG_NAME,
+								options.includeLineNumbers ? i + 1 : undefined,
+								{ tag },
+								`Invalid tag name: ${tag}`
+							)
+						);
 					}
 				}
 			}
 		}
-		
+
 		return issues;
 	}
 
 	_detectStepParameterIssues(lines, options) {
 		const issues = [];
-		
+
 		for (let i = 0; i < lines.length; i++) {
 			const line = lines[i];
-			
+
 			// Check for {parameter} style parameters
 			const paramMatches = line.match(this.patterns.stepParams);
-			
+
 			if (paramMatches) {
 				for (const match of paramMatches) {
 					const parameter = match.slice(1, -1); // Remove { }
-					
+
 					if (!this._isValidPythonIdentifier(parameter)) {
-						issues.push(this._createIssue(
-							this.issueTypes.INVALID_STEP_PARAMETER,
-							options.includeLineNumbers ? i + 1 : undefined,
-							{ parameter },
-							`Invalid step parameter: ${parameter}`
-						));
+						issues.push(
+							this._createIssue(
+								this.issueTypes.INVALID_STEP_PARAMETER,
+								options.includeLineNumbers ? i + 1 : undefined,
+								{ parameter },
+								`Invalid step parameter: ${parameter}`
+							)
+						);
 					}
 				}
 			}
 		}
-		
+
 		return issues;
 	}
 
 	_isDataTableHeader(line) {
 		const trimmed = line.trim();
-		return trimmed.startsWith('|') && trimmed.endsWith('|') && (trimmed.match(/\|/g) || []).length >= 2;
+		return (
+			trimmed.startsWith('|') &&
+			trimmed.endsWith('|') &&
+			(trimmed.match(/\|/g) || []).length >= 2
+		);
 	}
 
 	_extractDataTableHeaders(line) {
-		return line.split('|').map(h => h.trim()).filter(h => h.length > 0);
+		return line
+			.split('|')
+			.map((h) => h.trim())
+			.filter((h) => h.length > 0);
 	}
 
 	_isValidPythonIdentifier(identifier) {
@@ -456,7 +534,11 @@ export class PythonBddCompatibilityFixer {
 	}
 
 	_extractTags(line) {
-		return line.trim().split(/\s+/).filter(tag => tag.startsWith('@')).map(tag => tag.substring(1));
+		return line
+			.trim()
+			.split(/\s+/)
+			.filter((tag) => tag.startsWith('@'))
+			.map((tag) => tag.substring(1));
 	}
 
 	_isValidTagName(tag) {
@@ -467,8 +549,8 @@ export class PythonBddCompatibilityFixer {
 	_fixDataTableHeaderLine(line) {
 		const parts = line.split('|');
 		const mapping = {};
-		
-		const fixedParts = parts.map(part => {
+
+		const fixedParts = parts.map((part) => {
 			const trimmed = part.trim();
 			if (trimmed && !this._isValidPythonIdentifier(trimmed)) {
 				const fixed = this._sanitizeIdentifier(trimmed);
@@ -477,7 +559,7 @@ export class PythonBddCompatibilityFixer {
 			}
 			return part;
 		});
-		
+
 		return {
 			fixed: fixedParts.join('|'),
 			mapping: Object.keys(mapping).length > 0 ? mapping : null
@@ -487,17 +569,17 @@ export class PythonBddCompatibilityFixer {
 	_sanitizeIdentifier(identifier) {
 		// Convert to valid Python identifier
 		let sanitized = identifier.replace(/[^a-zA-Z0-9_]/g, '_');
-		
+
 		// Ensure doesn't start with number
 		if (this.patterns.startWithNumber.test(sanitized)) {
 			sanitized = '_' + sanitized;
 		}
-		
+
 		// Handle reserved keywords
 		if (this.pythonReservedKeywords.includes(sanitized)) {
 			sanitized = sanitized + '_param';
 		}
-		
+
 		return sanitized;
 	}
 
@@ -519,25 +601,26 @@ export class PythonBddCompatibilityFixer {
 
 	_fixExamplesTableHeader(line, mappings) {
 		const parts = line.split('|');
-		
-		const fixedParts = parts.map(part => {
+
+		const fixedParts = parts.map((part) => {
 			const trimmed = part.trim();
 			if (trimmed && !this._isValidPythonIdentifier(trimmed)) {
-				const fixed = mappings.get(trimmed) || this._sanitizeIdentifier(trimmed);
+				const fixed =
+					mappings.get(trimmed) || this._sanitizeIdentifier(trimmed);
 				mappings.set(trimmed, fixed);
 				return ` ${fixed} `;
 			}
 			return part;
 		});
-		
+
 		return fixedParts.join('|');
 	}
 
 	_fixTagLine(line) {
 		const tags = line.trim().split(/\s+/);
 		const mappings = [];
-		
-		const fixedTags = tags.map(tag => {
+
+		const fixedTags = tags.map((tag) => {
 			if (tag.startsWith('@')) {
 				const tagName = tag.substring(1);
 				if (!this._isValidTagName(tagName)) {
@@ -548,7 +631,7 @@ export class PythonBddCompatibilityFixer {
 			}
 			return tag;
 		});
-		
+
 		return {
 			fixed: fixedTags.join(' '),
 			mappings
@@ -558,7 +641,7 @@ export class PythonBddCompatibilityFixer {
 	_checkParametersInLine(line, lineNumber) {
 		const violations = [];
 		const paramMatches = line.match(this.patterns.scenarioOutlineParams);
-		
+
 		if (paramMatches) {
 			for (const match of paramMatches) {
 				const parameter = match.slice(1, -1);
@@ -572,13 +655,13 @@ export class PythonBddCompatibilityFixer {
 				}
 			}
 		}
-		
+
 		return violations;
 	}
 
 	_checkDataTableInLine(line, lineNumber) {
 		const violations = [];
-		
+
 		if (this._isDataTableHeader(line)) {
 			const headers = this._extractDataTableHeaders(line);
 			for (const header of headers) {
@@ -592,13 +675,13 @@ export class PythonBddCompatibilityFixer {
 				}
 			}
 		}
-		
+
 		return violations;
 	}
 
 	_checkTagsInLine(line, lineNumber) {
 		const violations = [];
-		
+
 		if (this._isTagLine(line)) {
 			const tags = this._extractTags(line);
 			for (const tag of tags) {
@@ -612,17 +695,19 @@ export class PythonBddCompatibilityFixer {
 				}
 			}
 		}
-		
+
 		return violations;
 	}
 
 	_isStepLine(line) {
 		const trimmed = line.trim();
-		return trimmed.startsWith('Given ') || 
-		       trimmed.startsWith('When ') || 
-		       trimmed.startsWith('Then ') || 
-		       trimmed.startsWith('And ') || 
-		       trimmed.startsWith('But ');
+		return (
+			trimmed.startsWith('Given ') ||
+			trimmed.startsWith('When ') ||
+			trimmed.startsWith('Then ') ||
+			trimmed.startsWith('And ') ||
+			trimmed.startsWith('But ')
+		);
 	}
 
 	_analyzeStepCompatibility(line, framework) {
@@ -631,25 +716,28 @@ export class PythonBddCompatibilityFixer {
 			compatible: true,
 			issues: []
 		};
-		
+
 		// Basic compatibility analysis
 		if (line.includes('{') && framework === 'pytest-bdd') {
-			analysis.issues.push('pytest-bdd prefers parameter style over string formatting');
+			analysis.issues.push(
+				'pytest-bdd prefers parameter style over string formatting'
+			);
 		}
-		
+
 		if (analysis.issues.length > 0) {
 			analysis.compatible = false;
 		}
-		
+
 		return analysis;
 	}
 
 	_generateStepTemplates(stepDefinitions, framework) {
-		return stepDefinitions.map(step => ({
+		return stepDefinitions.map((step) => ({
 			step: step.step,
-			template: framework === 'behave' ? 
-				`@given('${step.step.replace(/^Given /, '')}')\ndef step_impl(context):\n    pass` :
-				`@given(parsers.parse('${step.step.replace(/^Given /, '')}'))\ndef step_impl():\n    pass`
+			template:
+				framework === 'behave'
+					? `@given('${step.step.replace(/^Given /, '')}')\ndef step_impl(context):\n    pass`
+					: `@given(parsers.parse('${step.step.replace(/^Given /, '')}'))\ndef step_impl():\n    pass`
 		}));
 	}
 }

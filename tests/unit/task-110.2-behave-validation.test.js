@@ -1,20 +1,20 @@
 import { jest } from '@jest/globals';
-import { BehaveTestUtils } from './helpers/behave-test-utils.js';
 import { BEHAVE_METHODS } from './helpers/behave-test-constants.js';
-import {
-	BehaveValidator,
-	FeatureFileParser,
-	BehaveExecutionEngine,
-	PythonSyntaxChecker
-} from './helpers/behave-test-mocks.js';
 import { EXPECTED_RESULTS, TEST_DATA } from './helpers/behave-test-data.js';
 import {
 	createAsyncTest,
-	createConfigTest,
 	createComplexityTest,
-	createTestInstances,
-	createFeatureFileVerificationTest
+	createConfigTest,
+	createFeatureFileVerificationTest,
+	createTestInstances
 } from './helpers/behave-test-helpers.js';
+import {
+	BehaveExecutionEngine,
+	BehaveValidator,
+	FeatureFileParser,
+	PythonSyntaxChecker
+} from './helpers/behave-test-mocks.js';
+import { BehaveTestUtils } from './helpers/behave-test-utils.js';
 
 /**
  * Unit Tests for Task 110.2: Validate Generated Feature Files with Behave

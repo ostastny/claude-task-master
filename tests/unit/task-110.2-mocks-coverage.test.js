@@ -5,9 +5,9 @@
 
 import { jest } from '@jest/globals';
 import {
+	BehaveExecutionEngine,
 	BehaveValidator,
 	FeatureFileParser,
-	BehaveExecutionEngine,
 	PythonSyntaxChecker
 } from './helpers/behave-test-mocks.js';
 

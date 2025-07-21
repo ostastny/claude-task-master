@@ -1,6 +1,6 @@
-import { jest, describe, test, expect, beforeEach } from '@jest/globals';
 import fs from 'fs';
 import path from 'path';
+import { beforeEach, describe, expect, jest, test } from '@jest/globals';
 import { PrdToGherkinParser } from '../../src/parsers/prd-to-gherkin-parser.js';
 
 describe('PrdToGherkinParser', () => {

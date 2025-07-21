@@ -2,8 +2,8 @@ import { jest } from '@jest/globals';
 
 // Import modules after mocking
 import fs from 'fs';
-import { convertRuleToProfileRule } from '../../../src/utils/rule-transformer.js';
 import { rooProfile } from '../../../src/profiles/roo.js';
+import { convertRuleToProfileRule } from '../../../src/utils/rule-transformer.js';
 
 // Mock fs module before importing anything that uses it
 jest.mock('fs', () => ({

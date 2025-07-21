@@ -20,8 +20,14 @@ export class FeatureFileValidator {
 		};
 
 		// Run comprehensive Behave validation
-		const syntaxValidation = await this.validatePythonDataTableSyntax(content, 'behave');
-		const outlineValidation = await this.validatePythonScenarioOutlineSyntax(content, 'behave');
+		const syntaxValidation = await this.validatePythonDataTableSyntax(
+			content,
+			'behave'
+		);
+		const outlineValidation = await this.validatePythonScenarioOutlineSyntax(
+			content,
+			'behave'
+		);
 		const tagValidation = await this.validatePythonTagSyntax(content, 'behave');
 		const parserValidation = await this.runBehaveParserValidation(content);
 
@@ -33,7 +39,12 @@ export class FeatureFileValidator {
 		};
 
 		// Aggregate issues
-		const allValidations = [syntaxValidation, outlineValidation, tagValidation, parserValidation];
+		const allValidations = [
+			syntaxValidation,
+			outlineValidation,
+			tagValidation,
+			parserValidation
+		];
 		for (const v of allValidations) {
 			if (!v.valid) {
 				validation.compatible = false;
@@ -56,11 +67,23 @@ export class FeatureFileValidator {
 		};
 
 		// Run comprehensive pytest-bdd validation
-		const syntaxValidation = await this.validatePythonDataTableSyntax(content, 'pytest-bdd');
-		const outlineValidation = await this.validatePythonScenarioOutlineSyntax(content, 'pytest-bdd');
-		const tagValidation = await this.validatePythonTagSyntax(content, 'pytest-bdd');
+		const syntaxValidation = await this.validatePythonDataTableSyntax(
+			content,
+			'pytest-bdd'
+		);
+		const outlineValidation = await this.validatePythonScenarioOutlineSyntax(
+			content,
+			'pytest-bdd'
+		);
+		const tagValidation = await this.validatePythonTagSyntax(
+			content,
+			'pytest-bdd'
+		);
 		const parserValidation = await this.runPytestBddParserValidation(content);
-		const stepValidation = await this.validatePythonStepDefinitionCompatibility(content, 'pytest-bdd');
+		const stepValidation = await this.validatePythonStepDefinitionCompatibility(
+			content,
+			'pytest-bdd'
+		);
 
 		validation.validationResults = {
 			syntax: syntaxValidation,
@@ -71,7 +94,13 @@ export class FeatureFileValidator {
 		};
 
 		// Aggregate issues
-		const allValidations = [syntaxValidation, outlineValidation, tagValidation, parserValidation, stepValidation];
+		const allValidations = [
+			syntaxValidation,
+			outlineValidation,
+			tagValidation,
+			parserValidation,
+			stepValidation
+		];
 		for (const v of allValidations) {
 			if (!v.valid) {
 				validation.compatible = false;
@@ -114,11 +143,11 @@ export class FeatureFileValidator {
 				}
 
 				const cells = this._parseDataTableCells(line);
-				
+
 				if (currentTable.headers.length === 0 && cells.length > 0) {
 					// This is the header row
 					currentTable.headers = cells;
-					
+
 					// Validate each header
 					for (const header of cells) {
 						if (!this._isValidPythonIdentifier(header)) {
@@ -196,7 +225,7 @@ export class FeatureFileValidator {
 					for (const match of parameterMatches) {
 						const parameter = match.slice(1, -1);
 						currentOutline.parameters.add(parameter);
-						
+
 						if (!this._isValidPythonIdentifier(parameter)) {
 							const issue = {
 								type: 'invalid_scenario_outline_parameter',
@@ -217,7 +246,7 @@ export class FeatureFileValidator {
 					const table = this._parseExamplesTable(lines, i + 1);
 					if (table) {
 						currentOutline.exampleTables.push(table);
-						
+
 						// Validate that example headers match parameters
 						const headerSet = new Set(table.headers);
 						for (const param of currentOutline.parameters) {
@@ -265,7 +294,7 @@ export class FeatureFileValidator {
 
 			if (this._isTagLine(line)) {
 				const tags = this._extractTags(line);
-				
+
 				for (const tag of tags) {
 					validation.tags.push({
 						tag,
@@ -307,16 +336,21 @@ export class FeatureFileValidator {
 			const lineNumber = i + 1;
 
 			if (this._isStepLine(line)) {
-				const stepAnalysis = this._analyzeStepDefinitionCompatibility(line, framework);
+				const stepAnalysis = this._analyzeStepDefinitionCompatibility(
+					line,
+					framework
+				);
 				stepAnalysis.line = lineNumber;
 				validation.steps.push(stepAnalysis);
 
 				if (!stepAnalysis.compatible) {
 					validation.valid = false;
-					validation.issues.push(...stepAnalysis.issues.map(issue => ({
-						...issue,
-						line: lineNumber
-					})));
+					validation.issues.push(
+						...stepAnalysis.issues.map((issue) => ({
+							...issue,
+							line: lineNumber
+						}))
+					);
 				}
 			}
 		}
@@ -340,7 +374,7 @@ export class FeatureFileValidator {
 			// Basic structure validation
 			const structureValidation = this._validateGherkinStructure(content);
 			validation.parserResults.structure = structureValidation;
-			
+
 			if (!structureValidation.valid) {
 				validation.valid = false;
 				validation.issues.push(...structureValidation.issues);
@@ -349,12 +383,11 @@ export class FeatureFileValidator {
 			// Behave-specific validations
 			const contextValidation = this._validateBehaveContextUsage(content);
 			validation.parserResults.context = contextValidation;
-			
+
 			if (!contextValidation.valid) {
 				validation.valid = false;
 				validation.issues.push(...contextValidation.issues);
 			}
-
 		} catch (error) {
 			validation.valid = false;
 			validation.issues.push({
@@ -382,21 +415,21 @@ export class FeatureFileValidator {
 			// Basic structure validation
 			const structureValidation = this._validateGherkinStructure(content);
 			validation.parserResults.structure = structureValidation;
-			
+
 			if (!structureValidation.valid) {
 				validation.valid = false;
 				validation.issues.push(...structureValidation.issues);
 			}
 
 			// pytest-bdd specific validations
-			const fixtureValidation = this._validatePytestBddFixtureCompatibility(content);
+			const fixtureValidation =
+				this._validatePytestBddFixtureCompatibility(content);
 			validation.parserResults.fixtures = fixtureValidation;
-			
+
 			if (!fixtureValidation.valid) {
 				validation.valid = false;
 				validation.issues.push(...fixtureValidation.issues);
 			}
-
 		} catch (error) {
 			validation.valid = false;
 			validation.issues.push({
@@ -411,13 +444,16 @@ export class FeatureFileValidator {
 	// Helper methods
 	_isDataTableLine(line) {
 		const trimmed = line.trim();
-		return trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.length > 2;
+		return (
+			trimmed.startsWith('|') && trimmed.endsWith('|') && trimmed.length > 2
+		);
 	}
 
 	_parseDataTableCells(line) {
-		return line.split('|')
-			.map(cell => cell.trim())
-			.filter(cell => cell.length > 0);
+		return line
+			.split('|')
+			.map((cell) => cell.trim())
+			.filter((cell) => cell.length > 0);
 	}
 
 	_isValidPythonIdentifier(identifier) {
@@ -435,7 +471,7 @@ export class FeatureFileValidator {
 
 		for (let i = startIndex; i < lines.length; i++) {
 			const line = lines[i];
-			
+
 			if (!this._isDataTableLine(line)) {
 				break;
 			}
@@ -456,10 +492,11 @@ export class FeatureFileValidator {
 	}
 
 	_extractTags(line) {
-		return line.trim()
+		return line
+			.trim()
 			.split(/\s+/)
-			.filter(part => part.startsWith('@'))
-			.map(tag => tag.substring(1));
+			.filter((part) => part.startsWith('@'))
+			.map((tag) => tag.substring(1));
 	}
 
 	_isValidTagName(tag) {
@@ -469,11 +506,13 @@ export class FeatureFileValidator {
 
 	_isStepLine(line) {
 		const trimmed = line.trim();
-		return trimmed.startsWith('Given ') || 
-		       trimmed.startsWith('When ') || 
-		       trimmed.startsWith('Then ') || 
-		       trimmed.startsWith('And ') || 
-		       trimmed.startsWith('But ');
+		return (
+			trimmed.startsWith('Given ') ||
+			trimmed.startsWith('When ') ||
+			trimmed.startsWith('Then ') ||
+			trimmed.startsWith('And ') ||
+			trimmed.startsWith('But ')
+		);
 	}
 
 	_analyzeStepDefinitionCompatibility(line, framework) {
@@ -486,7 +525,12 @@ export class FeatureFileValidator {
 		// Framework-specific compatibility checks
 		if (framework === 'behave') {
 			// Check for Behave-specific patterns
-			if (line.includes('context.') && !line.includes('Given') && !line.includes('When') && !line.includes('Then')) {
+			if (
+				line.includes('context.') &&
+				!line.includes('Given') &&
+				!line.includes('When') &&
+				!line.includes('Then')
+			) {
 				analysis.issues.push({
 					type: 'context_usage_in_step',
 					message: 'Context usage should be in step definition, not step text'

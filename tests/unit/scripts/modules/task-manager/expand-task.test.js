@@ -1,8 +1,8 @@
+import fs from 'fs';
 /**
  * Tests for the expand-task.js module
  */
 import { jest } from '@jest/globals';
-import fs from 'fs';
 import {
 	createGetTagAwareFilePathMock,
 	createSlugifyTagForFilePathMock

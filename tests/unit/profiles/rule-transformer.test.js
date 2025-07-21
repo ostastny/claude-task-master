@@ -1,8 +1,8 @@
-import {
-	isValidProfile,
-	getRulesProfile
-} from '../../../src/utils/rule-transformer.js';
 import { RULE_PROFILES } from '../../../src/constants/profiles.js';
+import {
+	getRulesProfile,
+	isValidProfile
+} from '../../../src/utils/rule-transformer.js';
 
 describe('Rule Transformer - General', () => {
 	describe('Profile Configuration Validation', () => {

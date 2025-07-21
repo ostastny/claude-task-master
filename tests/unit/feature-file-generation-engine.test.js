@@ -1,6 +1,6 @@
-import { jest, describe, test, expect, beforeEach } from '@jest/globals';
 import fs from 'fs';
 import path from 'path';
+import { beforeEach, describe, expect, jest, test } from '@jest/globals';
 
 // Import the feature file generation engine that should be implemented
 // This will fail until the actual implementation exists (TDD Red phase)

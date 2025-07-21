@@ -4,22 +4,22 @@
  */
 
 import { jest } from '@jest/globals';
-import { BehaveTestUtils } from './helpers/behave-test-utils.js';
 import { EXPECTED_RESULTS, TEST_DATA } from './helpers/behave-test-data.js';
 import {
 	createAsyncTest,
-	createConfigTest,
 	createComplexityTest,
-	createTestInstances,
+	createConfigTest,
+	createMultipleTests,
 	createTestGroup,
-	createMultipleTests
+	createTestInstances
 } from './helpers/behave-test-helpers.js';
 import {
+	BehaveExecutionEngine,
 	BehaveValidator,
 	FeatureFileParser,
-	BehaveExecutionEngine,
 	PythonSyntaxChecker
 } from './helpers/behave-test-mocks.js';
+import { BehaveTestUtils } from './helpers/behave-test-utils.js';
 
 describe('Task 110.2: Coverage Improvement Tests', () => {
 	let instances;

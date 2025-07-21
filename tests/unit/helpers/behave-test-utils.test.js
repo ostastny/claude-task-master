@@ -5,8 +5,8 @@
 
 import { jest } from '@jest/globals';
 import mockFs from 'mock-fs';
-import { BehaveTestUtils } from './behave-test-utils.js';
 import { BEHAVE_METHODS } from './behave-test-constants.js';
+import { BehaveTestUtils } from './behave-test-utils.js';
 
 describe('BehaveTestUtils', () => {
 	afterEach(() => {
@@ -22,7 +22,7 @@ describe('BehaveTestUtils', () => {
 			expect(structure).toBeDefined();
 			expect(structure[projectRoot]).toBeDefined();
 			expect(structure[projectRoot]['.taskmaster']).toBeDefined();
-			expect(structure[projectRoot]['.taskmaster']['tasks']).toBeDefined();
+			expect(structure[projectRoot]['.taskmaster'].tasks).toBeDefined();
 			expect(
 				structure[projectRoot]['.taskmaster']['config.json']
 			).toBeDefined();
@@ -34,7 +34,7 @@ describe('BehaveTestUtils', () => {
 			const structure = BehaveTestUtils.createMockProjectStructure(projectRoot);
 
 			const tasksJson =
-				structure[projectRoot]['.taskmaster']['tasks']['tasks.json'];
+				structure[projectRoot]['.taskmaster'].tasks['tasks.json'];
 			const configJson = structure[projectRoot]['.taskmaster']['config.json'];
 			const packageJson = structure[projectRoot]['package.json'];
 
@@ -48,7 +48,7 @@ describe('BehaveTestUtils', () => {
 			const structure = BehaveTestUtils.createMockProjectStructure(projectRoot);
 
 			const tasksJson =
-				structure[projectRoot]['.taskmaster']['tasks']['tasks.json'];
+				structure[projectRoot]['.taskmaster'].tasks['tasks.json'];
 			const tasks = JSON.parse(tasksJson);
 
 			expect(tasks.tasks).toHaveLength(1);

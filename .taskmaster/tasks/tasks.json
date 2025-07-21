@@ -360,7 +360,7 @@
               1
             ],
             "details": "Run Behave against all currently generated .feature files to identify syntax compatibility issues. Document any Python-specific Gherkin syntax requirements or limitations. Test with various PRD complexity levels to ensure broad compatibility. Validate that feature files parse correctly and can be executed.",
-            "status": "in-progress",
+            "status": "done",
             "testStrategy": ""
           },
           {
@@ -371,7 +371,7 @@
               2
             ],
             "details": "Modify the Gherkin generator to address Python-specific syntax requirements identified during testing. Ensure proper handling of data tables, scenario outlines, and tags for Python BDD frameworks. Add validation rules to prevent generation of incompatible syntax. Update documentation with Python BDD framework compatibility notes.",
-            "status": "pending",
+            "status": "in-progress",
             "testStrategy": ""
           }
         ]
@@ -630,7 +630,7 @@
     ],
     "metadata": {
       "created": "2025-06-13T23:52:56.848Z",
-      "updated": "2025-07-21T11:20:32.615Z",
+      "updated": "2025-07-21T15:51:11.782Z",
       "description": "Tasks for master context"
     }
   },

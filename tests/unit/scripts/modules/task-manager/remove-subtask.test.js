@@ -63,6 +63,7 @@ const testRemoveSubtask = (
 
 	// If parent has no more subtasks, remove the subtasks array
 	if (parentTask.subtasks.length === 0) {
+		// biome-ignore lint/performance/noDelete: Need to actually remove property for test
 		delete parentTask.subtasks;
 	}
 

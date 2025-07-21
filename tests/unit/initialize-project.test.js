@@ -244,6 +244,7 @@ describe('initializeProject – Git / Alias flag logic', () => {
 			const originalShell = process.env.SHELL;
 			const originalHome = process.env.HOME;
 
+			// biome-ignore lint/performance/noDelete: Need to actually remove env var for test
 			delete process.env.SHELL; // Remove shell env var
 			process.env.HOME = '/mock/home';
 

@@ -3,7 +3,7 @@
  * Task management functions for the Task Master CLI
  */
 
-import { findTaskById } from './utils.js';
+import { findTaskById, readComplexityReport } from './utils.js';
 import parsePRD from './task-manager/parse-prd.js';
 import updateTasks from './task-manager/update-tasks.js';
 import updateTaskById from './task-manager/update-task-by-id.js';
@@ -27,7 +27,6 @@ import setResponseLanguage from './task-manager/response-language.js';
 import moveTask from './task-manager/move-task.js';
 import { migrateProject } from './task-manager/migrate.js';
 import { performResearch } from './task-manager/research.js';
-import { readComplexityReport } from './utils.js';
 
 // Export task manager functions
 export {

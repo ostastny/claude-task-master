@@ -380,7 +380,7 @@ describe('addTask', () => {
 				master: expect.objectContaining({
 					tasks: expect.arrayContaining([
 						expect.objectContaining({
-							priority: priority
+							priority
 						})
 					])
 				})

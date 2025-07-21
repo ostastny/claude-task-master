@@ -158,7 +158,7 @@ export function removeTaskMasterMCPConfiguration(projectRoot, mcpConfigPath) {
 
 	const mcpPath = path.join(projectRoot, mcpConfigPath);
 
-	let result = {
+	const result = {
 		success: false,
 		removed: false,
 		deleted: false,
@@ -207,6 +207,7 @@ export function removeTaskMasterMCPConfiguration(projectRoot, mcpConfigPath) {
 		}
 
 		// Remove task-master-ai server
+		// biome-ignore lint/performance/noDelete: Need to actually remove property from config object
 		delete mcpConfig.mcpServers['task-master-ai'];
 
 		// Also remove any servers that have task-master-ai in their args

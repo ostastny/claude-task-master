@@ -4,13 +4,13 @@
  */
 
 import { z } from 'zod';
-import {
-	handleApiResult,
-	createErrorResponse,
-	withNormalizedProjectRoot
-} from './utils.js';
 import { clearSubtasksDirect } from '../core/task-master-core.js';
 import { findTasksPath } from '../core/utils/path-utils.js';
+import {
+	createErrorResponse,
+	handleApiResult,
+	withNormalizedProjectRoot
+} from './utils.js';
 
 /**
  * Register the clearSubtasks tool with the MCP server
@@ -62,7 +62,7 @@ export function registerClearSubtasksTool(server) {
 
 				const result = await clearSubtasksDirect(
 					{
-						tasksJsonPath: tasksJsonPath,
+						tasksJsonPath,
 						id: args.id,
 						all: args.all,
 						projectRoot: args.projectRoot,

@@ -3,16 +3,17 @@
  * Direct function implementation for expanding a task into subtasks
  */
 
+import fs from 'fs';
+import path from 'path';
 import expandTask from '../../../../scripts/modules/task-manager/expand-task.js';
 import {
-	readJSON,
-	writeJSON,
-	enableSilentMode,
 	disableSilentMode,
-	isSilentMode
+	enableSilentMode,
+	isSilentMode,
+	readJSON,
+	writeJSON
 } from '../../../../scripts/modules/utils.js';
-import path from 'path';
-import fs from 'fs';
+import { BDDReplacementSystem } from '../../../../src/bdd-replacement-system.js';
 import { createLogWrapper } from '../../tools/utils.js';
 
 /**
@@ -208,6 +209,25 @@ export async function expandTaskDirect(args, log, context = {}) {
 			// Read the updated data
 			const updatedData = readJSON(tasksPath, projectRoot);
 			const updatedTask = updatedData.tasks.find((t) => t.id === taskId);
+
+			// Generate BDD scenarios for the expanded task
+			const bddSystem = new BDDReplacementSystem();
+			const bddOutputDir = path.resolve(projectRoot, 'features');
+			try {
+				await bddSystem.generateBDDFromRequirements(
+					[
+						{
+							title: updatedTask.title,
+							description: updatedTask.description,
+							subtasks: updatedTask.subtasks || []
+						}
+					],
+					bddOutputDir
+				);
+				log.info(`BDD scenarios generated for task ${taskId}`);
+			} catch (bddError) {
+				log.warn(`BDD scenario generation failed: ${bddError.message}`);
+			}
 
 			// Calculate how many subtasks were added
 			const subtasksAdded = updatedTask.subtasks

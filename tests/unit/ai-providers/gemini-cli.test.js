@@ -28,20 +28,24 @@ jest.unstable_mockModule('../../../src/ai-providers/base-provider.js', () => ({
 		constructor() {
 			this.name = 'Base Provider';
 		}
+
 		handleError(context, error) {
 			throw error;
 		}
+
 		validateParams(params) {
 			// Basic validation
 			if (!params.modelId) {
 				throw new Error('Model ID is required');
 			}
 		}
+
 		validateMessages(messages) {
 			if (!messages || !Array.isArray(messages)) {
 				throw new Error('Invalid messages array');
 			}
 		}
+
 		async generateObject(params) {
 			// Mock implementation that can be overridden
 			throw new Error('Mock base generateObject error');

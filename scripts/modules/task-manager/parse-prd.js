@@ -20,6 +20,7 @@ import { generateObjectService } from '../ai-services-unified.js';
 import { getDebugFlag } from '../config-manager.js';
 import { getPromptManager } from '../prompt-manager.js';
 import generateTaskFiles from './generate-task-files.js';
+import { BDDIntegration } from '../../../src/utils/bdd-integration.js';
 import { displayAiUsageSummary } from '../ui.js';
 
 // Define the Zod schema for a SINGLE task object
@@ -78,16 +79,14 @@ async function parsePRD(prdPath, tasksPath, numTasks, options = {}) {
 	// Use the provided tag, or the current active tag, or default to 'master'
 	const targetTag = tag || getCurrentTag(projectRoot) || 'master';
 
-	const logFn = mcpLog
-		? mcpLog
-		: {
-				// Wrapper for CLI
-				info: (...args) => log('info', ...args),
-				warn: (...args) => log('warn', ...args),
-				error: (...args) => log('error', ...args),
-				debug: (...args) => log('debug', ...args),
-				success: (...args) => log('success', ...args)
-			};
+	const logFn = mcpLog || {
+		// Wrapper for CLI
+		info: (...args) => log('info', ...args),
+		warn: (...args) => log('warn', ...args),
+		error: (...args) => log('error', ...args),
+		debug: (...args) => log('debug', ...args),
+		success: (...args) => log('success', ...args)
+	};
 
 	// Create custom reporter using logFn
 	const report = (message, level = 'info') => {
@@ -199,11 +198,11 @@ async function parsePRD(prdPath, tasksPath, numTasks, options = {}) {
 		// Call generateObjectService with the CORRECT schema and additional telemetry params
 		aiServiceResponse = await generateObjectService({
 			role: research ? 'research' : 'main', // Use research role if flag is set
-			session: session,
-			projectRoot: projectRoot,
+			session,
+			projectRoot,
 			schema: prdResponseSchema,
 			objectName: 'tasks_data',
-			systemPrompt: systemPrompt,
+			systemPrompt,
 			prompt: userPrompt,
 			commandName: 'parse-prd',
 			outputType: isMCP ? 'mcp' : 'cli'
@@ -317,8 +316,9 @@ async function parsePRD(prdPath, tasksPath, numTasks, options = {}) {
 			'success'
 		);
 
-		// Generate markdown task files after writing tasks.json
-		// await generateTaskFiles(tasksPath, path.dirname(tasksPath), { mcpLog });
+		// Generate BDD features instead of task files
+		const bddIntegration = new BDDIntegration();
+		await bddIntegration.processPRDToBDDFeatures(prdPath, projectRoot, logFn);
 
 		// Handle CLI output (e.g., success message)
 		if (outputFormat === 'text') {

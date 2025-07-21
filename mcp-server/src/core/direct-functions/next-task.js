@@ -5,12 +5,10 @@
 
 import { findNextTask } from '../../../../scripts/modules/task-manager.js';
 import {
-	readJSON,
-	readComplexityReport
-} from '../../../../scripts/modules/utils.js';
-import {
+	disableSilentMode,
 	enableSilentMode,
-	disableSilentMode
+	readComplexityReport,
+	readJSON
 } from '../../../../scripts/modules/utils.js';
 
 /**

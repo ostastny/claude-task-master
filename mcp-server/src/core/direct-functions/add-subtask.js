@@ -4,8 +4,8 @@
 
 import { addSubtask } from '../../../../scripts/modules/task-manager.js';
 import {
-	enableSilentMode,
-	disableSilentMode
+	disableSilentMode,
+	enableSilentMode
 } from '../../../../scripts/modules/utils.js';
 
 /**
@@ -130,11 +130,11 @@ export async function addSubtaskDirect(args, log) {
 			log.info(`Creating new subtask for parent task ${parentId}`);
 
 			const newSubtaskData = {
-				title: title,
+				title,
 				description: description || '',
 				details: details || '',
 				status: status || 'pending',
-				dependencies: dependencies
+				dependencies
 			};
 
 			const result = await addSubtask(

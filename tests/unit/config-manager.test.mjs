@@ -6,8 +6,8 @@
 
 import fs from 'fs';
 import path from 'path';
-import { jest } from '@jest/globals';
 import { fileURLToPath } from 'url';
+import { jest } from '@jest/globals';
 import { sampleTasks } from '../fixtures/sample-tasks.js';
 
 // Disable chalk's color detection which can cause fs.readFileSync calls
@@ -318,8 +318,9 @@ describe('Config Manager Module', () => {
 		test('should read and merge valid config file with defaults', () => {
 			// Arrange: Override readFileSync for this test
 			mockReadFileSync.mockImplementation((filePath) => {
-				if (filePath === MOCK_CONFIG_PATH)
+				if (filePath === MOCK_CONFIG_PATH) {
 					return JSON.stringify(VALID_CUSTOM_CONFIG);
+				}
 				if (path.basename(filePath) === 'supported-models.json') {
 					// Provide necessary models for validation within getConfig
 					return JSON.stringify({
@@ -370,8 +371,9 @@ describe('Config Manager Module', () => {
 		test('should merge defaults for partial config file', () => {
 			// Arrange
 			mockReadFileSync.mockImplementation((filePath) => {
-				if (filePath === MOCK_CONFIG_PATH)
+				if (filePath === MOCK_CONFIG_PATH) {
 					return JSON.stringify(PARTIAL_CONFIG);
+				}
 				if (path.basename(filePath) === 'supported-models.json') {
 					return JSON.stringify({
 						openai: [{ id: 'gpt-4-turbo' }],
@@ -464,7 +466,7 @@ describe('Config Manager Module', () => {
 			expect(config).toEqual(DEFAULT_CONFIG);
 			expect(consoleErrorSpy).toHaveBeenCalledWith(
 				expect.stringContaining(
-					`Permission denied. Using default configuration.`
+					'Permission denied. Using default configuration.'
 				)
 			);
 		});
@@ -472,8 +474,9 @@ describe('Config Manager Module', () => {
 		test('should validate provider and fallback to default if invalid', () => {
 			// Arrange
 			mockReadFileSync.mockImplementation((filePath) => {
-				if (filePath === MOCK_CONFIG_PATH)
+				if (filePath === MOCK_CONFIG_PATH) {
 					return JSON.stringify(INVALID_PROVIDER_CONFIG);
+				}
 				if (path.basename(filePath) === 'supported-models.json') {
 					return JSON.stringify({
 						perplexity: [{ id: 'llama-3-sonar-large-32k-online' }],
@@ -554,7 +557,7 @@ describe('Config Manager Module', () => {
 			expect(success).toBe(false);
 			expect(mockWriteFileSync).toHaveBeenCalled();
 			expect(consoleErrorSpy).toHaveBeenCalledWith(
-				expect.stringContaining(`Disk full`)
+				expect.stringContaining('Disk full')
 			);
 		});
 
@@ -581,8 +584,9 @@ describe('Config Manager Module', () => {
 		test('getMainProvider should return provider from config', () => {
 			// Arrange: Set up readFileSync to return VALID_CUSTOM_CONFIG
 			mockReadFileSync.mockImplementation((filePath) => {
-				if (filePath === MOCK_CONFIG_PATH)
+				if (filePath === MOCK_CONFIG_PATH) {
 					return JSON.stringify(VALID_CUSTOM_CONFIG);
+				}
 				if (path.basename(filePath) === 'supported-models.json') {
 					return JSON.stringify({
 						openai: [{ id: 'gpt-4o' }],
@@ -612,8 +616,9 @@ describe('Config Manager Module', () => {
 		test('getLogLevel should return logLevel from config', () => {
 			// Arrange: Set up readFileSync to return VALID_CUSTOM_CONFIG
 			mockReadFileSync.mockImplementation((filePath) => {
-				if (filePath === MOCK_CONFIG_PATH)
+				if (filePath === MOCK_CONFIG_PATH) {
 					return JSON.stringify(VALID_CUSTOM_CONFIG);
+				}
 				if (path.basename(filePath) === 'supported-models.json') {
 					// Provide enough mock model data for validation within getConfig
 					return JSON.stringify({

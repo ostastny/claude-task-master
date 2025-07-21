@@ -4,13 +4,13 @@
  */
 
 import { z } from 'zod';
-import {
-	handleApiResult,
-	createErrorResponse,
-	withNormalizedProjectRoot
-} from './utils.js';
 import { removeTaskDirect } from '../core/task-master-core.js';
 import { findTasksPath } from '../core/utils/path-utils.js';
+import {
+	createErrorResponse,
+	handleApiResult,
+	withNormalizedProjectRoot
+} from './utils.js';
 
 /**
  * Register the remove-task tool with the MCP server
@@ -63,7 +63,7 @@ export function registerRemoveTaskTool(server) {
 
 				const result = await removeTaskDirect(
 					{
-						tasksJsonPath: tasksJsonPath,
+						tasksJsonPath,
 						id: args.id,
 						projectRoot: args.projectRoot,
 						tag: args.tag

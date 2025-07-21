@@ -111,7 +111,7 @@ const registerInitializeProjectTool = (server) => {
 					message: 'Project initialized successfully.',
 					next_step:
 						'Now that the project is initialized, the next step is to create the tasks by parsing a PRD. This will create the tasks folder and the initial task files. The parse-prd tool will required a PRD file',
-					output: output
+					output
 				});
 			} catch (error) {
 				// Catch errors

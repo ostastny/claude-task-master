@@ -150,7 +150,7 @@ export class FuzzyTaskSearch {
 		const fuzzyResults = this.fuse.search(prompt);
 
 		// Also search for each significant word to catch different aspects
-		let wordResults = [];
+		const wordResults = [];
 		for (const word of promptWords) {
 			if (word.length > 5) {
 				// Only use significant words
@@ -315,14 +315,18 @@ export class FuzzyTaskSearch {
 
 		if (includeBreakdown && breakdown) {
 			const parts = [];
-			if (breakdown.highRelevance.length > 0)
+			if (breakdown.highRelevance.length > 0) {
 				parts.push(`${breakdown.highRelevance.length} high relevance`);
-			if (breakdown.mediumRelevance.length > 0)
+			}
+			if (breakdown.mediumRelevance.length > 0) {
 				parts.push(`${breakdown.mediumRelevance.length} medium relevance`);
-			if (breakdown.lowRelevance.length > 0)
+			}
+			if (breakdown.lowRelevance.length > 0) {
 				parts.push(`${breakdown.lowRelevance.length} low relevance`);
-			if (breakdown.categoryTasks.length > 0)
+			}
+			if (breakdown.categoryTasks.length > 0) {
 				parts.push(`${breakdown.categoryTasks.length} category matches`);
+			}
 
 			if (parts.length > 0) {
 				summary += ` (${parts.join(', ')})`;

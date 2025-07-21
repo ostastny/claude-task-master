@@ -7,8 +7,8 @@
 
 import { jest } from '@jest/globals';
 import {
-	sampleTasks,
-	emptySampleTasks
+	emptySampleTasks,
+	sampleTasks
 } from '../../../fixtures/sample-tasks.js';
 
 // Mock EVERYTHING
@@ -103,7 +103,7 @@ const registerListTasksTool = (server) => {
 
 				const result = mockListTasksDirect(
 					{
-						tasksJsonPath: tasksJsonPath,
+						tasksJsonPath,
 						status: args.status,
 						withSubtasks: args.withSubtasks,
 						reportPath: complexityReportPath

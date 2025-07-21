@@ -46,7 +46,7 @@ export function convertFromMCPFormat(response) {
 	let text = '';
 	let usage = null;
 	let finishReason = 'stop';
-	let warnings = [];
+	const warnings = [];
 
 	if (typeof response === 'string') {
 		text = response;

@@ -26,12 +26,15 @@ class MockValidProvider {
 	generateText() {
 		return Promise.resolve({ text: 'mock text' });
 	}
+
 	streamText() {
 		return Promise.resolve('mock stream');
 	}
+
 	generateObject() {
 		return Promise.resolve({ object: {} });
 	}
+
 	getRequiredApiKeyName() {
 		return 'MOCK_API_KEY';
 	}

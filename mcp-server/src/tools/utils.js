@@ -4,16 +4,16 @@
  */
 
 import { spawnSync } from 'child_process';
-import path from 'path';
 import fs from 'fs';
-import { contextManager } from '../core/context-manager.js'; // Import the singleton
+import path from 'path';
 import { fileURLToPath } from 'url';
 import { getCurrentTag } from '../../../scripts/modules/utils.js';
+import { contextManager } from '../core/context-manager.js'; // Import the singleton
 
 // Import path utilities to ensure consistent path resolution
 import {
-	lastFoundProjectRoot,
-	PROJECT_MARKERS
+	PROJECT_MARKERS,
+	lastFoundProjectRoot
 } from '../core/utils/path-utils.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -110,7 +110,7 @@ function getTagInfo(projectRoot, log) {
 
 		return {
 			currentTag: currentTag || 'master',
-			availableTags: availableTags
+			availableTags
 		};
 	} catch (error) {
 		log.warn(`Error getting tag information: ${error.message}`);
@@ -376,7 +376,7 @@ function executeTaskMasterCommand(
 		// Common options for spawn
 		const spawnOptions = {
 			encoding: 'utf8',
-			cwd: cwd,
+			cwd,
 			// Merge process.env with customEnv, giving precedence to customEnv
 			env: { ...process.env, ...(customEnv || {}) }
 		};
@@ -632,10 +632,11 @@ function normalizeProjectRoot(rawPath, log) {
 		try {
 			pathString = decodeURIComponent(pathString);
 		} catch (decodeError) {
-			if (log)
+			if (log) {
 				log.warn(
 					`Could not decode URI component for path "${rawPath}": ${decodeError.message}. Proceeding with raw string.`
 				);
+			}
 			// Proceed with the original string if decoding fails
 			pathString = Array.isArray(rawPath) ? rawPath[0] : String(rawPath);
 		}

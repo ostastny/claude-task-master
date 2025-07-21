@@ -5,9 +5,9 @@
  * using a custom AI SDK implementation.
  */
 
-import { createClaudeCode } from './custom-sdk/claude-code/index.js';
-import { BaseAIProvider } from './base-provider.js';
 import { getClaudeCodeSettingsForCommand } from '../../scripts/modules/config-manager.js';
+import { BaseAIProvider } from './base-provider.js';
+import { createClaudeCode } from './custom-sdk/claude-code/index.js';
 
 export class ClaudeCodeProvider extends BaseAIProvider {
 	constructor() {

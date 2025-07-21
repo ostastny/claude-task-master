@@ -4,6 +4,27 @@
 
 import { jest } from '@jest/globals';
 
+// Import the actual module to test
+import {
+	findCycles,
+	findTaskInComplexityReport,
+	formatTaskId,
+	getTagAwareFilePath,
+	log,
+	readComplexityReport,
+	readJSON,
+	sanitizePrompt,
+	slugifyTagForFilePath,
+	taskExists,
+	toKebabCase,
+	truncate,
+	writeJSON
+} from '../../scripts/modules/utils.js';
+
+// Import the mocked modules for use in tests
+import fs from 'fs';
+import path from 'path';
+
 // Mock modules first before any imports
 jest.mock('fs', () => ({
 	existsSync: jest.fn((filePath) => {
@@ -75,27 +96,6 @@ jest.mock('../../src/utils/path-utils.js', () => ({
 	resolveTasksOutputPath: jest.fn(() => '/mock/tasks.json'),
 	resolveComplexityReportOutputPath: jest.fn(() => '/mock/report.json')
 }));
-
-// Import the actual module to test
-import {
-	truncate,
-	log,
-	readJSON,
-	writeJSON,
-	sanitizePrompt,
-	readComplexityReport,
-	findTaskInComplexityReport,
-	taskExists,
-	formatTaskId,
-	findCycles,
-	toKebabCase,
-	slugifyTagForFilePath,
-	getTagAwareFilePath
-} from '../../scripts/modules/utils.js';
-
-// Import the mocked modules for use in tests
-import fs from 'fs';
-import path from 'path';
 
 // Mock config-manager to provide config values
 const mockGetLogLevel = jest.fn(() => 'info'); // Default log level for tests

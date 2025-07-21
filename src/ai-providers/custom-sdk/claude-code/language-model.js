@@ -4,9 +4,9 @@
 
 import { NoSuchModelError } from '@ai-sdk/provider';
 import { generateId } from '@ai-sdk/provider-utils';
-import { convertToClaudeCodeMessages } from './message-converter.js';
-import { extractJson } from './json-extractor.js';
 import { createAPICallError, createAuthenticationError } from './errors.js';
+import { extractJson } from './json-extractor.js';
+import { convertToClaudeCodeMessages } from './message-converter.js';
 
 let query;
 let AbortError;
@@ -94,17 +94,24 @@ export class ClaudeCodeLanguageModel {
 		const unsupportedParams = [];
 
 		// Check for unsupported parameters
-		if (options.temperature !== undefined)
+		if (options.temperature !== undefined) {
 			unsupportedParams.push('temperature');
+		}
 		if (options.maxTokens !== undefined) unsupportedParams.push('maxTokens');
 		if (options.topP !== undefined) unsupportedParams.push('topP');
 		if (options.topK !== undefined) unsupportedParams.push('topK');
-		if (options.presencePenalty !== undefined)
+		if (options.presencePenalty !== undefined) {
 			unsupportedParams.push('presencePenalty');
-		if (options.frequencyPenalty !== undefined)
+		}
+		if (options.frequencyPenalty !== undefined) {
 			unsupportedParams.push('frequencyPenalty');
-		if (options.stopSequences !== undefined && options.stopSequences.length > 0)
+		}
+		if (
+			options.stopSequences !== undefined &&
+			options.stopSequences.length > 0
+		) {
 			unsupportedParams.push('stopSequences');
+		}
 		if (options.seed !== undefined) unsupportedParams.push('seed');
 
 		if (unsupportedParams.length > 0) {
@@ -427,6 +434,8 @@ export class ClaudeCodeLanguageModel {
 						}
 					}
 
+					controller.close();
+				} catch (error) {
 					// -------------------------------------------------------------
 					// Work-around for Claude-Code CLI/SDK JSON truncation bug (#913)
 					// -------------------------------------------------------------
@@ -474,8 +483,6 @@ export class ClaudeCodeLanguageModel {
 						return; // Skip normal error path
 					}
 
-					controller.close();
-				} catch (error) {
 					let errorToEmit;
 
 					if (error instanceof AbortError) {

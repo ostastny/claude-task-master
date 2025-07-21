@@ -788,11 +788,10 @@ function listTasks(
 
 		if (outputFormat === 'json') {
 			// Return structured error for JSON output
-			throw {
-				code: 'TASK_LIST_ERROR',
-				message: error.message,
-				details: error.stack
-			};
+			const listError = new Error(error.message);
+			listError.code = 'TASK_LIST_ERROR';
+			listError.details = error.stack;
+			throw listError;
 		}
 
 		console.error(chalk.red(`Error: ${error.message}`));
@@ -880,7 +879,7 @@ function generateMarkdownOutput(data, filteredTasks, stats) {
 	markdown += `| Pending | ${pendingCount} |\n`;
 	markdown += `| Deferred | ${deferredCount} |\n`;
 	markdown += `| Cancelled | ${cancelledCount} |\n`;
-	markdown += `|-|-|\n`;
+	markdown += '|-|-|\n';
 	markdown += `| Subtask Progress | ${subtaskProgressBar} ${Math.round(subtaskCompletionPercentage)}% |\n`;
 	markdown += `| Completed | ${completedSubtasks} |\n`;
 	markdown += `| In Progress | ${inProgressSubtasks} |\n`;

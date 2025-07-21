@@ -1,4 +1,10 @@
-import { log, readJSON, isSilentMode, findProjectRoot } from '../utils.js';
+import {
+	log,
+	readJSON,
+	isSilentMode,
+	findProjectRoot,
+	aggregateTelemetry
+} from '../utils.js';
 import {
 	startLoadingIndicator,
 	stopLoadingIndicator,
@@ -6,7 +12,6 @@ import {
 } from '../ui.js';
 import expandTask from './expand-task.js';
 import { getDebugFlag } from '../config-manager.js';
-import { aggregateTelemetry } from '../utils.js';
 import chalk from 'chalk';
 import boxen from 'boxen';
 
@@ -201,8 +206,9 @@ async function expandAllTasks(
 			telemetryData: aggregatedTelemetryData
 		};
 	} catch (error) {
-		if (loadingIndicator)
+		if (loadingIndicator) {
 			stopLoadingIndicator(loadingIndicator, 'Error.', false);
+		}
 		logger.error(`Error during expand all operation: ${error.message}`);
 		if (!isMCPCall && getDebugFlag(session)) {
 			console.error(error); // Log full stack in debug CLI mode

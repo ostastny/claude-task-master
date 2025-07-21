@@ -594,7 +594,7 @@ describe('Unified AI Services', () => {
 			expect(mockLog).toHaveBeenCalledWith(
 				'warn',
 				expect.stringContaining(
-					`Skipping role 'main' (Provider: anthropic): API key not set or invalid.`
+					"Skipping role 'main' (Provider: anthropic): API key not set or invalid."
 				)
 			);
 
@@ -664,13 +664,13 @@ describe('Unified AI Services', () => {
 			expect(mockLog).toHaveBeenCalledWith(
 				'warn',
 				expect.stringContaining(
-					`Skipping role 'main' (Provider: anthropic): API key not set or invalid.`
+					"Skipping role 'main' (Provider: anthropic): API key not set or invalid."
 				)
 			);
 			expect(mockLog).toHaveBeenCalledWith(
 				'warn',
 				expect.stringContaining(
-					`Skipping role 'fallback' (Provider: openai): API key not set or invalid.`
+					"Skipping role 'fallback' (Provider: openai): API key not set or invalid."
 				)
 			);
 
@@ -701,19 +701,19 @@ describe('Unified AI Services', () => {
 			expect(mockLog).toHaveBeenCalledWith(
 				'warn',
 				expect.stringContaining(
-					`Skipping role 'main' (Provider: anthropic): API key not set or invalid.`
+					"Skipping role 'main' (Provider: anthropic): API key not set or invalid."
 				)
 			);
 			expect(mockLog).toHaveBeenCalledWith(
 				'warn',
 				expect.stringContaining(
-					`Skipping role 'fallback' (Provider: anthropic): API key not set or invalid.`
+					"Skipping role 'fallback' (Provider: anthropic): API key not set or invalid."
 				)
 			);
 			expect(mockLog).toHaveBeenCalledWith(
 				'warn',
 				expect.stringContaining(
-					`Skipping role 'research' (Provider: perplexity): API key not set or invalid.`
+					"Skipping role 'research' (Provider: perplexity): API key not set or invalid."
 				)
 			);
 

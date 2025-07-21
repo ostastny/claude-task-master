@@ -4,14 +4,14 @@
  */
 
 import { z } from 'zod';
+import { COMPLEXITY_REPORT_FILE } from '../../../src/constants/paths.js';
+import { complexityReportDirect } from '../core/task-master-core.js';
+import { findComplexityReportPath } from '../core/utils/path-utils.js';
 import {
-	handleApiResult,
 	createErrorResponse,
+	handleApiResult,
 	withNormalizedProjectRoot
 } from './utils.js';
-import { complexityReportDirect } from '../core/task-master-core.js';
-import { COMPLEXITY_REPORT_FILE } from '../../../src/constants/paths.js';
-import { findComplexityReportPath } from '../core/utils/path-utils.js';
 
 /**
  * Register the complexityReport tool with the MCP server
@@ -53,7 +53,7 @@ export function registerComplexityReportTool(server) {
 
 				const result = await complexityReportDirect(
 					{
-						reportPath: reportPath
+						reportPath
 					},
 					log
 				);

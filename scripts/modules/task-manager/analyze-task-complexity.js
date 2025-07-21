@@ -3,7 +3,13 @@ import boxen from 'boxen';
 import readline from 'readline';
 import fs from 'fs';
 
-import { log, readJSON, writeJSON, isSilentMode } from '../utils.js';
+import {
+	log,
+	readJSON,
+	writeJSON,
+	isSilentMode,
+	flattenTasksWithSubtasks
+} from '../utils.js';
 
 import {
 	startLoadingIndicator,
@@ -21,7 +27,6 @@ import {
 } from '../../../src/constants/paths.js';
 import { ContextGatherer } from '../utils/contextGatherer.js';
 import { FuzzyTaskSearch } from '../utils/fuzzyTaskSearch.js';
-import { flattenTasksWithSubtasks } from '../utils.js';
 
 /**
  * Generates the prompt for complexity analysis.
@@ -332,7 +337,7 @@ async function analyzeTaskComplexity(options, context = {}) {
 				meta: {
 					generatedAt: new Date().toISOString(),
 					tasksAnalyzed: 0,
-					thresholdScore: thresholdScore,
+					thresholdScore,
 					projectName: getProjectName(session),
 					usedResearch: useResearch
 				},
@@ -403,7 +408,7 @@ async function analyzeTaskComplexity(options, context = {}) {
 		const promptParams = {
 			tasks: tasksData.tasks,
 			gatheredContext: gatheredContext || '',
-			useResearch: useResearch
+			useResearch
 		};
 
 		const { systemPrompt, userPrompt: prompt } = await promptManager.loadPrompt(
@@ -571,7 +576,7 @@ async function analyzeTaskComplexity(options, context = {}) {
 					tasksAnalyzed: tasksData.tasks.length,
 					totalTasks: originalTaskCount,
 					analysisCount: finalComplexityAnalysis.length,
-					thresholdScore: thresholdScore,
+					thresholdScore,
 					projectName: getProjectName(session),
 					usedResearch: useResearch
 				},
@@ -657,7 +662,7 @@ async function analyzeTaskComplexity(options, context = {}) {
 			}
 
 			return {
-				report: report,
+				report,
 				telemetryData: aiServiceResponse?.telemetryData,
 				tagInfo: aiServiceResponse?.tagInfo
 			};

@@ -1,11 +1,11 @@
 import { z } from 'zod';
+import { RULE_PROFILES } from '../../../src/constants/profiles.js';
+import { initializeProjectDirect } from '../core/task-master-core.js';
 import {
 	createErrorResponse,
 	handleApiResult,
 	withNormalizedProjectRoot
 } from './utils.js';
-import { initializeProjectDirect } from '../core/task-master-core.js';
-import { RULE_PROFILES } from '../../../src/constants/profiles.js';
 
 export function registerInitializeProjectTool(server) {
 	server.addTool({

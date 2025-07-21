@@ -4,16 +4,16 @@
  */
 
 import { z } from 'zod';
+import { listTasksDirect } from '../core/task-master-core.js';
+import {
+	resolveComplexityReportPath,
+	resolveTasksPath
+} from '../core/utils/path-utils.js';
 import {
 	createErrorResponse,
 	handleApiResult,
 	withNormalizedProjectRoot
 } from './utils.js';
-import { listTasksDirect } from '../core/task-master-core.js';
-import {
-	resolveTasksPath,
-	resolveComplexityReportPath
-} from '../core/utils/path-utils.js';
 
 /**
  * Register the getTasks tool with the MCP server
@@ -80,7 +80,7 @@ export function registerListTasksTool(server) {
 
 				const result = await listTasksDirect(
 					{
-						tasksJsonPath: tasksJsonPath,
+						tasksJsonPath,
 						status: args.status,
 						withSubtasks: args.withSubtasks,
 						reportPath: complexityReportPath,

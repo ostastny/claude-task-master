@@ -922,7 +922,7 @@ async function renameTag(
 				renamed: true,
 				taskCount,
 				wasCurrentTag: isCurrentTag,
-				isCurrentTag: isCurrentTag
+				isCurrentTag
 			};
 		}
 
@@ -951,7 +951,7 @@ async function renameTag(
 			renamed: true,
 			taskCount,
 			wasCurrentTag: isCurrentTag,
-			isCurrentTag: isCurrentTag
+			isCurrentTag
 		};
 	} catch (error) {
 		logFn.error(`Error renaming tag: ${error.message}`);

@@ -10,7 +10,9 @@ import {
 	writeJSON,
 	truncate,
 	isSilentMode,
-	getCurrentTag
+	getCurrentTag,
+	flattenTasksWithSubtasks,
+	findProjectRoot
 } from '../utils.js';
 
 import {
@@ -27,7 +29,6 @@ import { generateTextService } from '../ai-services-unified.js';
 import { getModelConfiguration } from './models.js';
 import { ContextGatherer } from '../utils/contextGatherer.js';
 import { FuzzyTaskSearch } from '../utils/fuzzyTaskSearch.js';
-import { flattenTasksWithSubtasks, findProjectRoot } from '../utils.js';
 
 // Zod schema for validating the structure of tasks AFTER parsing
 const updatedTaskSchema = z
@@ -69,8 +70,9 @@ function parseUpdatedTasksFromText(text, expectedCount, logFn, isMCP) {
 		'info',
 		'Attempting to parse updated tasks array from text response...'
 	);
-	if (!text || text.trim() === '')
+	if (!text || text.trim() === '') {
 		throw new Error('AI response text is empty.');
+	}
 
 	let cleanedResponse = text.trim();
 	const originalResponseForDebug = cleanedResponse;
@@ -240,17 +242,18 @@ async function updateTasks(
 	// Flag to easily check which logger type we have
 	const isMCP = !!mcpLog;
 
-	if (isMCP)
+	if (isMCP) {
 		logFn.info(`updateTasks called with context: session=${!!session}`);
-	else logFn('info', `updateTasks called`); // CLI log
+	} else logFn('info', 'updateTasks called'); // CLI log
 
 	try {
 		if (isMCP) logFn.info(`Updating tasks from ID ${fromId}`);
-		else
+		else {
 			logFn(
 				'info',
 				`Updating tasks from ID ${fromId} with prompt: "${prompt}"`
 			);
+		}
 
 		// Determine project root
 		const projectRoot = providedProjectRoot || findProjectRoot();
@@ -263,16 +266,18 @@ async function updateTasks(
 
 		// --- Task Loading/Filtering (Updated to pass projectRoot and tag) ---
 		const data = readJSON(tasksPath, projectRoot, currentTag);
-		if (!data || !data.tasks)
+		if (!data || !data.tasks) {
 			throw new Error(`No valid tasks found in ${tasksPath}`);
+		}
 		const tasksToUpdate = data.tasks.filter(
 			(task) => task.id >= fromId && task.status !== 'done'
 		);
 		if (tasksToUpdate.length === 0) {
-			if (isMCP)
+			if (isMCP) {
 				logFn.info(`No tasks to update (ID >= ${fromId} and not 'done').`);
-			else
+			} else {
 				logFn('info', `No tasks to update (ID >= ${fromId} and not 'done').`);
+			}
 			if (outputFormat === 'text') console.log(/* yellow message */);
 			return; // Nothing to do
 		}
@@ -398,16 +403,17 @@ async function updateTasks(
 			// Call the unified AI service
 			aiServiceResponse = await generateTextService({
 				role: serviceRole,
-				session: session,
-				projectRoot: projectRoot,
-				systemPrompt: systemPrompt,
+				session,
+				projectRoot,
+				systemPrompt,
 				prompt: userPrompt,
 				commandName: 'update-tasks',
 				outputType: isMCP ? 'mcp' : 'cli'
 			});
 
-			if (loadingIndicator)
+			if (loadingIndicator) {
 				stopLoadingIndicator(loadingIndicator, 'AI update complete.');
+			}
 
 			// Use the mainResult (text) for parsing
 			const parsedUpdatedTasks = parseUpdatedTasksFromText(
@@ -424,15 +430,16 @@ async function updateTasks(
 					'Parsed AI response for updated tasks was not an array.'
 				);
 			}
-			if (isMCP)
+			if (isMCP) {
 				logFn.info(
 					`Received ${parsedUpdatedTasks.length} updated tasks from AI.`
 				);
-			else
+			} else {
 				logFn(
 					'info',
 					`Received ${parsedUpdatedTasks.length} updated tasks from AI.`
 				);
+			}
 			// Create a map for efficient lookup
 			const updatedTasksMap = new Map(
 				parsedUpdatedTasks.map((task) => [task.id, task])
@@ -446,27 +453,29 @@ async function updateTasks(
 					actualUpdateCount++;
 				}
 			});
-			if (isMCP)
+			if (isMCP) {
 				logFn.info(
 					`Applied updates to ${actualUpdateCount} tasks in the dataset.`
 				);
-			else
+			} else {
 				logFn(
 					'info',
 					`Applied updates to ${actualUpdateCount} tasks in the dataset.`
 				);
+			}
 
 			// Fix: Pass projectRoot and currentTag to writeJSON
 			writeJSON(tasksPath, data, projectRoot, currentTag);
-			if (isMCP)
+			if (isMCP) {
 				logFn.info(
 					`Successfully updated ${actualUpdateCount} tasks in ${tasksPath}`
 				);
-			else
+			} else {
 				logFn(
 					'success',
 					`Successfully updated ${actualUpdateCount} tasks in ${tasksPath}`
 				);
+			}
 			// await generateTaskFiles(tasksPath, path.dirname(tasksPath));
 
 			if (outputFormat === 'text' && aiServiceResponse.telemetryData) {
@@ -484,15 +493,16 @@ async function updateTasks(
 			if (isMCP) logFn.error(`Error during AI service call: ${error.message}`);
 			else logFn('error', `Error during AI service call: ${error.message}`);
 			if (error.message.includes('API key')) {
-				if (isMCP)
+				if (isMCP) {
 					logFn.error(
 						'Please ensure API keys are configured correctly in .env or mcp.json.'
 					);
-				else
+				} else {
 					logFn(
 						'error',
 						'Please ensure API keys are configured correctly in .env or mcp.json.'
 					);
+				}
 			}
 			throw error;
 		} finally {

@@ -87,3 +87,17 @@ dev-debug.log
 *.njsproj
 *.sln
 *.sw?
+
+# OS specific
+
+# complexity report
+complexity-report/
+report/
+.nyc_output/
+
+#claude commands
+.claude/commands/
+
+# Task files
+# tasks.json
+# tasks/ 

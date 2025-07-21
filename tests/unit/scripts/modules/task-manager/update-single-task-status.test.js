@@ -5,8 +5,8 @@ import { jest } from '@jest/globals';
 
 // Import test fixtures
 import {
-	isValidTaskStatus,
-	TASK_STATUS_OPTIONS
+	TASK_STATUS_OPTIONS,
+	isValidTaskStatus
 } from '../../../../../src/constants/task-status.js';
 
 // Sample tasks data for testing
@@ -167,6 +167,7 @@ describe('updateSingleTaskStatus function', () => {
 
 		// Remove subtasks from task 3
 		const taskWithoutSubtasks = { ...testTasksData.tasks[2] };
+		// biome-ignore lint/performance/noDelete: Need to actually remove property for test
 		delete taskWithoutSubtasks.subtasks;
 		testTasksData.tasks[2] = taskWithoutSubtasks;
 

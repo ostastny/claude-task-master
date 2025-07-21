@@ -72,7 +72,7 @@ async function addSubtask(
 
 			// Check for circular dependency
 			if (existingTaskIdNum === parentIdNum) {
-				throw new Error(`Cannot make a task a subtask of itself`);
+				throw new Error('Cannot make a task a subtask of itself');
 			}
 
 			// Check if parent task is a subtask of the task we're converting

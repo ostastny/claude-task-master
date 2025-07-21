@@ -4,13 +4,13 @@
  */
 
 import { z } from 'zod';
-import {
-	handleApiResult,
-	createErrorResponse,
-	withNormalizedProjectRoot
-} from './utils.js';
 import { fixDependenciesDirect } from '../core/task-master-core.js';
 import { findTasksPath } from '../core/utils/path-utils.js';
+import {
+	createErrorResponse,
+	handleApiResult,
+	withNormalizedProjectRoot
+} from './utils.js';
 
 /**
  * Register the fixDependencies tool with the MCP server
@@ -47,7 +47,7 @@ export function registerFixDependenciesTool(server) {
 
 				const result = await fixDependenciesDirect(
 					{
-						tasksJsonPath: tasksJsonPath,
+						tasksJsonPath,
 						projectRoot: args.projectRoot,
 						tag: args.tag
 					},

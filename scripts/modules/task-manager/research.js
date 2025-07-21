@@ -90,7 +90,7 @@ async function performResearch(
 	// Show UI banner for CLI mode
 	if (outputFormat === 'text') {
 		console.log(
-			boxen(chalk.cyan.bold(`🔍 AI Research Query`), {
+			boxen(chalk.cyan.bold('🔍 AI Research Query'), {
 				padding: 1,
 				borderColor: 'cyan',
 				borderStyle: 'round',
@@ -195,9 +195,9 @@ async function performResearch(
 		const promptManager = getPromptManager();
 
 		const promptParams = {
-			query: query,
+			query,
 			gatheredContext: gatheredContext || '',
-			detailLevel: detailLevel,
+			detailLevel,
 			projectInfo: {
 				root: projectRoot,
 				taskCount: finalTaskIds.length,

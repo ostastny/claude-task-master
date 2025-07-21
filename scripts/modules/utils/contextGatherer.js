@@ -213,7 +213,7 @@ export class ContextGatherer {
 
 		const result = {
 			context: finalContext,
-			analysisData: analysisData,
+			analysisData,
 			contextSections: contextSections.length,
 			finalTaskIds: Array.from(finalTaskIds)
 		};
@@ -329,10 +329,10 @@ export class ContextGatherer {
 		return {
 			tasks: finalResults,
 			analysisData: {
-				highRelevance: highRelevance,
-				mediumRelevance: mediumRelevance,
-				recentTasks: recentTasks,
-				allRelevantTasks: allRelevantTasks
+				highRelevance,
+				mediumRelevance,
+				recentTasks,
+				allRelevantTasks
 			}
 		};
 	}
@@ -364,13 +364,14 @@ export class ContextGatherer {
 				.slice(0, 5)
 				.map((t) => `- Task ${t.id}: ${t.title} - ${t.description}`)
 				.join('\n')}`;
-			if (indirectDeps.length > 5)
+			if (indirectDeps.length > 5) {
 				context += `\n- ... and ${
 					indirectDeps.length - 5
 				} more indirect dependencies`;
+			}
 		}
 
-		context += `\n\nDetailed information about dependencies:`;
+		context += '\n\nDetailed information about dependencies:';
 		for (const depTask of uniqueDetailedTasks) {
 			const isDirect = taskIds.includes(depTask.id)
 				? ' [DIRECT DEPENDENCY]'
@@ -666,7 +667,7 @@ export class ContextGatherer {
 				const fileData = {
 					path: relativePath,
 					size: stats.size,
-					content: content,
+					content,
 					lastModified: stats.mtime
 				};
 
@@ -725,7 +726,7 @@ export class ContextGatherer {
 
 			return {
 				context: finalContext,
-				breakdown: breakdown
+				breakdown
 			};
 		} catch (error) {
 			console.warn(

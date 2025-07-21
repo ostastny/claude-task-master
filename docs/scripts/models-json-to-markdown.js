@@ -74,7 +74,7 @@ function main() {
 				const models = supportedModels[provider];
 				models.forEach((model) => {
 					const modelEntry = {
-						provider: provider,
+						provider,
 						modelName: model.id,
 						sweScore: model.swe_score,
 						inputCost: model.cost_per_1m_tokens

@@ -5,8 +5,8 @@
 
 import { setTaskStatus } from '../../../../scripts/modules/task-manager.js';
 import {
-	enableSilentMode,
 	disableSilentMode,
+	enableSilentMode,
 	isSilentMode
 } from '../../../../scripts/modules/utils.js';
 import { nextTaskDirect } from './next-task.js';
@@ -91,7 +91,7 @@ export async function setTaskStatusDirect(args, log, context = {}) {
 					message: `Successfully updated task ${taskId} status to "${newStatus}"`,
 					taskId,
 					status: newStatus,
-					tasksPath: tasksPath // Return the path used
+					tasksPath // Return the path used
 				}
 			};
 
@@ -101,9 +101,9 @@ export async function setTaskStatusDirect(args, log, context = {}) {
 					log.info(`Attempting to fetch next task for task ${taskId}`);
 					const nextResult = await nextTaskDirect(
 						{
-							tasksJsonPath: tasksJsonPath,
+							tasksJsonPath,
 							reportPath: complexityReportPath,
-							projectRoot: projectRoot
+							projectRoot
 						},
 						log,
 						{ session }

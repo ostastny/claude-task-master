@@ -1,7 +1,7 @@
-import { jest } from '@jest/globals';
 import fs from 'fs';
-import path from 'path';
 import os from 'os';
+import path from 'path';
+import { jest } from '@jest/globals';
 
 // Reduce noise in test output
 process.env.TASKMASTER_LOG_LEVEL = 'error';
@@ -244,6 +244,7 @@ describe('initializeProject – Git / Alias flag logic', () => {
 			const originalShell = process.env.SHELL;
 			const originalHome = process.env.HOME;
 
+			// biome-ignore lint/performance/noDelete: Need to actually remove env var for test
 			delete process.env.SHELL; // Remove shell env var
 			process.env.HOME = '/mock/home';
 

@@ -5,8 +5,8 @@
 
 import { updateTaskById } from '../../../../scripts/modules/task-manager.js';
 import {
-	enableSilentMode,
 	disableSilentMode,
+	enableSilentMode,
 	isSilentMode
 } from '../../../../scripts/modules/utils.js';
 import { createLogWrapper } from '../../tools/utils.js';
@@ -131,8 +131,8 @@ export async function updateTaskByIdDirect(args, log, context = {}) {
 				return {
 					success: true,
 					data: {
-						message: message,
-						taskId: taskId,
+						message,
+						taskId,
 						updated: false,
 						telemetryData: coreResult?.telemetryData,
 						tagInfo: coreResult?.tagInfo
@@ -147,9 +147,9 @@ export async function updateTaskByIdDirect(args, log, context = {}) {
 				success: true,
 				data: {
 					message: successMessage,
-					taskId: taskId,
-					tasksPath: tasksPath,
-					useResearch: useResearch,
+					taskId,
+					tasksPath,
+					useResearch,
 					updated: true,
 					updatedTask: coreResult.updatedTask,
 					telemetryData: coreResult.telemetryData,

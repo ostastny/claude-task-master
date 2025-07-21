@@ -4,13 +4,13 @@
  */
 
 import { z } from 'zod';
+import { addTaskDirect } from '../core/task-master-core.js';
+import { findTasksPath } from '../core/utils/path-utils.js';
 import {
 	createErrorResponse,
 	handleApiResult,
 	withNormalizedProjectRoot
 } from './utils.js';
-import { addTaskDirect } from '../core/task-master-core.js';
-import { findTasksPath } from '../core/utils/path-utils.js';
 
 /**
  * Register the addTask tool with the MCP server
@@ -84,7 +84,7 @@ export function registerAddTaskTool(server) {
 				// Call the direct functionP
 				const result = await addTaskDirect(
 					{
-						tasksJsonPath: tasksJsonPath,
+						tasksJsonPath,
 						prompt: args.prompt,
 						title: args.title,
 						description: args.description,

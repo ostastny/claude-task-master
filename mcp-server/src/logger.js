@@ -1,6 +1,6 @@
 import chalk from 'chalk';
-import { isSilentMode } from '../../scripts/modules/utils.js';
 import { getLogLevel } from '../../scripts/modules/config-manager.js';
+import { isSilentMode } from '../../scripts/modules/utils.js';
 
 // Define log levels
 const LOG_LEVELS = {
@@ -98,7 +98,7 @@ export function createLogger() {
 		warn: createLogMethod('warn'),
 		error: createLogMethod('error'),
 		success: createLogMethod('success'),
-		log: log // Also expose the raw log function
+		log // Also expose the raw log function
 	};
 }
 

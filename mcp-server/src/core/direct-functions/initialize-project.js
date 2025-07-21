@@ -1,10 +1,10 @@
+import os from 'os'; // Import os module for home directory check
 import { initializeProject } from '../../../../scripts/init.js'; // Import core function and its logger if needed separately
 import {
-	enableSilentMode,
-	disableSilentMode
+	disableSilentMode,
+	enableSilentMode
 	// isSilentMode // Not used directly here
 } from '../../../../scripts/modules/utils.js';
-import os from 'os'; // Import os module for home directory check
 import { RULE_PROFILES } from '../../../../src/constants/profiles.js';
 import { convertAllRulesToProfileRules } from '../../../../src/utils/rule-transformer.js';
 
@@ -81,7 +81,7 @@ export async function initializeProjectDirect(args, log, context = {}) {
 			// For MCP initialization, default to Cursor profile only
 			options.rules = ['cursor'];
 			options.rulesExplicitlyProvided = true;
-			log.info(`No rule profiles specified, defaulting to: Cursor`);
+			log.info('No rule profiles specified, defaulting to: Cursor');
 		}
 
 		log.info(`Initializing project with options: ${JSON.stringify(options)}`);

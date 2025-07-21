@@ -15,16 +15,16 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
 import readline from 'readline';
+import { fileURLToPath } from 'url';
+
+// Import prompt manager
+import { getPromptManager } from '../../../scripts/modules/prompt-manager.js';
 
 // Get project root and import prompt manager
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, '../../..');
-
-// Import prompt manager
-import { getPromptManager } from '../../../scripts/modules/prompt-manager.js';
 const promptManager = getPromptManager();
 
 // ANSI color codes for better output formatting
@@ -1077,7 +1077,7 @@ async function runComprehensiveTests(generateDetailed = false) {
 	for (const testCase of testCases) {
 		try {
 			// Handle variant conversion for comprehensive tests
-			let scenarioVariant = testCase.variant;
+			const scenarioVariant = testCase.variant;
 			let templateVariant = testCase.variant;
 
 			// For templates using detail levels, convert to default with detailLevel param
@@ -1793,10 +1793,10 @@ function generateHTMLReport(testResults, templateResults = []) {
 				html += `<div class="error-message">Error: ${escapeHtml(result.error)}</div>`;
 			}
 
-			html += `</div>`;
+			html += '</div>';
 		});
 
-		html += `</div></div>`;
+		html += '</div></div>';
 	}
 
 	html += `

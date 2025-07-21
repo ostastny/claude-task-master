@@ -4,6 +4,15 @@
 
 import { jest } from '@jest/globals';
 
+// Import all modules after mocking
+import fs from 'fs';
+import path from 'path';
+import { setupCLI } from '../../scripts/modules/commands.js';
+import {
+	RULES_ACTIONS,
+	RULES_SETUP_ACTION
+} from '../../src/constants/rules-actions.js';
+
 // Mock modules first
 jest.mock('fs', () => ({
 	existsSync: jest.fn(),
@@ -84,18 +93,9 @@ jest.mock('../../scripts/modules/utils.js', () => ({
 		projectVersion: '1.5.0'
 	},
 	log: jest.fn(() => {}), // Prevent any real logging that could trigger config discovery
-	toKebabCase: toKebabCase,
-	detectCamelCaseFlags: detectCamelCaseFlags
+	toKebabCase,
+	detectCamelCaseFlags
 }));
-
-// Import all modules after mocking
-import fs from 'fs';
-import path from 'path';
-import { setupCLI } from '../../scripts/modules/commands.js';
-import {
-	RULES_SETUP_ACTION,
-	RULES_ACTIONS
-} from '../../src/constants/rules-actions.js';
 
 describe('Commands Module - CLI Setup and Integration', () => {
 	const mockExistsSync = jest.spyOn(fs, 'existsSync');

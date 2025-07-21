@@ -4,13 +4,13 @@
  */
 
 import { z } from 'zod';
-import {
-	handleApiResult,
-	createErrorResponse,
-	withNormalizedProjectRoot
-} from './utils.js';
 import { expandAllTasksDirect } from '../core/task-master-core.js';
 import { findTasksPath } from '../core/utils/path-utils.js';
+import {
+	createErrorResponse,
+	handleApiResult,
+	withNormalizedProjectRoot
+} from './utils.js';
 
 /**
  * Register the expandAll tool with the MCP server
@@ -81,7 +81,7 @@ export function registerExpandAllTool(server) {
 
 				const result = await expandAllTasksDirect(
 					{
-						tasksJsonPath: tasksJsonPath,
+						tasksJsonPath,
 						num: args.num,
 						research: args.research,
 						prompt: args.prompt,

@@ -229,11 +229,11 @@ async function updateSubtaskById(
 
 			const promptParams = {
 				parentTask: parentContext,
-				prevSubtask: prevSubtask,
-				nextSubtask: nextSubtask,
+				prevSubtask,
+				nextSubtask,
 				currentDetails: subtask.details || '(No existing details)',
 				updatePrompt: prompt,
-				useResearch: useResearch,
+				useResearch,
 				gatheredContext: gatheredContext || ''
 			};
 
@@ -249,7 +249,7 @@ async function updateSubtaskById(
 
 			aiServiceResponse = await generateTextService({
 				prompt: userPrompt,
-				systemPrompt: systemPrompt,
+				systemPrompt,
 				role,
 				session,
 				projectRoot,
@@ -365,7 +365,7 @@ async function updateSubtaskById(
 		}
 
 		return {
-			updatedSubtask: updatedSubtask,
+			updatedSubtask,
 			telemetryData: aiServiceResponse.telemetryData,
 			tagInfo: aiServiceResponse.tagInfo
 		};

@@ -85,8 +85,9 @@ function parseUpdatedTaskFromText(text, expectedTaskId, logFn, isMCP) {
 		'info',
 		'Attempting to parse updated task object from text response...'
 	);
-	if (!text || text.trim() === '')
+	if (!text || text.trim() === '') {
 		throw new Error('AI response text is empty.');
+	}
 
 	let cleanedResponse = text.trim();
 	const originalResponseForDebug = cleanedResponse;
@@ -256,25 +257,29 @@ async function updateTaskById(
 		report('info', `Updating single task ${taskId} with prompt: "${prompt}"`);
 
 		// --- Input Validations (Keep existing) ---
-		if (!Number.isInteger(taskId) || taskId <= 0)
+		if (!Number.isInteger(taskId) || taskId <= 0) {
 			throw new Error(
 				`Invalid task ID: ${taskId}. Task ID must be a positive integer.`
 			);
-		if (!prompt || typeof prompt !== 'string' || prompt.trim() === '')
+		}
+		if (!prompt || typeof prompt !== 'string' || prompt.trim() === '') {
 			throw new Error('Prompt cannot be empty.');
+		}
 		if (useResearch && !isApiKeySet('perplexity', session)) {
 			report(
 				'warn',
 				'Perplexity research requested but API key not set. Falling back.'
 			);
-			if (outputFormat === 'text')
+			if (outputFormat === 'text') {
 				console.log(
 					chalk.yellow('Perplexity AI not available. Falling back to main AI.')
 				);
+			}
 			useResearch = false;
 		}
-		if (!fs.existsSync(tasksPath))
+		if (!fs.existsSync(tasksPath)) {
 			throw new Error(`Tasks file not found: ${tasksPath}`);
+		}
 		// --- End Input Validations ---
 
 		// Determine project root
@@ -288,8 +293,9 @@ async function updateTaskById(
 
 		// --- Task Loading and Status Check (Keep existing) ---
 		const data = readJSON(tasksPath, projectRoot, currentTag);
-		if (!data || !data.tasks)
+		if (!data || !data.tasks) {
 			throw new Error(`No valid tasks found in ${tasksPath}.`);
+		}
 		const taskIndex = data.tasks.findIndex((task) => task.id === taskId);
 		if (taskIndex === -1) throw new Error(`Task with ID ${taskId} not found.`);
 		const taskToUpdate = data.tasks[taskIndex];
@@ -416,8 +422,8 @@ async function updateTaskById(
 			task: taskToUpdate,
 			taskJson: JSON.stringify(taskToUpdate, null, 2),
 			updatePrompt: prompt,
-			appendMode: appendMode,
-			useResearch: useResearch,
+			appendMode,
+			useResearch,
 			currentDetails: taskToUpdate.details || '(No existing details)',
 			gatheredContext: gatheredContext || ''
 		};
@@ -480,16 +486,17 @@ async function updateTaskById(
 			const serviceRole = useResearch ? 'research' : 'main';
 			aiServiceResponse = await generateTextService({
 				role: serviceRole,
-				session: session,
-				projectRoot: projectRoot,
-				systemPrompt: systemPrompt,
+				session,
+				projectRoot,
+				systemPrompt,
 				prompt: userPrompt,
 				commandName: 'update-task',
 				outputType: isMCP ? 'mcp' : 'cli'
 			});
 
-			if (loadingIndicator)
+			if (loadingIndicator) {
 				stopLoadingIndicator(loadingIndicator, 'AI update complete.');
+			}
 
 			if (appendMode) {
 				// Append mode: handle as plain text
@@ -565,10 +572,12 @@ async function updateTaskById(
 			);
 
 			// --- Task Validation/Correction (Keep existing logic) ---
-			if (!updatedTask || typeof updatedTask !== 'object')
+			if (!updatedTask || typeof updatedTask !== 'object') {
 				throw new Error('Received invalid task object from AI.');
-			if (!updatedTask.title || !updatedTask.description)
+			}
+			if (!updatedTask.title || !updatedTask.description) {
 				throw new Error('Updated task missing required fields.');
+			}
 			// Preserve ID if AI changed it
 			if (updatedTask.id !== taskId) {
 				report('warn', `AI changed task ID. Restoring original ID ${taskId}.`);
@@ -679,7 +688,7 @@ async function updateTaskById(
 
 			// --- Return Success with Telemetry ---
 			return {
-				updatedTask: updatedTask, // Return the updated task object
+				updatedTask, // Return the updated task object
 				telemetryData: aiServiceResponse.telemetryData, // <<< ADD telemetryData
 				tagInfo: aiServiceResponse.tagInfo
 			};

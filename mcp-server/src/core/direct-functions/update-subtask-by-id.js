@@ -5,8 +5,8 @@
 
 import { updateSubtaskById } from '../../../../scripts/modules/task-manager.js';
 import {
-	enableSilentMode,
 	disableSilentMode,
+	enableSilentMode,
 	isSilentMode
 } from '../../../../scripts/modules/utils.js';
 import { createLogWrapper } from '../../tools/utils.js';
@@ -123,7 +123,7 @@ export async function updateSubtaskByIdDirect(args, log, context = {}) {
 				logWrapper.error(message);
 				return {
 					success: false,
-					error: { code: 'SUBTASK_NOT_FOUND', message: message }
+					error: { code: 'SUBTASK_NOT_FOUND', message }
 				};
 			}
 

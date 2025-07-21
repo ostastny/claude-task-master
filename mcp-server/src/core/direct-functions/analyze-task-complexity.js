@@ -2,13 +2,13 @@
  * Direct function wrapper for analyzeTaskComplexity
  */
 
+import fs from 'fs';
 import analyzeTaskComplexity from '../../../../scripts/modules/task-manager/analyze-task-complexity.js';
 import {
-	enableSilentMode,
 	disableSilentMode,
+	enableSilentMode,
 	isSilentMode
 } from '../../../../scripts/modules/utils.js';
-import fs from 'fs';
 import { createLogWrapper } from '../../tools/utils.js'; // Import the new utility
 
 /**
@@ -86,12 +86,12 @@ export async function analyzeTaskComplexityDirect(args, log, context = {}) {
 		const coreOptions = {
 			file: tasksJsonPath,
 			output: outputPath,
-			threshold: threshold,
+			threshold,
 			research: research === true, // Ensure boolean
-			projectRoot: projectRoot, // Pass projectRoot here
+			projectRoot, // Pass projectRoot here
 			id: ids, // Pass the ids parameter to the core function as 'id'
-			from: from, // Pass from parameter
-			to: to // Pass to parameter
+			from, // Pass from parameter
+			to // Pass to parameter
 		};
 		// --- End Initial Checks ---
 

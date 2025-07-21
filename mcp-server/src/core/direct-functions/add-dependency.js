@@ -5,8 +5,8 @@
 
 import { addDependency } from '../../../../scripts/modules/dependency-manager.js';
 import {
-	enableSilentMode,
-	disableSilentMode
+	disableSilentMode,
+	enableSilentMode
 } from '../../../../scripts/modules/utils.js';
 
 /**
@@ -86,8 +86,8 @@ export async function addDependencyDirect(args, log) {
 			success: true,
 			data: {
 				message: `Successfully added dependency: Task ${taskId} now depends on ${dependencyId}`,
-				taskId: taskId,
-				dependencyId: dependencyId
+				taskId,
+				dependencyId
 			}
 		};
 	} catch (error) {

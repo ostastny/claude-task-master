@@ -1,5 +1,10 @@
 import { jest } from '@jest/globals';
 
+// Import modules after mocking
+import fs from 'fs';
+import { rooProfile } from '../../../src/profiles/roo.js';
+import { convertRuleToProfileRule } from '../../../src/utils/rule-transformer.js';
+
 // Mock fs module before importing anything that uses it
 jest.mock('fs', () => ({
 	readFileSync: jest.fn(),
@@ -7,11 +12,6 @@ jest.mock('fs', () => ({
 	existsSync: jest.fn(),
 	mkdirSync: jest.fn()
 }));
-
-// Import modules after mocking
-import fs from 'fs';
-import { convertRuleToProfileRule } from '../../../src/utils/rule-transformer.js';
-import { rooProfile } from '../../../src/profiles/roo.js';
 
 describe('Roo Rule Transformer', () => {
 	// Set up spies on the mocked modules

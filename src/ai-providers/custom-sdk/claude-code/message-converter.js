@@ -64,7 +64,7 @@ export function convertToClaudeCodeMessages(prompt, mode) {
 					);
 					if (toolCalls.length > 0) {
 						// For now, we'll just note that tool calls were made
-						messages.push(`Assistant: [Tool calls made]`);
+						messages.push('Assistant: [Tool calls made]');
 					}
 				}
 				break;

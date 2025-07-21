@@ -287,7 +287,6 @@ async function checkAndAutoSwitchGitTag(projectRoot, tasksPath) {
 
 	// DISABLED: Automatic git workflow is too rigid and opinionated
 	// Users should explicitly use git-tag commands if they want integration
-	return;
 }
 
 /**
@@ -299,12 +298,11 @@ async function checkAndAutoSwitchGitTag(projectRoot, tasksPath) {
  */
 function checkAndAutoSwitchGitTagSync(projectRoot, tasksPath) {
 	if (!projectRoot) {
-		return; // Can't proceed without project root
+		// Can't proceed without project root
 	}
 
 	// DISABLED: Automatic git workflow is too rigid and opinionated
 	// Users should explicitly use git-tag commands if they want integration
-	return;
 }
 
 /**

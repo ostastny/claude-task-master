@@ -4,13 +4,13 @@
  */
 
 import { z } from 'zod';
+import { listTagsDirect } from '../core/task-master-core.js';
+import { findTasksPath } from '../core/utils/path-utils.js';
 import {
 	createErrorResponse,
 	handleApiResult,
 	withNormalizedProjectRoot
 } from './utils.js';
-import { listTagsDirect } from '../core/task-master-core.js';
-import { findTasksPath } from '../core/utils/path-utils.js';
 
 /**
  * Register the listTags tool with the MCP server
@@ -54,7 +54,7 @@ export function registerListTagsTool(server) {
 				// Call the direct function
 				const result = await listTagsDirect(
 					{
-						tasksJsonPath: tasksJsonPath,
+						tasksJsonPath,
 						showMetadata: args.showMetadata,
 						projectRoot: args.projectRoot
 					},

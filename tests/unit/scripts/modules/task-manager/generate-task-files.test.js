@@ -22,10 +22,12 @@ jest.unstable_mockModule('fs', () => ({
 jest.unstable_mockModule('path', () => ({
 	default: {
 		join: jest.fn((...args) => args.join('/')),
-		dirname: jest.fn((p) => p.split('/').slice(0, -1).join('/'))
+		dirname: jest.fn((p) => p.split('/').slice(0, -1).join('/')),
+		resolve: jest.fn((...args) => args.join('/'))
 	},
 	join: jest.fn((...args) => args.join('/')),
-	dirname: jest.fn((p) => p.split('/').slice(0, -1).join('/'))
+	dirname: jest.fn((p) => p.split('/').slice(0, -1).join('/')),
+	resolve: jest.fn((...args) => args.join('/'))
 }));
 
 jest.unstable_mockModule('../../../../../scripts/modules/utils.js', () => ({
@@ -76,6 +78,24 @@ jest.unstable_mockModule(
 	})
 );
 
+jest.unstable_mockModule(
+	'../../../../../src/bdd-replacement-system.js',
+	() => ({
+		BDDReplacementSystem: jest.fn().mockImplementation(() => ({
+			generateBDDFromRequirements: jest.fn().mockResolvedValue({
+				success: true,
+				files: ['test.feature'],
+				summary: { totalFiles: 1, successfulFiles: 1, failedFiles: 0 }
+			}),
+			validateNoBDDTaskFiles: jest.fn().mockResolvedValue({
+				success: true,
+				taskFilesFound: false,
+				taskFiles: []
+			})
+		}))
+	})
+);
+
 // Import the mocked modules
 const { readJSON, writeJSON, log, findProjectRoot, ensureTagMetadata } =
 	await import('../../../../../scripts/modules/utils.js');
@@ -88,6 +108,9 @@ const { validateAndFixDependencies } = await import(
 
 const fs = (await import('fs')).default;
 const path = (await import('path')).default;
+const { BDDReplacementSystem } = await import(
+	'../../../../../src/bdd-replacement-system.js'
+);
 
 // Import the module under test
 const { default: generateTaskFiles } = await import(
@@ -199,22 +222,11 @@ describe('generateTaskFiles', () => {
 			'master'
 		);
 
-		// Verify files were written for each task in the master tag
-		expect(fs.writeFileSync).toHaveBeenCalledTimes(3);
+		// Verify NO task files were written (only BDD features)
+		expect(fs.writeFileSync).not.toHaveBeenCalled();
 
-		// Verify specific file paths
-		expect(fs.writeFileSync).toHaveBeenCalledWith(
-			'tasks/task_001.txt',
-			expect.any(String)
-		);
-		expect(fs.writeFileSync).toHaveBeenCalledWith(
-			'tasks/task_002.txt',
-			expect.any(String)
-		);
-		expect(fs.writeFileSync).toHaveBeenCalledWith(
-			'tasks/task_003.txt',
-			expect.any(String)
-		);
+		// Verify BDD system was called
+		expect(BDDReplacementSystem).toHaveBeenCalled();
 	});
 
 	test('should format dependencies with status indicators', async () => {
@@ -229,9 +241,11 @@ describe('generateTaskFiles', () => {
 			mcpLog: { info: jest.fn() }
 		});
 
-		// Verify formatDependenciesWithStatus was called for tasks with dependencies
-		// It will be called multiple times, once for each task that has dependencies.
-		expect(formatDependenciesWithStatus).toHaveBeenCalled();
+		// Verify BDD system was called (dependencies are no longer formatted in task files)
+		expect(BDDReplacementSystem).toHaveBeenCalled();
+
+		// Verify NO task files were written
+		expect(fs.writeFileSync).not.toHaveBeenCalled();
 	});
 
 	test('should handle tasks with no subtasks', async () => {
@@ -274,12 +288,11 @@ describe('generateTaskFiles', () => {
 			mcpLog: { info: jest.fn() }
 		});
 
-		// Verify the file was written
-		expect(fs.writeFileSync).toHaveBeenCalledTimes(1);
-		expect(fs.writeFileSync).toHaveBeenCalledWith(
-			'tasks/task_001.txt',
-			expect.any(String)
-		);
+		// Verify NO task files were written (only BDD features)
+		expect(fs.writeFileSync).not.toHaveBeenCalled();
+
+		// Verify BDD system was called
+		expect(BDDReplacementSystem).toHaveBeenCalled();
 	});
 
 	test('should validate dependencies before generating files', async () => {

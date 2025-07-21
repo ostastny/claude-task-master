@@ -5,8 +5,8 @@
 
 import { addTask } from '../../../../scripts/modules/task-manager.js';
 import {
-	enableSilentMode,
-	disableSilentMode
+	disableSilentMode,
+	enableSilentMode
 } from '../../../../scripts/modules/utils.js';
 import { createLogWrapper } from '../../tools/utils.js';
 
@@ -166,8 +166,8 @@ export async function addTaskDirect(args, log, context = {}) {
 			data: {
 				taskId: newTaskId,
 				message: `Successfully added new task #${newTaskId}`,
-				telemetryData: telemetryData,
-				tagInfo: tagInfo
+				telemetryData,
+				tagInfo
 			}
 		};
 	} catch (error) {

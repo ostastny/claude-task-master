@@ -1,12 +1,12 @@
-import { FastMCP } from 'fastmcp';
-import path from 'path';
-import dotenv from 'dotenv';
-import { fileURLToPath } from 'url';
 import fs from 'fs';
-import logger from './logger.js';
-import { registerTaskMasterTools } from './tools/index.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
+import { FastMCP } from 'fastmcp';
 import ProviderRegistry from '../../src/provider-registry/index.js';
+import logger from './logger.js';
 import { MCPProvider } from './providers/mcp-provider.js';
+import { registerTaskMasterTools } from './tools/index.js';
 
 // Load environment variables
 dotenv.config();
@@ -98,7 +98,8 @@ class TaskMasterMCPServer {
 				session.server.sendLoggingMessage({
 					data: {
 						context: session.context,
-						message: `MCP session missing required sampling capabilities, providers not registered`
+						message:
+							'MCP session missing required sampling capabilities, providers not registered'
 					},
 					level: 'info'
 				});
@@ -118,7 +119,7 @@ class TaskMasterMCPServer {
 			session.server.sendLoggingMessage({
 				data: {
 					context: session.context,
-					message: `MCP Server connected`
+					message: 'MCP Server connected'
 				},
 				level: 'info'
 			});
@@ -126,7 +127,7 @@ class TaskMasterMCPServer {
 			session.server.sendLoggingMessage({
 				data: {
 					context: session.context,
-					message: `No MCP sessions available, providers not registered`
+					message: 'No MCP sessions available, providers not registered'
 				},
 				level: 'warn'
 			});

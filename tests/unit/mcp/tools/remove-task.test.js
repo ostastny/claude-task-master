@@ -92,7 +92,7 @@ const registerRemoveTaskTool = (server) => {
 
 				const result = await mockRemoveTaskDirect(
 					{
-						tasksJsonPath: tasksJsonPath,
+						tasksJsonPath,
 						id: args.id,
 						projectRoot: args.projectRoot,
 						tag: args.tag

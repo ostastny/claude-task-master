@@ -7,7 +7,12 @@
 			"tasks",
 			"package-lock.json",
 			"tests/fixture/*.json",
-			"dist"
+			"dist",
+			".nyc_output",
+			"complexity-report",
+			".taskmaster/config.json",
+			".taskmaster/reports",
+			"node_modules"
 		]
 	},
 	"formatter": {

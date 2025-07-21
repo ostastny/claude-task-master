@@ -1,5 +1,5 @@
 // Cursor conversion profile for rule-transformer
-import { createProfile, COMMON_TOOL_MAPPINGS } from './base-profile.js';
+import { COMMON_TOOL_MAPPINGS, createProfile } from './base-profile.js';
 
 // Create and export cursor profile using the base factory
 export const cursorProfile = createProfile({

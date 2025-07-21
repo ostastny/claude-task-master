@@ -2,9 +2,12 @@
  * Integration test for direct function imports in MCP server
  */
 
-import { jest } from '@jest/globals';
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { jest } from '@jest/globals';
+
+// Import dependencies after mocks are set up
+import { sampleTasks } from '../../fixtures/sample-tasks.js';
 
 // Get the current module's directory
 const __filename = fileURLToPath(import.meta.url);
@@ -159,9 +162,6 @@ jest.mock('../../../scripts/modules/task-manager.js', () => ({
 	findTaskById: mockFindTaskById,
 	taskExists: mockTaskExists
 }));
-
-// Import dependencies after mocks are set up
-import { sampleTasks } from '../../fixtures/sample-tasks.js';
 
 // Mock logger
 const mockLogger = {

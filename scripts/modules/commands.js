@@ -108,7 +108,12 @@ import {
 } from '../../src/ui/confirm.js';
 import {
 	wouldRemovalLeaveNoProfiles,
-	getInstalledProfiles
+	getInstalledProfiles,
+	runInteractiveProfilesSetup,
+	generateProfileSummary,
+	categorizeProfileResults,
+	generateProfileRemovalSummary,
+	categorizeRemovalResults
 } from '../../src/utils/profiles.js';
 
 import { initializeProject } from '../init.js';
@@ -136,13 +141,6 @@ import {
 	isValidProfile,
 	getRulesProfile
 } from '../../src/utils/rule-transformer.js';
-import {
-	runInteractiveProfilesSetup,
-	generateProfileSummary,
-	categorizeProfileResults,
-	generateProfileRemovalSummary,
-	categorizeRemovalResults
-} from '../../src/utils/profiles.js';
 
 /**
  * Runs the interactive setup process for model configuration.
@@ -923,9 +921,9 @@ function registerCommands(programInstance) {
 				await parsePRD(taskMaster.getPrdPath(), outputPath, numTasks, {
 					append: useAppend,
 					force: useForce,
-					research: research,
+					research,
 					projectRoot: taskMaster.getProjectRoot(),
-					tag: tag
+					tag
 				});
 				spinner.succeed('Tasks generated successfully!');
 			} catch (error) {
@@ -1000,7 +998,7 @@ function registerCommands(programInstance) {
 					)
 				);
 				console.log(
-					`  task-master update-task --id=<id> --prompt="Your prompt here"`
+					'  task-master update-task --id=<id> --prompt="Your prompt here"'
 				);
 				process.exit(1);
 			}
@@ -1925,8 +1923,8 @@ function registerCommands(programInstance) {
 			// Create validated parameters object
 			const validatedParams = {
 				prompt: prompt.trim(),
-				taskIds: taskIds,
-				filePaths: filePaths,
+				taskIds,
+				filePaths,
 				customContext: options.context ? options.context.trim() : null,
 				includeProjectTree: !!options.tree,
 				saveTarget: options.save ? options.save.trim() : null,
@@ -1979,7 +1977,7 @@ function registerCommands(programInstance) {
 					detailLevel: validatedParams.detailLevel,
 					projectRoot: validatedParams.projectRoot,
 					saveToFile: !!options.saveFile,
-					tag: tag
+					tag
 				};
 
 				// Execute research
@@ -1989,7 +1987,7 @@ function registerCommands(programInstance) {
 					{
 						commandName: 'research',
 						outputType: 'cli',
-						tag: tag
+						tag
 					},
 					'text',
 					validatedParams.allowFollowUp // Pass follow-up flag
@@ -2026,7 +2024,7 @@ ${result.result}`;
 									commandName: 'research-save',
 									outputType: 'cli',
 									projectRoot: validatedParams.projectRoot,
-									tag: tag
+									tag
 								},
 								'text'
 							);
@@ -2052,7 +2050,7 @@ ${result.result}`;
 									commandName: 'research-save',
 									outputType: 'cli',
 									projectRoot: validatedParams.projectRoot,
-									tag: tag
+									tag
 								},
 								'text',
 								true // appendMode = true
@@ -2693,7 +2691,7 @@ ${result.result}
 						description: options.description || '',
 						details: options.details || '',
 						status: options.status || 'pending',
-						dependencies: dependencies
+						dependencies
 					};
 
 					const subtask = await addSubtask(
@@ -2754,13 +2752,13 @@ ${result.result}
 								chalk.white('Convert existing task to subtask:') +
 								'\n' +
 								chalk.yellow(
-									`  task-master add-subtask --parent=5 --task-id=8`
+									'  task-master add-subtask --parent=5 --task-id=8'
 								) +
 								'\n\n' +
 								chalk.white('Create new subtask:') +
 								'\n' +
 								chalk.yellow(
-									`  task-master add-subtask --parent=5 --title="Implement login UI" --description="Create the login form"`
+									'  task-master add-subtask --parent=5 --title="Implement login UI" --description="Create the login form"'
 								) +
 								'\n\n',
 							{ padding: 1, borderColor: 'blue', borderStyle: 'round' }
@@ -2931,7 +2929,7 @@ ${result.result}
 					'\n\n' +
 					chalk.cyan('Usage:') +
 					'\n' +
-					`  task-master remove-subtask --id=<parentId.subtaskId> [options]\n\n` +
+					'  task-master remove-subtask --id=<parentId.subtaskId> [options]\n\n' +
 					chalk.cyan('Options:') +
 					'\n' +
 					'  -i, --id <id>       Subtask ID(s) to remove in format "parentId.subtaskId" (can be comma-separated, required)\n' +
@@ -2958,7 +2956,7 @@ ${result.result}
 					'\n\n' +
 					chalk.cyan('Usage:') +
 					'\n' +
-					`  task-master tags [options]\n\n` +
+					'  task-master tags [options]\n\n' +
 					chalk.cyan('Options:') +
 					'\n' +
 					'  -f, --file <file>   Path to the tasks file (default: "' +
@@ -2987,7 +2985,7 @@ ${result.result}
 					'\n\n' +
 					chalk.cyan('Usage:') +
 					'\n' +
-					`  task-master add-tag <tagName> [options]\n\n` +
+					'  task-master add-tag <tagName> [options]\n\n' +
 					chalk.cyan('Options:') +
 					'\n' +
 					'  -f, --file <file>        Path to the tasks file (default: "' +
@@ -3015,7 +3013,7 @@ ${result.result}
 					'\n\n' +
 					chalk.cyan('Usage:') +
 					'\n' +
-					`  task-master delete-tag <tagName> [options]\n\n` +
+					'  task-master delete-tag <tagName> [options]\n\n' +
 					chalk.cyan('Options:') +
 					'\n' +
 					'  -f, --file <file>   Path to the tasks file (default: "' +
@@ -3042,7 +3040,7 @@ ${result.result}
 					'\n\n' +
 					chalk.cyan('Usage:') +
 					'\n' +
-					`  task-master use-tag <tagName> [options]\n\n` +
+					'  task-master use-tag <tagName> [options]\n\n' +
 					chalk.cyan('Options:') +
 					'\n' +
 					'  -f, --file <file>   Path to the tasks file (default: "' +
@@ -3069,7 +3067,7 @@ ${result.result}
 					'\n\n' +
 					chalk.cyan('Usage:') +
 					'\n' +
-					`  task-master research "<query>" [options]\n\n` +
+					'  task-master research "<query>" [options]\n\n' +
 					chalk.cyan('Required:') +
 					'\n' +
 					'  <query>             Research question or prompt (required)\n\n' +
@@ -3539,8 +3537,9 @@ Examples:
 					});
 					if (result.success) {
 						console.log(chalk.green(`✅ ${result.data.message}`));
-						if (result.data.warning)
+						if (result.data.warning) {
 							console.log(chalk.yellow(result.data.warning));
+						}
 						updateOccurred = true;
 					} else {
 						console.error(
@@ -3565,8 +3564,9 @@ Examples:
 					});
 					if (result.success) {
 						console.log(chalk.green(`✅ ${result.data.message}`));
-						if (result.data.warning)
+						if (result.data.warning) {
 							console.log(chalk.yellow(result.data.warning));
+						}
 						updateOccurred = true;
 					} else {
 						console.error(
@@ -3593,8 +3593,9 @@ Examples:
 					});
 					if (result.success) {
 						console.log(chalk.green(`✅ ${result.data.message}`));
-						if (result.data.warning)
+						if (result.data.warning) {
 							console.log(chalk.yellow(result.data.warning));
+						}
 						updateOccurred = true;
 					} else {
 						console.error(
@@ -3682,7 +3683,7 @@ Examples:
 				);
 			}
 			// --- IMPORTANT: Exit after displaying status ---
-			return; // Stop execution here
+			// Stop execution here
 		});
 
 	// response-language command

@@ -585,7 +585,7 @@ async function setModel(role, modelId, options = {}) {
 		currentConfig.models[role] = {
 			...currentConfig.models[role], // Keep existing params like temperature
 			provider: determinedProvider,
-			modelId: modelId
+			modelId
 		};
 
 		// If model data is available, update maxTokens from supported-models.json

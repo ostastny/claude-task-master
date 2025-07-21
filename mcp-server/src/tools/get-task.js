@@ -4,16 +4,16 @@
  */
 
 import { z } from 'zod';
-import {
-	handleApiResult,
-	createErrorResponse,
-	withNormalizedProjectRoot
-} from './utils.js';
 import { showTaskDirect } from '../core/task-master-core.js';
 import {
-	findTasksPath,
-	findComplexityReportPath
+	findComplexityReportPath,
+	findTasksPath
 } from '../core/utils/path-utils.js';
+import {
+	createErrorResponse,
+	handleApiResult,
+	withNormalizedProjectRoot
+} from './utils.js';
 
 /**
  * Custom processor function that removes allTasks from the response
@@ -80,10 +80,7 @@ export function registerShowTaskTool(server) {
 				// Resolve the path to tasks.json using the NORMALIZED projectRoot from args
 				let tasksJsonPath;
 				try {
-					tasksJsonPath = findTasksPath(
-						{ projectRoot: projectRoot, file: file },
-						log
-					);
+					tasksJsonPath = findTasksPath({ projectRoot, file }, log);
 					log.info(`Resolved tasks path: ${tasksJsonPath}`);
 				} catch (error) {
 					log.error(`Error finding tasks.json: ${error.message}`);
@@ -98,7 +95,7 @@ export function registerShowTaskTool(server) {
 				try {
 					complexityReportPath = findComplexityReportPath(
 						{
-							projectRoot: projectRoot,
+							projectRoot,
 							complexityReport: args.complexityReport
 						},
 						log
@@ -108,12 +105,12 @@ export function registerShowTaskTool(server) {
 				}
 				const result = await showTaskDirect(
 					{
-						tasksJsonPath: tasksJsonPath,
+						tasksJsonPath,
 						reportPath: complexityReportPath,
 						// Pass other relevant args
-						id: id,
-						status: status,
-						projectRoot: projectRoot
+						id,
+						status,
+						projectRoot
 					},
 					log,
 					{ session }

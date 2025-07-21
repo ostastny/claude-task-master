@@ -8,10 +8,9 @@
  */
 
 import fs from 'fs';
-import path from 'path';
+import path, { dirname } from 'path';
 import dotenv from 'dotenv';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 import { execSync, spawn } from 'child_process';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -136,7 +135,7 @@ function createErrorSimulationScript(errorType, failureCount = 2) {
 
 		default:
 			// No modification
-			mockCode = `const response = await anthropic.messages.create(`;
+			mockCode = 'const response = await anthropic.messages.create(';
 	}
 
 	// Replace the anthropic call with our mock

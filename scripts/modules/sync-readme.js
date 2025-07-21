@@ -66,7 +66,7 @@ function createStartMarker(options) {
 
 	// Create a markdown box using code blocks and emojis to mimic our UI style
 	const boxContent =
-		`<!-- TASKMASTER_EXPORT_START -->\n` +
+		'<!-- TASKMASTER_EXPORT_START -->\n' +
 		`> ${exportInfo.split('\n').join('\n> ')}\n\n`;
 
 	return boxContent;
@@ -78,8 +78,8 @@ function createStartMarker(options) {
  */
 function createEndMarker() {
 	return (
-		`\n> 📋 **End of Taskmaster Export** - Tasks are synced from your project using the \`sync-readme\` command.\n` +
-		`<!-- TASKMASTER_EXPORT_END -->\n`
+		'\n> 📋 **End of Taskmaster Export** - Tasks are synced from your project using the `sync-readme` command.\n' +
+		'<!-- TASKMASTER_EXPORT_END -->\n'
 	);
 }
 

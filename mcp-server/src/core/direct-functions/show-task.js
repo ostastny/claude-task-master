@@ -36,10 +36,7 @@ export async function showTaskDirect(args, log) {
 	let tasksJsonPath;
 	try {
 		// Use the projectRoot passed directly from args
-		tasksJsonPath = findTasksPath(
-			{ projectRoot: projectRoot, file: file },
-			log
-		);
+		tasksJsonPath = findTasksPath({ projectRoot, file }, log);
 		log.info(`Resolved tasks path: ${tasksJsonPath}`);
 	} catch (error) {
 		log.error(`Error finding tasks.json: ${error.message}`);
@@ -146,7 +143,7 @@ export async function showTaskDirect(args, log) {
 				tasks: foundTasks,
 				requestedIds: taskIds,
 				foundCount: foundTasks.length,
-				notFoundIds: notFoundIds,
+				notFoundIds,
 				isMultiple: true
 			}
 		};

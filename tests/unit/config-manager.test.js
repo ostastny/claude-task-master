@@ -1,7 +1,12 @@
 import fs from 'fs';
 import path from 'path';
-import { jest } from '@jest/globals';
 import { fileURLToPath } from 'url';
+import { jest } from '@jest/globals';
+
+// Import the mocked 'fs' module to allow spying on its functions
+import fsMocked from 'fs';
+// --- Import the module under test AFTER mocks are defined ---
+import * as configManager from '../../scripts/modules/config-manager.js';
 
 // Mock modules first before any imports
 jest.mock('fs', () => ({
@@ -101,11 +106,6 @@ jest.mock('../../scripts/modules/utils.js', () => ({
 	// Include other necessary exports from utils if config-manager uses them directly
 	resolveEnvVariable: jest.fn() // Example if needed
 }));
-
-// --- Import the module under test AFTER mocks are defined ---
-import * as configManager from '../../scripts/modules/config-manager.js';
-// Import the mocked 'fs' module to allow spying on its functions
-import fsMocked from 'fs';
 
 // --- Test Data (Keep as is, ensure DEFAULT_CONFIG is accurate) ---
 const MOCK_PROJECT_ROOT = '/mock/project';
@@ -454,8 +454,9 @@ describe('Claude Code Getter Functions', () => {
 		mockFindConfigPath.mockReturnValue(MOCK_CONFIG_PATH);
 
 		fsReadFileSyncSpy.mockImplementation((filePath) => {
-			if (filePath === MOCK_CONFIG_PATH)
+			if (filePath === MOCK_CONFIG_PATH) {
 				return JSON.stringify(configWithClaudeCode);
+			}
 			if (path.basename(filePath) === 'supported-models.json') {
 				return JSON.stringify({
 					openai: [{ id: 'gpt-4o' }],
@@ -494,8 +495,9 @@ describe('Claude Code Getter Functions', () => {
 
 		fsReadFileSyncSpy.mockImplementation((filePath) => {
 			if (path.basename(filePath) === 'supported-models.json') return '{}';
-			if (filePath === MOCK_CONFIG_PATH)
+			if (filePath === MOCK_CONFIG_PATH) {
 				return JSON.stringify(configWithClaudeCode);
+			}
 			throw new Error(`Unexpected fs.readFileSync call: ${filePath}`);
 			throw new Error(`Unexpected fs.readFileSync call: ${filePath}`);
 		});
@@ -527,8 +529,9 @@ describe('Claude Code Getter Functions', () => {
 
 		fsReadFileSyncSpy.mockImplementation((filePath) => {
 			if (path.basename(filePath) === 'supported-models.json') return '{}';
-			if (filePath === MOCK_CONFIG_PATH)
+			if (filePath === MOCK_CONFIG_PATH) {
 				return JSON.stringify(configWithClaudeCode);
+			}
 			throw new Error(`Unexpected fs.readFileSync call: ${filePath}`);
 		});
 		fsExistsSyncSpy.mockReturnValue(true);
@@ -589,8 +592,9 @@ describe('getConfig Tests', () => {
 	test('should read and merge valid config file with defaults', () => {
 		// Arrange: Override readFileSync for this test
 		fsReadFileSyncSpy.mockImplementation((filePath) => {
-			if (filePath === MOCK_CONFIG_PATH)
+			if (filePath === MOCK_CONFIG_PATH) {
 				return JSON.stringify(VALID_CUSTOM_CONFIG);
+			}
 			if (path.basename(filePath) === 'supported-models.json') {
 				// Provide necessary models for validation within getConfig
 				return JSON.stringify({
@@ -745,8 +749,9 @@ describe('getConfig Tests', () => {
 	test('should validate provider and fallback to default if invalid', () => {
 		// Arrange
 		fsReadFileSyncSpy.mockImplementation((filePath) => {
-			if (filePath === MOCK_CONFIG_PATH)
+			if (filePath === MOCK_CONFIG_PATH) {
 				return JSON.stringify(INVALID_PROVIDER_CONFIG);
+			}
 			if (path.basename(filePath) === 'supported-models.json') {
 				return JSON.stringify({
 					perplexity: [{ id: 'llama-3-sonar-large-32k-online' }],
@@ -858,8 +863,9 @@ describe('Getter Functions', () => {
 	test('getMainProvider should return provider from config', () => {
 		// Arrange: Set up readFileSync to return VALID_CUSTOM_CONFIG
 		fsReadFileSyncSpy.mockImplementation((filePath) => {
-			if (filePath === MOCK_CONFIG_PATH)
+			if (filePath === MOCK_CONFIG_PATH) {
 				return JSON.stringify(VALID_CUSTOM_CONFIG);
+			}
 			if (path.basename(filePath) === 'supported-models.json') {
 				return JSON.stringify({
 					openai: [{ id: 'gpt-4o' }],
@@ -889,8 +895,9 @@ describe('Getter Functions', () => {
 	test('getLogLevel should return logLevel from config', () => {
 		// Arrange: Set up readFileSync to return VALID_CUSTOM_CONFIG
 		fsReadFileSyncSpy.mockImplementation((filePath) => {
-			if (filePath === MOCK_CONFIG_PATH)
+			if (filePath === MOCK_CONFIG_PATH) {
 				return JSON.stringify(VALID_CUSTOM_CONFIG);
+			}
 			if (path.basename(filePath) === 'supported-models.json') {
 				// Provide enough mock model data for validation within getConfig
 				return JSON.stringify({

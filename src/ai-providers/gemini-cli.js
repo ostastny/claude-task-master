@@ -7,8 +7,8 @@
 
 import { generateObject, generateText, streamText } from 'ai';
 import { parse } from 'jsonc-parser';
-import { BaseAIProvider } from './base-provider.js';
 import { log } from '../../scripts/modules/utils.js';
+import { BaseAIProvider } from './base-provider.js';
 
 let createGeminiProvider;
 
@@ -123,7 +123,7 @@ export class GeminiCliProvider extends BaseAIProvider {
 	 * @returns {string} JSON enforcement system prompt
 	 */
 	_getJsonEnforcementPrompt() {
-		return `CRITICAL: You MUST respond with ONLY valid JSON. Do not include any explanatory text, markdown formatting, code block markers, or conversational phrases like "Here is" or "Of course". Your entire response must be parseable JSON that starts with { or [ and ends with } or ]. No exceptions.`;
+		return 'CRITICAL: You MUST respond with ONLY valid JSON. Do not include any explanatory text, markdown formatting, code block markers, or conversational phrases like "Here is" or "Of course". Your entire response must be parseable JSON that starts with { or [ and ends with } or ]. No exceptions.';
 	}
 
 	/**
@@ -440,7 +440,7 @@ Generate ${subtaskCount} subtasks based on the original task context. Return ONL
 			const result = await generateText({
 				model: client(params.modelId),
 				system: systemPrompt,
-				messages: messages,
+				messages,
 				maxTokens: params.maxTokens,
 				temperature: params.temperature
 			});
@@ -544,7 +544,7 @@ Generate ${subtaskCount} subtasks based on the original task context. Return ONL
 			const stream = await streamText({
 				model: client(params.modelId),
 				system: systemPrompt,
-				messages: messages,
+				messages,
 				maxTokens: params.maxTokens,
 				temperature: params.temperature
 			});
@@ -575,7 +575,7 @@ Generate ${subtaskCount} subtasks based on the original task context. Return ONL
 			if (error.message?.includes('JSON') || error.message?.includes('parse')) {
 				log(
 					'debug',
-					`Gemini CLI generateObject failed with parsing error, attempting manual extraction`
+					'Gemini CLI generateObject failed with parsing error, attempting manual extraction'
 				);
 
 				try {
@@ -601,7 +601,7 @@ Generate ${subtaskCount} subtasks based on the original task context. Return ONL
 					const result = await generateObject({
 						model: client(params.modelId),
 						system: systemPrompt,
-						messages: messages,
+						messages,
 						schema: params.schema,
 						mode: 'json', // Use json mode instead of auto for Gemini
 						maxTokens: params.maxTokens,

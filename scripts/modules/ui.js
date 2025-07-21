@@ -292,8 +292,9 @@ function createProgressBar(percent, length = 30, statusBreakdown = null) {
 			// Add each status section proportionally
 			for (const [status, percentage] of Object.entries(statusBreakdown)) {
 				// Skip statuses that are considered complete
-				if (['deferred', 'cancelled', 'done', 'completed'].includes(status))
+				if (['deferred', 'cancelled', 'done', 'completed'].includes(status)) {
 					continue;
+				}
 
 				// Calculate how many characters this status should fill
 				const statusChars = Math.round((percentage / totalRemaining) * empty);
@@ -1899,9 +1900,9 @@ async function displayComplexityReport(reportPath) {
 		boxen(
 			chalk.white.bold('Suggested Actions:') +
 				'\n\n' +
-				`${chalk.cyan('1.')} Expand all complex tasks: ${chalk.yellow(`task-master expand --all`)}\n` +
-				`${chalk.cyan('2.')} Expand a specific task: ${chalk.yellow(`task-master expand --id=<id>`)}\n` +
-				`${chalk.cyan('3.')} Regenerate with research: ${chalk.yellow(`task-master analyze-complexity --research`)}`,
+				`${chalk.cyan('1.')} Expand all complex tasks: ${chalk.yellow('task-master expand --all')}\n` +
+				`${chalk.cyan('2.')} Expand a specific task: ${chalk.yellow('task-master expand --id=<id>')}\n` +
+				`${chalk.cyan('3.')} Regenerate with research: ${chalk.yellow('task-master analyze-complexity --research')}`,
 			{
 				padding: 1,
 				borderColor: 'cyan',
@@ -2047,9 +2048,9 @@ const formatSweScoreWithTertileStars = (score, allModels) => {
 		const topThirdIndex = Math.max(0, Math.floor(n / 3) - 1);
 		const midThirdIndex = Math.max(0, Math.floor((2 * n) / 3) - 1);
 		if (score >= sortedScores[topThirdIndex]) stars = chalk.yellow('★★★');
-		else if (score >= sortedScores[midThirdIndex])
+		else if (score >= sortedScores[midThirdIndex]) {
 			stars = chalk.yellow('★★') + chalk.gray('☆');
-		else stars = chalk.yellow('★') + chalk.gray('☆☆');
+		} else stars = chalk.yellow('★') + chalk.gray('☆☆');
 	}
 	return `${formattedPercentage} ${stars}`;
 };
@@ -2087,7 +2088,7 @@ function displayModelConfiguration(configData, allAvailableModels = []) {
 			'Cost ($/1M tkns)'
 			// 'API Key Status' // Removed, handled by separate displayApiKeyStatus
 		].map((h) => chalk.cyan.bold(h)),
-		colWidths: [10, 14, 30, 18, 20 /*, 28 */], // Adjusted widths
+		colWidths: [10, 14, 30, 18, 20], // Adjusted widths
 		style: { head: ['cyan', 'bold'] }
 	});
 
@@ -2409,8 +2410,9 @@ async function displayMultipleTasksSummary(
 
 			// Compact subtask count with status indicators
 			subtaskSummary = `${chalk.green(completed)}/${total}`;
-			if (inProgress > 0)
+			if (inProgress > 0) {
 				subtaskSummary += ` ${chalk.hex('#FFA500')(`+${inProgress}`)}`;
+			}
 			if (pending > 0) subtaskSummary += ` ${chalk.yellow(`(${pending})`)}`;
 
 			// Mini progress bar (shorter than usual)
@@ -2474,7 +2476,6 @@ async function displayMultipleTasksSummary(
 		rl.close();
 
 		if (choice.toLowerCase() === 'q') {
-			return;
 		} else if (choice.trim() === '') {
 			// Show action menu for selected tasks
 			console.log(
@@ -2545,7 +2546,7 @@ async function displayMultipleTasksSummary(
 					);
 					break;
 				case '3':
-					console.log(chalk.blue(`\n→ Command: task-master next`));
+					console.log(chalk.blue('\n→ Command: task-master next'));
 					console.log(
 						chalk.green(
 							'✓ Copy and run this command to see the next available task'
@@ -2584,7 +2585,7 @@ async function displayMultipleTasksSummary(
 					break;
 				}
 				case '6':
-					console.log(chalk.blue(`\n→ Command: task-master generate`));
+					console.log(chalk.blue('\n→ Command: task-master generate'));
 					console.log(
 						chalk.green('✓ Copy and run this command to generate task files')
 					);

@@ -4,13 +4,13 @@
  */
 
 import { z } from 'zod';
-import {
-	handleApiResult,
-	createErrorResponse,
-	withNormalizedProjectRoot
-} from './utils.js';
 import { removeDependencyDirect } from '../core/task-master-core.js';
 import { findTasksPath } from '../core/utils/path-utils.js';
+import {
+	createErrorResponse,
+	handleApiResult,
+	withNormalizedProjectRoot
+} from './utils.js';
 
 /**
  * Register the removeDependency tool with the MCP server
@@ -55,7 +55,7 @@ export function registerRemoveDependencyTool(server) {
 
 				const result = await removeDependencyDirect(
 					{
-						tasksJsonPath: tasksJsonPath,
+						tasksJsonPath,
 						id: args.id,
 						dependsOn: args.dependsOn
 					},

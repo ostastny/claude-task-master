@@ -147,7 +147,7 @@ export function createProfile(editorConfig) {
 		// Documentation URL replacements
 		docUrls: [
 			{
-				from: new RegExp(`https:\\/\\/docs\\.cursor\\.com\\/[^\\s)'\"]+`, 'g'),
+				from: /https:\/\/docs\.cursor\.com\/[^\s)'"]+/g,
 				to: (match) => match.replace('docs.cursor.com', docsUrl)
 			},
 			{
@@ -220,7 +220,7 @@ export function createProfile(editorConfig) {
 
 	return {
 		profileName: name, // Use name for programmatic access (tests expect this)
-		displayName: displayName, // Keep displayName for UI purposes
+		displayName, // Keep displayName for UI purposes
 		profileDir,
 		rulesDir,
 		mcpConfig,

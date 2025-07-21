@@ -1,5 +1,4 @@
-import { log } from '../utils.js';
-import { addComplexityToTask } from '../utils.js';
+import { log, addComplexityToTask } from '../utils.js';
 
 /**
  * Return the next work item:
@@ -86,8 +85,9 @@ function findNextTask(tasks, complexityReport = null) {
 			const pb = priorityValues[b.priority] ?? 2;
 			if (pb !== pa) return pb - pa;
 
-			if (a.dependencies.length !== b.dependencies.length)
+			if (a.dependencies.length !== b.dependencies.length) {
 				return a.dependencies.length - b.dependencies.length;
+			}
 
 			// compare parent then sub-id numerically
 			const [aPar, aSub] = a.id.split('.').map(Number);

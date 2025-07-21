@@ -299,7 +299,7 @@ async function addTask(
 			rawData[targetTag].metadata = {
 				created: new Date().toISOString(),
 				updated: new Date().toISOString(),
-				description: ``
+				description: ''
 			};
 		}
 
@@ -406,14 +406,18 @@ async function addTask(
 
 			// Add any manually provided details to the prompt for context
 			let contextFromArgs = '';
-			if (manualTaskData?.title)
+			if (manualTaskData?.title) {
 				contextFromArgs += `\n- Suggested Title: "${manualTaskData.title}"`;
-			if (manualTaskData?.description)
+			}
+			if (manualTaskData?.description) {
 				contextFromArgs += `\n- Suggested Description: "${manualTaskData.description}"`;
-			if (manualTaskData?.details)
+			}
+			if (manualTaskData?.details) {
 				contextFromArgs += `\n- Additional Details Context: "${manualTaskData.details}"`;
-			if (manualTaskData?.testStrategy)
+			}
+			if (manualTaskData?.testStrategy) {
 				contextFromArgs += `\n- Additional Test Strategy Context: "${manualTaskData.testStrategy}"`;
+			}
 
 			// Load prompts using PromptManager
 			const promptManager = getPromptManager();
@@ -445,11 +449,11 @@ async function addTask(
 				aiServiceResponse = await generateObjectService({
 					// Capture the full response
 					role: serviceRole,
-					session: session,
-					projectRoot: projectRoot,
+					session,
+					projectRoot,
 					schema: AiTaskDataSchema,
 					objectName: 'newTaskData',
-					systemPrompt: systemPrompt,
+					systemPrompt,
 					prompt: userPrompt,
 					commandName: commandName || 'add-task', // Use passed commandName or default
 					outputType: outputType || (isMCP ? 'mcp' : 'cli') // Use passed outputType or derive
@@ -707,7 +711,7 @@ async function addTask(
 			'debug'
 		);
 		return {
-			newTaskId: newTaskId,
+			newTaskId,
 			telemetryData: aiServiceResponse ? aiServiceResponse.telemetryData : null,
 			tagInfo: aiServiceResponse ? aiServiceResponse.tagInfo : null
 		};

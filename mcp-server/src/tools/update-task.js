@@ -4,13 +4,13 @@
  */
 
 import { z } from 'zod';
-import {
-	handleApiResult,
-	createErrorResponse,
-	withNormalizedProjectRoot
-} from './utils.js';
 import { updateTaskByIdDirect } from '../core/task-master-core.js';
 import { findTasksPath } from '../core/utils/path-utils.js';
+import {
+	createErrorResponse,
+	handleApiResult,
+	withNormalizedProjectRoot
+} from './utils.js';
 
 /**
  * Register the update-task tool with the MCP server
@@ -69,7 +69,7 @@ export function registerUpdateTaskTool(server) {
 				// 3. Call Direct Function - Include projectRoot
 				const result = await updateTaskByIdDirect(
 					{
-						tasksJsonPath: tasksJsonPath,
+						tasksJsonPath,
 						id: args.id,
 						prompt: args.prompt,
 						research: args.research,

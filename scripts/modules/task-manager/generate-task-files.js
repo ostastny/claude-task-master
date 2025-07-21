@@ -1,201 +1,323 @@
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 import chalk from 'chalk';
 
-import { log, readJSON } from '../utils.js';
-import { formatDependenciesWithStatus } from '../ui.js';
-import { validateAndFixDependencies } from '../dependency-manager.js';
+import { BDDReplacementSystem } from '../../../src/bdd-replacement-system.js';
 import { getDebugFlag } from '../config-manager.js';
+import { validateAndFixDependencies } from '../dependency-manager.js';
+import { formatDependenciesWithStatus } from '../ui.js';
+import { log, readJSON } from '../utils.js';
+
+// Constants
+const DEFAULT_TAG = 'master';
+const FEATURES_DIR = 'features';
+
+// Error Messages
+const ERROR_MESSAGES = {
+	TASK_FILE_READ_FAILED: 'Could not read or parse tasks file',
+	TAG_NOT_FOUND: 'not found or contains no tasks in the data',
+	BDD_GENERATION_FAILED: 'Error generating BDD features'
+};
+
+// Log Messages
+const LOG_MESSAGES = {
+	GENERATION_START: (count, tag) =>
+		`Preparing to generate ${count} BDD feature files for tag '${tag}'`,
+	GENERATION_SUCCESS: (count, tag, dir) =>
+		`Successfully generated ${count} BDD feature files for tag '${tag}' in '${dir}'.`
+};
 
 /**
- * Generate individual task files from tasks.json
+ * Generate BDD feature files from tasks.json, replacing legacy task file generation
+ *
+ * This function has been refactored for Task 109.2 to eliminate all task file generation
+ * logic and replace it with BDD feature file generation through the BDD replacement system.
+ *
  * @param {string} tasksPath - Path to the tasks.json file
- * @param {string} outputDir - Output directory for task files
- * @param {Object} options - Additional options (mcpLog for MCP mode, projectRoot, tag)
- * @returns {Object|undefined} Result object in MCP mode, undefined in CLI mode
+ * @param {string} outputDir - Output directory for feature files (legacy parameter, now used for validation)
+ * @param {Object} options - Configuration options
+ * @param {Object} [options.mcpLog] - MCP logging interface (when present, enables MCP mode)
+ * @param {string} [options.projectRoot] - Project root directory path
+ * @param {string} [options.tag] - Tag to process (defaults to 'master')
+ * @returns {Object|undefined} Result object in MCP mode with success status, count, and directory; undefined in CLI mode
+ * @throws {Error} When task data cannot be loaded, BDD generation fails, or validation fails
  */
-function generateTaskFiles(tasksPath, outputDir, options = {}) {
+async function generateBDDFeatureFiles(tasksPath, outputDir, options = {}) {
 	try {
-		const isMcpMode = !!options?.mcpLog;
+		validateRequiredParameters(tasksPath, outputDir);
 
-		// 1. Read the raw data structure, ensuring we have all tags.
-		// We call readJSON without a specific tag to get the resolved default view,
-		// which correctly contains the full structure in `_rawTaggedData`.
-		const resolvedData = readJSON(tasksPath, options.projectRoot);
-		if (!resolvedData) {
-			throw new Error(`Could not read or parse tasks file: ${tasksPath}`);
-		}
-		// Prioritize the _rawTaggedData if it exists, otherwise use the data as is.
-		const rawData = resolvedData._rawTaggedData || resolvedData;
+		const context = await setupGenerationContext(tasksPath, outputDir, options);
+		await validateDependencies(context);
+		const bddResult = await executeBDDGeneration(context);
+		await validateGenerationResults(outputDir);
 
-		// 2. Determine the target tag we need to generate files for.
-		const targetTag = options.tag || resolvedData.tag || 'master';
-		const tagData = rawData[targetTag];
-
-		if (!tagData || !tagData.tasks) {
-			throw new Error(
-				`Tag '${targetTag}' not found or has no tasks in the data.`
-			);
-		}
-		const tasksForGeneration = tagData.tasks;
-
-		// Create the output directory if it doesn't exist
-		if (!fs.existsSync(outputDir)) {
-			fs.mkdirSync(outputDir, { recursive: true });
-		}
-
-		log(
-			'info',
-			`Preparing to regenerate ${tasksForGeneration.length} task files for tag '${targetTag}'`
+		logGenerationSuccess(
+			bddResult.files.length,
+			context.targetTag,
+			bddResult.directory
 		);
 
-		// 3. Validate dependencies using the FULL, raw data structure to prevent data loss.
-		validateAndFixDependencies(
-			rawData, // Pass the entire object with all tags
-			tasksPath,
-			options.projectRoot,
-			targetTag // Provide the current tag context for the operation
-		);
-
-		const allTasksInTag = tagData.tasks;
-		const validTaskIds = allTasksInTag.map((task) => task.id);
-
-		// Cleanup orphaned task files
-		log('info', 'Checking for orphaned task files to clean up...');
-		try {
-			const files = fs.readdirSync(outputDir);
-			// Tag-aware file patterns: master -> task_001.txt, other tags -> task_001_tagname.txt
-			const masterFilePattern = /^task_(\d+)\.txt$/;
-			const taggedFilePattern = new RegExp(`^task_(\\d+)_${targetTag}\\.txt$`);
-
-			const orphanedFiles = files.filter((file) => {
-				let match = null;
-				let fileTaskId = null;
-
-				// Check if file belongs to current tag
-				if (targetTag === 'master') {
-					match = file.match(masterFilePattern);
-					if (match) {
-						fileTaskId = parseInt(match[1], 10);
-						// Only clean up master files when processing master tag
-						return !validTaskIds.includes(fileTaskId);
-					}
-				} else {
-					match = file.match(taggedFilePattern);
-					if (match) {
-						fileTaskId = parseInt(match[1], 10);
-						// Only clean up files for the current tag
-						return !validTaskIds.includes(fileTaskId);
-					}
-				}
-				return false;
-			});
-
-			if (orphanedFiles.length > 0) {
-				log(
-					'info',
-					`Found ${orphanedFiles.length} orphaned task files to remove for tag '${targetTag}'`
-				);
-				orphanedFiles.forEach((file) => {
-					const filePath = path.join(outputDir, file);
-					fs.unlinkSync(filePath);
-				});
-			} else {
-				log('info', 'No orphaned task files found.');
-			}
-		} catch (err) {
-			log('warn', `Error cleaning up orphaned task files: ${err.message}`);
-		}
-
-		// Generate task files for the target tag
-		log('info', `Generating individual task files for tag '${targetTag}'...`);
-		tasksForGeneration.forEach((task) => {
-			// Tag-aware file naming: master -> task_001.txt, other tags -> task_001_tagname.txt
-			const taskFileName =
-				targetTag === 'master'
-					? `task_${task.id.toString().padStart(3, '0')}.txt`
-					: `task_${task.id.toString().padStart(3, '0')}_${targetTag}.txt`;
-
-			const taskPath = path.join(outputDir, taskFileName);
-
-			let content = `# Task ID: ${task.id}\n`;
-			content += `# Title: ${task.title}\n`;
-			content += `# Status: ${task.status || 'pending'}\n`;
-
-			if (task.dependencies && task.dependencies.length > 0) {
-				content += `# Dependencies: ${formatDependenciesWithStatus(task.dependencies, allTasksInTag, false)}\n`;
-			} else {
-				content += '# Dependencies: None\n';
-			}
-
-			content += `# Priority: ${task.priority || 'medium'}\n`;
-			content += `# Description: ${task.description || ''}\n`;
-			content += '# Details:\n';
-			content += (task.details || '')
-				.split('\n')
-				.map((line) => line)
-				.join('\n');
-			content += '\n\n';
-			content += '# Test Strategy:\n';
-			content += (task.testStrategy || '')
-				.split('\n')
-				.map((line) => line)
-				.join('\n');
-			content += '\n';
-
-			if (task.subtasks && task.subtasks.length > 0) {
-				content += '\n# Subtasks:\n';
-				task.subtasks.forEach((subtask) => {
-					content += `## ${subtask.id}. ${subtask.title} [${subtask.status || 'pending'}]\n`;
-					if (subtask.dependencies && subtask.dependencies.length > 0) {
-						const subtaskDeps = subtask.dependencies
-							.map((depId) =>
-								typeof depId === 'number'
-									? `${task.id}.${depId}`
-									: depId.toString()
-							)
-							.join(', ');
-						content += `### Dependencies: ${subtaskDeps}\n`;
-					} else {
-						content += '### Dependencies: None\n';
-					}
-					content += `### Description: ${subtask.description || ''}\n`;
-					content += '### Details:\n';
-					content += (subtask.details || '')
-						.split('\n')
-						.map((line) => line)
-						.join('\n');
-					content += '\n\n';
-				});
-			}
-
-			fs.writeFileSync(taskPath, content);
-		});
-
-		log(
-			'success',
-			`All ${tasksForGeneration.length} tasks for tag '${targetTag}' have been generated into '${outputDir}'.`
-		);
-
-		if (isMcpMode) {
-			return {
-				success: true,
-				count: tasksForGeneration.length,
-				directory: outputDir
-			};
-		}
+		return context.isMcpMode ? createMcpResult(bddResult) : undefined;
 	} catch (error) {
-		log('error', `Error generating task files: ${error.message}`);
-		if (!options?.mcpLog) {
-			console.error(chalk.red(`Error generating task files: ${error.message}`));
-			if (getDebugFlag()) {
-				console.error(error);
-			}
-			process.exit(1);
-		} else {
-			throw error;
-		}
+		handleGenerationError(error, options);
 	}
 }
 
-export default generateTaskFiles;
+/**
+ * Validate required parameters for generation
+ * @param {string} tasksPath - Path to tasks file
+ * @param {string} outputDir - Output directory
+ * @throws {Error} When required parameters are missing or invalid
+ */
+function validateRequiredParameters(tasksPath, outputDir) {
+	if (!tasksPath || typeof tasksPath !== 'string') {
+		throw new Error('tasksPath is required and must be a string');
+	}
+	if (!outputDir || typeof outputDir !== 'string') {
+		throw new Error('outputDir is required and must be a string');
+	}
+}
+
+/**
+ * Setup generation context with all necessary data
+ * @param {string} tasksPath - Path to tasks file
+ * @param {string} outputDir - Output directory
+ * @param {Object} options - Generation options
+ * @returns {Object} Generation context object
+ */
+async function setupGenerationContext(tasksPath, outputDir, options) {
+	const isMcpMode = !!options?.mcpLog;
+	const taskData = loadTaskData(tasksPath, options.projectRoot);
+	const targetTag = determineTargetTag(options.tag, taskData.tag);
+	const tasksForGeneration = extractTasksForTag(taskData, targetTag);
+
+	ensureDirectoryExists(outputDir);
+	logGenerationStart(tasksForGeneration.length, targetTag);
+
+	return {
+		isMcpMode,
+		taskData,
+		targetTag,
+		tasksForGeneration,
+		tasksPath,
+		projectRoot: options.projectRoot,
+		outputDir
+	};
+}
+
+/**
+ * Validate task dependencies
+ * @param {Object} context - Generation context
+ */
+async function validateDependencies(context) {
+	const rawData = context.taskData._rawTaggedData || context.taskData;
+	validateAndFixDependencies(
+		rawData,
+		context.tasksPath,
+		context.projectRoot,
+		context.targetTag
+	);
+}
+
+/**
+ * Execute BDD feature generation
+ * @param {Object} context - Generation context
+ * @returns {Object} BDD generation result
+ */
+async function executeBDDGeneration(context) {
+	return await generateBDDFeatures(
+		context.tasksForGeneration,
+		context.projectRoot
+	);
+}
+
+/**
+ * Validate generation results
+ * @param {string} outputDir - Output directory to validate
+ */
+async function validateGenerationResults(outputDir) {
+	await validateNoBDDTaskFiles(outputDir);
+}
+
+/**
+ * Load and validate task data from file
+ * @param {string} tasksPath - Path to the tasks.json file
+ * @param {string} projectRoot - Project root directory
+ * @returns {Object} Task data object
+ */
+function loadTaskData(tasksPath, projectRoot) {
+	const resolvedData = readJSON(tasksPath, projectRoot);
+	if (!resolvedData) {
+		throw new Error(`${ERROR_MESSAGES.TASK_FILE_READ_FAILED}: ${tasksPath}`);
+	}
+	return resolvedData;
+}
+
+/**
+ * Determine the target tag for task processing
+ * @param {string} [optionsTag] - Tag from options
+ * @param {string} [dataTag] - Tag from task data
+ * @returns {string} Target tag to use
+ */
+function determineTargetTag(optionsTag, dataTag) {
+	return optionsTag || dataTag || DEFAULT_TAG;
+}
+
+/**
+ * Extract tasks for a specific tag from task data
+ * @param {Object} taskData - Task data object containing tasks and optional tagged data
+ * @param {string} targetTag - Tag to extract tasks for
+ * @returns {Array} Tasks for the specified tag
+ * @throws {Error} When target tag is not found or has no tasks
+ */
+function extractTasksForTag(taskData, targetTag) {
+	const rawData = taskData._rawTaggedData || taskData;
+
+	// Try tagged data first
+	if (rawData[targetTag]?.tasks) {
+		return rawData[targetTag].tasks;
+	}
+
+	// Fall back to main tasks array
+	if (taskData.tasks) {
+		return taskData.tasks;
+	}
+
+	throw new Error(`Tag '${targetTag}' ${ERROR_MESSAGES.TAG_NOT_FOUND}.`);
+}
+
+/**
+ * Ensure output directory exists
+ * @param {string} outputDir - Output directory path
+ */
+function ensureDirectoryExists(outputDir) {
+	if (!fs.existsSync(outputDir)) {
+		fs.mkdirSync(outputDir, { recursive: true });
+	}
+}
+
+/**
+ * Log generation start message
+ * @param {number} taskCount - Number of tasks to generate
+ * @param {string} targetTag - Target tag name
+ */
+function logGenerationStart(taskCount, targetTag) {
+	log('info', LOG_MESSAGES.GENERATION_START(taskCount, targetTag));
+}
+
+/**
+ * Log generation success message
+ * @param {number} fileCount - Number of files generated
+ * @param {string} targetTag - Target tag name
+ * @param {string} outputDir - Output directory
+ */
+function logGenerationSuccess(fileCount, targetTag, outputDir) {
+	log(
+		'success',
+		LOG_MESSAGES.GENERATION_SUCCESS(fileCount, targetTag, outputDir)
+	);
+}
+
+/**
+ * Generate BDD features from task requirements
+ * @param {Array} tasks - Tasks to convert to BDD features
+ * @param {string} projectRoot - Project root directory
+ * @returns {Promise<Object>} BDD generation result with directory information
+ */
+async function generateBDDFeatures(tasks, projectRoot) {
+	const bddSystem = new BDDReplacementSystem();
+	const bddOutputDir = resolveBDDOutputDirectory(projectRoot);
+	const requirements = transformTasksToRequirements(tasks);
+
+	const result = await bddSystem.generateBDDFromRequirements(
+		requirements,
+		bddOutputDir
+	);
+	return { ...result, directory: bddOutputDir };
+}
+
+/**
+ * Resolve the BDD output directory path
+ * @param {string} projectRoot - Project root directory
+ * @returns {string} Absolute path to BDD output directory
+ */
+function resolveBDDOutputDirectory(projectRoot) {
+	return path.resolve(projectRoot || process.cwd(), FEATURES_DIR);
+}
+
+/**
+ * Transform tasks into requirements format for BDD generation
+ * @param {Array} tasks - Array of task objects
+ * @returns {Array} Array of requirement objects suitable for BDD generation
+ */
+function transformTasksToRequirements(tasks) {
+	return tasks.map((task) => ({
+		title: task.title,
+		description: task.description,
+		details: task.details,
+		subtasks: task.subtasks || []
+	}));
+}
+
+/**
+ * Validate that no BDD task files are generated
+ * @param {string} outputDir - Output directory to validate
+ */
+async function validateNoBDDTaskFiles(outputDir) {
+	const bddSystem = new BDDReplacementSystem();
+	await bddSystem.validateNoBDDTaskFiles(outputDir);
+}
+
+/**
+ * Create MCP result object
+ * @param {Object} bddResult - BDD generation result
+ * @returns {Object} MCP result object
+ */
+function createMcpResult(bddResult) {
+	return {
+		success: true,
+		count: bddResult.files.length,
+		directory: bddResult.directory
+	};
+}
+
+/**
+ * Handle generation errors with appropriate logging and exit behavior
+ * @param {Error} error - Error object to handle
+ * @param {Object} options - Options object containing mcpLog for mode detection
+ * @throws {Error} In MCP mode, re-throws the error; in CLI mode, exits process
+ */
+function handleGenerationError(error, options) {
+	const errorMessage = `${ERROR_MESSAGES.BDD_GENERATION_FAILED}: ${error.message}`;
+	log('error', errorMessage);
+
+	if (isCliMode(options)) {
+		logCliError(errorMessage, error);
+		process.exit(1);
+	} else {
+		throw error;
+	}
+}
+
+/**
+ * Log errors in CLI mode with appropriate formatting
+ * @param {string} errorMessage - Formatted error message
+ * @param {Error} error - Original error object for debug output
+ */
+function logCliError(errorMessage, error) {
+	console.error(chalk.red(errorMessage));
+	if (getDebugFlag()) {
+		console.error(error);
+	}
+}
+
+/**
+ * Check if running in CLI mode (not MCP mode)
+ * @param {Object} options - Options object
+ * @returns {boolean} True if in CLI mode, false if in MCP mode
+ */
+function isCliMode(options) {
+	return !options?.mcpLog;
+}
+
+export default generateBDDFeatureFiles;

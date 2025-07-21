@@ -5,9 +5,10 @@
 
 import { generateTaskFiles } from '../../../../scripts/modules/task-manager.js';
 import {
-	enableSilentMode,
-	disableSilentMode
+	disableSilentMode,
+	enableSilentMode
 } from '../../../../scripts/modules/utils.js';
+import { BDDReplacementSystem } from '../../../../src/bdd-replacement-system.js';
 
 /**
  * Direct function wrapper for generateTaskFiles with error handling.
@@ -51,8 +52,12 @@ export async function generateTaskFilesDirect(args, log) {
 			// Enable silent mode to prevent logs from being written to stdout
 			enableSilentMode();
 
-			// The function is synchronous despite being awaited elsewhere
-			generateTaskFiles(tasksPath, resolvedOutputDir);
+			// The function is now async and generates BDD features
+			await generateTaskFiles(tasksPath, resolvedOutputDir);
+
+			// Also validate that BDD system is being used
+			const bddSystem = new BDDReplacementSystem();
+			await bddSystem.validateNoBDDTaskFiles(resolvedOutputDir);
 
 			// Restore normal logging after task generation
 			disableSilentMode();
@@ -71,11 +76,10 @@ export async function generateTaskFilesDirect(args, log) {
 		return {
 			success: true,
 			data: {
-				message: `Successfully generated task files`,
-				tasksPath: tasksPath,
+				message: 'Successfully generated BDD feature files',
+				tasksPath,
 				outputDir: resolvedOutputDir,
-				taskFiles:
-					'Individual task files have been generated in the output directory'
+				taskFiles: 'BDD feature files have been generated instead of task files'
 			}
 		};
 	} catch (error) {

@@ -113,7 +113,7 @@ function _getCostForModel(providerName, modelId) {
 	return {
 		inputCost: modelData.cost_per_1m_tokens.input || 0,
 		outputCost: modelData.cost_per_1m_tokens.output || 0,
-		currency: currency
+		currency
 	};
 }
 
@@ -166,7 +166,7 @@ function _getTagInfo(projectRoot) {
 
 		return {
 			currentTag: currentTag || 'master',
-			availableTags: availableTags
+			availableTags
 		};
 	} catch (error) {
 		if (getDebugFlag()) {
@@ -648,8 +648,8 @@ async function _unifiedServiceRunner(serviceType, params) {
 
 			return {
 				mainResult: finalMainResult,
-				telemetryData: telemetryData,
-				tagInfo: tagInfo
+				telemetryData,
+				tagInfo
 			};
 		} catch (error) {
 			const cleanMessage = _extractErrorMessage(error);

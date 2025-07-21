@@ -12,8 +12,8 @@ import { log } from '../../scripts/modules/utils.js';
 
 // Import the shared MCP configuration helper
 import {
-	setupMCPConfiguration,
-	removeTaskMasterMCPConfiguration
+	removeTaskMasterMCPConfiguration,
+	setupMCPConfiguration
 } from './create-mcp-config.js';
 
 // Import profile constants (single source of truth)
@@ -341,7 +341,13 @@ export function removeProfileRules(projectRoot, profile) {
 		skipped: false,
 		error: null,
 		filesRemoved: [],
-		mcpResult: null,
+		mcpResult: {
+			success: false,
+			removed: false,
+			deleted: false,
+			error: null,
+			hasOtherServers: false
+		},
 		profileDirRemoved: false,
 		notice: null
 	};

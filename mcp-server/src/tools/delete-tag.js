@@ -4,13 +4,13 @@
  */
 
 import { z } from 'zod';
+import { deleteTagDirect } from '../core/task-master-core.js';
+import { findTasksPath } from '../core/utils/path-utils.js';
 import {
 	createErrorResponse,
 	handleApiResult,
 	withNormalizedProjectRoot
 } from './utils.js';
-import { deleteTagDirect } from '../core/task-master-core.js';
-import { findTasksPath } from '../core/utils/path-utils.js';
 
 /**
  * Register the deleteTag tool with the MCP server
@@ -55,7 +55,7 @@ export function registerDeleteTagTool(server) {
 				// Call the direct function (always skip confirmation for MCP)
 				const result = await deleteTagDirect(
 					{
-						tasksJsonPath: tasksJsonPath,
+						tasksJsonPath,
 						name: args.name,
 						yes: args.yes !== undefined ? args.yes : true, // Default to true for MCP
 						projectRoot: args.projectRoot

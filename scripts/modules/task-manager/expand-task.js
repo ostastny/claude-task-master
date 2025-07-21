@@ -7,7 +7,9 @@ import {
 	readJSON,
 	writeJSON,
 	isSilentMode,
-	getTagAwareFilePath
+	getTagAwareFilePath,
+	flattenTasksWithSubtasks,
+	findProjectRoot
 } from '../utils.js';
 
 import {
@@ -21,10 +23,10 @@ import { generateTextService } from '../ai-services-unified.js';
 import { getDefaultSubtasks, getDebugFlag } from '../config-manager.js';
 import { getPromptManager } from '../prompt-manager.js';
 import generateTaskFiles from './generate-task-files.js';
+import { BDDReplacementSystem } from '../../../src/bdd-replacement-system.js';
 import { COMPLEXITY_REPORT_FILE } from '../../../src/constants/paths.js';
 import { ContextGatherer } from '../utils/contextGatherer.js';
 import { FuzzyTaskSearch } from '../utils/fuzzyTaskSearch.js';
-import { flattenTasksWithSubtasks, findProjectRoot } from '../utils.js';
 
 // --- Zod Schemas (Keep from previous step) ---
 const subtaskSchema = z
@@ -326,8 +328,9 @@ async function expandTask(
 		// --- Task Loading/Filtering (Unchanged) ---
 		logger.info(`Reading tasks from ${tasksPath}`);
 		const data = readJSON(tasksPath, projectRoot, tag);
-		if (!data || !data.tasks)
+		if (!data || !data.tasks) {
 			throw new Error(`Invalid tasks data in ${tasksPath}`);
+		}
 		const taskIndex = data.tasks.findIndex(
 			(t) => t.id === parseInt(taskId, 10)
 		);
@@ -462,7 +465,7 @@ async function expandTask(
 		}
 
 		// Ensure expansionPrompt is a string (handle both string and object formats)
-		let expansionPromptText = undefined;
+		let expansionPromptText;
 		if (taskAnalysis?.expansionPrompt) {
 			if (typeof taskAnalysis.expansionPrompt === 'string') {
 				expansionPromptText = taskAnalysis.expansionPrompt;
@@ -487,13 +490,13 @@ async function expandTask(
 		}
 
 		const promptParams = {
-			task: task,
+			task,
 			subtaskCount: finalSubtaskCount,
-			nextSubtaskId: nextSubtaskId,
-			additionalContext: additionalContext,
-			complexityReasoningContext: complexityReasoningContext,
+			nextSubtaskId,
+			additionalContext,
+			complexityReasoningContext,
 			gatheredContext: gatheredContextText || '',
-			useResearch: useResearch,
+			useResearch,
 			expansionPrompt: expansionPromptText || undefined
 		};
 
@@ -532,7 +535,7 @@ async function expandTask(
 			// Call generateTextService with the determined prompts and telemetry params
 			aiServiceResponse = await generateTextService({
 				prompt: promptContent,
-				systemPrompt: systemPrompt,
+				systemPrompt,
 				role,
 				session,
 				projectRoot,
@@ -581,7 +584,24 @@ async function expandTask(
 
 		data.tasks[taskIndex] = task; // Assign the modified task back
 		writeJSON(tasksPath, data, projectRoot, tag);
-		// await generateTaskFiles(tasksPath, path.dirname(tasksPath));
+
+		// Generate BDD scenarios instead of task files
+		const bddSystem = new BDDReplacementSystem();
+		const bddOutputDir = path.resolve(projectRoot, 'features');
+		try {
+			await bddSystem.generateBDDFromRequirements(
+				[
+					{
+						title: task.title,
+						description: task.description,
+						subtasks: generatedSubtasks
+					}
+				],
+				bddOutputDir
+			);
+		} catch (bddError) {
+			logger.warn(`BDD scenario generation failed: ${bddError.message}`);
+		}
 
 		// Display AI Usage Summary for CLI
 		if (

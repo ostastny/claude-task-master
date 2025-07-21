@@ -14,10 +14,9 @@
  */
 
 import fs from 'fs';
-import path from 'path';
+import path, { dirname } from 'path';
 import readline from 'readline';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
 import chalk from 'chalk';
 import figlet from 'figlet';
 import boxen from 'boxen';
@@ -365,7 +364,7 @@ async function initializeProject(options = {}) {
 		// If non-interactive (e.g., --yes) and no rules specified, default to ALL.
 		log(
 			'info',
-			`No rules specified in non-interactive mode, defaulting to all profiles.`
+			'No rules specified in non-interactive mode, defaulting to all profiles.'
 		);
 		selectedRuleProfiles = RULE_PROFILES;
 	} else {

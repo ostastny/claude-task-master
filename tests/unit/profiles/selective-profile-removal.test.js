@@ -1,12 +1,12 @@
 import fs from 'fs';
-import path from 'path';
 import os from 'os';
+import path from 'path';
 import { jest } from '@jest/globals';
-import {
-	removeProfileRules,
-	getRulesProfile
-} from '../../../src/utils/rule-transformer.js';
 import { removeTaskMasterMCPConfiguration } from '../../../src/utils/create-mcp-config.js';
+import {
+	getRulesProfile,
+	removeProfileRules
+} from '../../../src/utils/rule-transformer.js';
 
 // Mock logger
 const mockLog = {
@@ -591,27 +591,32 @@ describe('Selective Rules Removal', () => {
 				// Only .cursor directories exist
 				if (filePath === path.join(projectRoot, '.cursor')) return true;
 				if (filePath === path.join(projectRoot, '.cursor/rules')) return true;
-				if (filePath === path.join(projectRoot, '.cursor/mcp.json'))
+				if (filePath === path.join(projectRoot, '.cursor/mcp.json')) {
 					return true;
+				}
 				// Only cursor_rules.mdc exists, not the other taskmaster files
 				if (
 					filePath === path.join(projectRoot, '.cursor/rules/cursor_rules.mdc')
-				)
+				) {
 					return true;
+				}
 				if (
 					filePath ===
 					path.join(projectRoot, '.cursor/rules/taskmaster/dev_workflow.mdc')
-				)
+				) {
 					return false;
+				}
 				if (
 					filePath === path.join(projectRoot, '.cursor/rules/self_improve.mdc')
-				)
+				) {
 					return false;
+				}
 				if (
 					filePath ===
 					path.join(projectRoot, '.cursor/rules/taskmaster/taskmaster.mdc')
-				)
+				) {
 					return false;
+				}
 				return false;
 			});
 

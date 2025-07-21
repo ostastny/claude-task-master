@@ -4,8 +4,8 @@
 
 import { removeDependency } from '../../../../scripts/modules/dependency-manager.js';
 import {
-	enableSilentMode,
-	disableSilentMode
+	disableSilentMode,
+	enableSilentMode
 } from '../../../../scripts/modules/utils.js';
 
 /**
@@ -84,8 +84,8 @@ export async function removeDependencyDirect(args, log) {
 			success: true,
 			data: {
 				message: `Successfully removed dependency: Task ${taskId} no longer depends on ${dependencyId}`,
-				taskId: taskId,
-				dependencyId: dependencyId
+				taskId,
+				dependencyId
 			}
 		};
 	} catch (error) {

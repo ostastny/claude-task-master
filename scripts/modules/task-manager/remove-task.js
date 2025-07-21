@@ -86,7 +86,7 @@ async function removeTask(tasksPath, taskIds, context = {}) {
 					// Store the subtask info before removal
 					const removedSubtask = {
 						...parentTask.subtasks[subtaskIndex],
-						parentTaskId: parentTaskId
+						parentTaskId
 					};
 					results.removedTasks.push(removedSubtask);
 

@@ -183,7 +183,7 @@ async function addDependency(tasksPath, taskId, dependencyId, context = {}) {
 		if (!isSilentMode()) {
 			console.log(
 				boxen(
-					chalk.green(`Successfully added dependency:\n\n`) +
+					chalk.green('Successfully added dependency:\n\n') +
 						`Task ${chalk.bold(formattedTaskId)} now depends on ${chalk.bold(formattedDependencyId)}`,
 					{
 						padding: 1,
@@ -323,7 +323,7 @@ async function removeDependency(tasksPath, taskId, dependencyId, context = {}) {
 		// Display a more visually appealing success message
 		console.log(
 			boxen(
-				chalk.green(`Successfully removed dependency:\n\n`) +
+				chalk.green('Successfully removed dependency:\n\n') +
 					`Task ${chalk.bold(formattedTaskId)} no longer depends on ${chalk.bold(formattedDependencyId)}`,
 				{
 					padding: 1,
@@ -614,7 +614,7 @@ async function validateDependenciesCommand(tasksPath, options = {}) {
 			if (!isSilentMode()) {
 				console.log(
 					boxen(
-						chalk.red(`Dependency Validation FAILED\n\n`) +
+						chalk.red('Dependency Validation FAILED\n\n') +
 							`${chalk.cyan('Tasks checked:')} ${taskCount}\n` +
 							`${chalk.cyan('Subtasks checked:')} ${subtaskCount}\n` +
 							`${chalk.red('Issues found:')} ${validationResult.issues.length}`, // Display count from result
@@ -637,7 +637,7 @@ async function validateDependenciesCommand(tasksPath, options = {}) {
 			if (!isSilentMode()) {
 				console.log(
 					boxen(
-						chalk.green(`All Dependencies Are Valid\n\n`) +
+						chalk.green('All Dependencies Are Valid\n\n') +
 							`${chalk.cyan('Tasks checked:')} ${taskCount}\n` +
 							`${chalk.cyan('Subtasks checked:')} ${subtaskCount}\n` +
 							`${chalk.cyan('Total dependencies verified:')} ${countAllDependencies(data.tasks)}`,
@@ -1032,7 +1032,7 @@ async function fixDependenciesCommand(tasksPath, options = {}) {
 
 				console.log(
 					boxen(
-						chalk.green(`Dependency Fixes Summary:\n\n`) +
+						chalk.green('Dependency Fixes Summary:\n\n') +
 							`${chalk.cyan('Invalid dependencies removed:')} ${stats.nonExistentDependenciesRemoved}\n` +
 							`${chalk.cyan('Self-dependencies removed:')} ${stats.selfDependenciesRemoved}\n` +
 							`${chalk.cyan('Duplicate dependencies removed:')} ${stats.duplicateDependenciesRemoved}\n` +
@@ -1055,7 +1055,7 @@ async function fixDependenciesCommand(tasksPath, options = {}) {
 
 				console.log(
 					boxen(
-						chalk.green(`All Dependencies Are Valid\n\n`) +
+						chalk.green('All Dependencies Are Valid\n\n') +
 							`${chalk.cyan('Tasks checked:')} ${data.tasks.length}\n` +
 							`${chalk.cyan('Total dependencies verified:')} ${countAllDependencies(data.tasks)}`,
 						{

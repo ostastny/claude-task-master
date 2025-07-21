@@ -94,8 +94,9 @@ export function isAuthenticationError(error) {
 	if (
 		error instanceof APICallError &&
 		/** @type {ClaudeCodeErrorMetadata} */ (error.data)?.exitCode === 401
-	)
+	) {
 		return true;
+	}
 	return false;
 }
 
@@ -108,8 +109,9 @@ export function isTimeoutError(error) {
 	if (
 		error instanceof APICallError &&
 		/** @type {ClaudeCodeErrorMetadata} */ (error.data)?.code === 'TIMEOUT'
-	)
+	) {
 		return true;
+	}
 	return false;
 }
 

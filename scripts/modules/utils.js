@@ -306,7 +306,7 @@ function readJSON(filepath, projectRoot = null, tag = null) {
 	// If it's not a tasks.json file, return as-is
 	if (!filepath.includes('tasks.json') || !data) {
 		if (isDebug) {
-			console.log(`File is not tasks.json or data is null, returning as-is`);
+			console.log('File is not tasks.json or data is null, returning as-is');
 		}
 		return data;
 	}
@@ -319,7 +319,7 @@ function readJSON(filepath, projectRoot = null, tag = null) {
 		!hasTaggedStructure(data)
 	) {
 		if (isDebug) {
-			console.log(`File is in legacy format, performing migration...`);
+			console.log('File is in legacy format, performing migration...');
 		}
 
 		// This is legacy format - migrate it to tagged format
@@ -338,7 +338,7 @@ function readJSON(filepath, projectRoot = null, tag = null) {
 		try {
 			writeJSON(filepath, migratedData);
 			if (isDebug) {
-				console.log(`Successfully migrated legacy format to tagged format`);
+				console.log('Successfully migrated legacy format to tagged format');
 			}
 
 			// Perform complete migration (config.json, state.json)
@@ -372,7 +372,7 @@ function readJSON(filepath, projectRoot = null, tag = null) {
 	if (typeof data === 'object' && !data.tasks) {
 		// This is tagged format
 		if (isDebug) {
-			console.log(`File is in tagged format, resolving tag...`);
+			console.log('File is in tagged format, resolving tag...');
 		}
 
 		// Ensure all tags have proper metadata before proceeding
@@ -476,7 +476,7 @@ function readJSON(filepath, projectRoot = null, tag = null) {
 					};
 				} else {
 					if (isDebug) {
-						console.log(`No valid tag data found, returning empty structure`);
+						console.log('No valid tag data found, returning empty structure');
 					}
 					// Return empty structure if no valid data
 					return {
@@ -507,7 +507,7 @@ function readJSON(filepath, projectRoot = null, tag = null) {
 
 	// If we reach here, it's some other format
 	if (isDebug) {
-		console.log(`File format not recognized, returning as-is`);
+		console.log('File format not recognized, returning as-is');
 	}
 	return data;
 }

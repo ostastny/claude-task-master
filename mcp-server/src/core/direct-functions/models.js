@@ -4,16 +4,16 @@
  */
 
 import {
-	getModelConfiguration,
 	getAvailableModelsList,
+	getModelConfiguration,
 	setModel
 } from '../../../../scripts/modules/task-manager/models.js';
 import {
-	enableSilentMode,
-	disableSilentMode
+	disableSilentMode,
+	enableSilentMode
 } from '../../../../scripts/modules/utils.js';
-import { createLogWrapper } from '../../tools/utils.js';
 import { CUSTOM_PROVIDERS_ARRAY } from '../../../../src/constants/providers.js';
+import { createLogWrapper } from '../../tools/utils.js';
 
 // Define supported roles for model setting
 const MODEL_ROLES = ['main', 'research', 'fallback'];

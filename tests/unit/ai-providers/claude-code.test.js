@@ -23,6 +23,7 @@ jest.unstable_mockModule('../../../src/ai-providers/base-provider.js', () => ({
 		constructor() {
 			this.name = 'Base Provider';
 		}
+
 		handleError(context, error) {
 			throw error;
 		}
